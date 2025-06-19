@@ -100,6 +100,7 @@ public class MainMenuScreen implements Screen {
 
     @Override public void resize(int width, int height) {
         mainmenustage.getViewport().update(width, height, true);
+        Gdx.input.setInputProcessor(mainmenustage);
     }
     @Override public void pause() {
 

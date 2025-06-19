@@ -157,6 +157,7 @@ public class OptionsScreen implements Screen {
 
     @Override public void resize(int width, int height) {
         optionstage.getViewport().update(width, height, true);
+        Gdx.input.setInputProcessor(optionstage);
     }
     @Override public void pause() {
 

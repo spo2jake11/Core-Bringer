@@ -92,6 +92,18 @@ public class Main extends Game {
         }
     }
 
+    @Override public void pause() {
+        if (!isMusicMuted && corebringerbgm.isPlaying()) {
+            corebringerbgm.pause();
+        }
+    }
+    @Override public void resume() {
+        super.resume();
+        if (!isMusicMuted && !corebringerbgm.isPlaying()) {
+            corebringerbgm.play();
+        }
+    }
+
     @Override
     public void dispose() {
         if (corebringerbgm != null) {
@@ -107,11 +119,11 @@ public class Main extends Game {
     @Override public void resize(int width, int height) {
         super.resize(width, height);
 
+        ///This makes the brightness overlay update its size
+        brightnessoverlaystage.getViewport().update(width, height, true);
+
         ///Repositions the overlay so no matter what screen size, brightness setting follows
         brightnessoverlay.setSize(width, height);
         brightnessoverlay.setPosition(0, 0);
-
-        ///This makes the brightness overlay update its size
-        brightnessoverlaystage.getViewport().update(width, height, true);
     }
 }
