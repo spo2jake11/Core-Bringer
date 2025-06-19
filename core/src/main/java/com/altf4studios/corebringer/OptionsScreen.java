@@ -2,6 +2,7 @@ package com.altf4studios.corebringer;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -13,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class OptionsScreen implements Screen {
@@ -22,7 +24,6 @@ public class OptionsScreen implements Screen {
     private Table optionlabeltable;
     private Table optionbuttonstable;
     private Label optionlabel;
-    private Skin testskin;
     private TextButton returnbutton;
     private Slider volumeslider;
     private Label volumelabel;
@@ -33,16 +34,14 @@ public class OptionsScreen implements Screen {
     public OptionsScreen(Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
         this.corebringer = corebringer;
-        optionstage = new Stage(new ScreenViewport());
-        testskin =  new Skin(Gdx.files.internal("ui/uiskin.json")); ////Usage of Sample Skin, can be changed soon
+        optionstage = new Stage(new FitViewport(1280, 720));
         optiontable = new Table();
         optiontable.setFillParent(true);
         optionstage.addActor(optiontable);
 
         ///Option Label will initialize in this table with its parameters
         optionlabeltable = new Table();
-        optionlabel = new Label("Options Menu", testskin);
-        optionlabel.setFontScale(3f);
+        optionlabel = new Label("Options Menu", corebringer.testskin);
 
         ///This is where the label will be called
         optionlabeltable.add(optionlabel).pad(20f).row();
@@ -51,13 +50,13 @@ public class OptionsScreen implements Screen {
         ///For the separate table
         optionbuttonstable = new Table();
         ///For the Return Button
-        returnbutton = new TextButton("Back", testskin);
+        returnbutton = new TextButton("Back", corebringer.testskin);
         ///For the Volume Slider
-        volumeslider = new Slider(0f, 100f, 1f, false, testskin);
+        volumeslider = new Slider(0f, 100f, 1f, false, corebringer.testskin);
         float currentvolume = corebringer.corebringerbgm.getVolume() * 100f;
         volumeslider.setValue(currentvolume);
-        volumelabel = new Label("Volume: " + (int) currentvolume + "%", testskin);
-        volumemutecheckbox = new CheckBox(" Mute Music?", testskin);
+        volumelabel = new Label("Volume: " + (int) currentvolume + "%", corebringer.responsivelabelstyle);
+        volumemutecheckbox = new CheckBox(" Mute Music?", corebringer.testskin);
         volumemutecheckbox.setChecked(corebringer.isMusicMuted);
         volumeslider.setDisabled(corebringer.isMusicMuted);
         if (corebringer.isMusicMuted) {
@@ -66,25 +65,18 @@ public class OptionsScreen implements Screen {
             volumelabel.setText("Volume: " + (int) currentvolume + "%");
         }
         ///For the Brightness Slider
-        screenbrightnesslabel = new Label("Brightness 100%", testskin);
-        screenbrightnessslider = new Slider(0f, 100f, 1f, false, testskin);
+        screenbrightnesslabel = new Label("Brightness 100%", corebringer.responsivelabelstyle);
+        screenbrightnessslider = new Slider(0f, 100f, 1f, false, corebringer.testskin);
         float currentbrightnessalpha = corebringer.brightnessoverlay.getColor().a;
         float currentbrightness = (1f - currentbrightnessalpha) * 100f;
         screenbrightnessslider.setValue(currentbrightness);
-        screenbrightnesslabel = new Label("Brightness: " + (int) currentbrightness + "%", testskin);
+        screenbrightnesslabel = new Label("Brightness: " + (int) currentbrightness + "%", corebringer.testskin);
 
         ///This code gives function to the Volume Slider
         volumeslider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
-                if (corebringer.isMusicMuted) {
-                    volumelabel.setText("Volume is Muted.");
-                    corebringer.corebringerbgm.setVolume(0f);
-                } else {
-                    float volume = volumeslider.getValue() / 100f;
-                    volumelabel.setText("Volume: " + (int) volumeslider.getValue() + "%");
-                    corebringer.corebringerbgm.setVolume(volume);
-                }
+                updateVolumeUI();
             }
         });
 
@@ -94,15 +86,7 @@ public class OptionsScreen implements Screen {
             public void changed(ChangeEvent changeEvent, Actor actor) {
                 corebringer.isMusicMuted = volumemutecheckbox.isChecked();
                 volumeslider.setDisabled(corebringer.isMusicMuted);
-
-                if (corebringer.isMusicMuted) {
-                    volumelabel.setText("Volume is Muted.");
-                    corebringer.corebringerbgm.setVolume(0f);
-                } else {
-                    float volume = volumeslider.getValue() / 100f;
-                    volumelabel.setText("Volume: " + (int) volumeslider.getValue() + "%");
-                    corebringer.corebringerbgm.setVolume(volume);
-                }
+                updateVolumeUI();
             }
         });
 
@@ -125,7 +109,7 @@ public class OptionsScreen implements Screen {
         returnbutton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(new MainMenuScreen(corebringer));
+                corebringer.setScreen(corebringer.mainMenuScreen);
             }
         });
 
@@ -141,6 +125,19 @@ public class OptionsScreen implements Screen {
         optiontable.add(optionlabeltable).expandX().padTop(10f).row();
         optiontable.row();
         optiontable.add(optionbuttonstable).expandX().padTop(10f).center();
+    }
+
+    ///This is for updating Music UI for the logic to be reusable in Options Screen
+    private void updateVolumeUI() {
+        if (corebringer.isMusicMuted) {
+            volumelabel.setText("Volume is Muted.");
+            corebringer.corebringerbgm.pause();
+        } else {
+            float volume = volumeslider.getValue() / 100f;
+            volumelabel.setText("Volume: " + (int) volumeslider.getValue() + "%");
+            corebringer.corebringerbgm.setVolume(volume);
+            corebringer.corebringerbgm.play();
+        }
     }
 
     @Override
@@ -159,7 +156,7 @@ public class OptionsScreen implements Screen {
     }
 
     @Override public void resize(int width, int height) {
-
+        optionstage.getViewport().update(width, height, true);
     }
     @Override public void pause() {
 

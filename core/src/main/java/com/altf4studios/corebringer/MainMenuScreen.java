@@ -12,6 +12,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 ///Now using Screens instead of ApplicationAdapter to implement button functionality and navigation
@@ -22,8 +23,6 @@ public class MainMenuScreen implements Screen {
     private Table mainmenutable;
     private Table gametitleandicontable;
     private Table gamestartandnavigationtable;
-    private Label gametitle;
-    private Skin testskin;
     private Image corebringericon;
     private TextButton startbutton;
     private TextButton optionsbutton;
@@ -32,9 +31,8 @@ public class MainMenuScreen implements Screen {
     public MainMenuScreen(Main corebringer) {
         ///Here's all the things that will initiate upon start-up
         this.corebringer = corebringer;
-        mainmenustage = new Stage(new ScreenViewport()); ////Used Stage as a skeletal framework for the UI
+        mainmenustage = new Stage(new FitViewport(1280, 720)); ////Used Stage as a skeletal framework for the UI
         mainmenutable = new Table(); ////Used Table as a flesh framework for the UI
-        testskin =  new Skin(Gdx.files.internal("ui/uiskin.json")); ////Usage of Sample Skin, can be changed soon
 
         ////Core Table parameters
         mainmenutable.setFillParent(true);
@@ -45,33 +43,33 @@ public class MainMenuScreen implements Screen {
         gametitleandicontable = new Table();
 
         ////Game Title and Icon Table parameters and values
-        corebringericon = new Image(new Texture("corebringercoffee.png"));
-        gametitle = new Label("CORE BRINGER!", testskin);
-        gametitle.setWrap(true);
-        gametitle.setFontScale(2f);
+        corebringericon = new Image(new Texture("titlecard/TitleCard2.png"));
 
-        gametitleandicontable.add(corebringericon).pad(50f).expandX().right();
-        gametitleandicontable.add(gametitle).width(300f).padTop(50f).expandX().left();
+        ///Game Title and Icon Table calling
+        gametitleandicontable.add(corebringericon).width(700f).height(350f).pad(10f);
 
         ///Game Start and Options Table initialization
         gamestartandnavigationtable = new Table();
 
         ///Game Start and Options Table parameters and values
-        startbutton = new TextButton("Start", testskin);
-        optionsbutton = new TextButton("Options", testskin);
-        exitbutton = new TextButton("Exit", testskin);
+        startbutton = new TextButton("Start", corebringer.testskin);
+        optionsbutton = new TextButton("Options", corebringer.testskin);
+        exitbutton = new TextButton("Exit", corebringer.testskin);
 
+        ///Game Start and Options Table calling
         gamestartandnavigationtable.add(startbutton).width(250f).height(50f).pad(10f).row();
         gamestartandnavigationtable.add(optionsbutton).width(250f).height(50f).pad(10f).row();
         gamestartandnavigationtable.add(exitbutton).width(250f).height(50f).pad(10f).row();
 
+        ///This gives function to the Options Button
         optionsbutton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(new OptionsScreen(corebringer));
+                corebringer.setScreen(corebringer.optionsScreen);
             }
         });
 
+        ///This gives function to the Exit Button
         exitbutton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -101,7 +99,7 @@ public class MainMenuScreen implements Screen {
     }
 
     @Override public void resize(int width, int height) {
-
+        mainmenustage.getViewport().update(width, height, true);
     }
     @Override public void pause() {
 
