@@ -28,8 +28,6 @@ public class OptionsScreen implements Screen {
     private Slider volumeslider;
     private Label volumelabel;
     private CheckBox volumemutecheckbox;
-    private Slider screenbrightnessslider;
-    private Label screenbrightnesslabel;
 
     public OptionsScreen(Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
@@ -64,13 +62,6 @@ public class OptionsScreen implements Screen {
         } else {
             volumelabel.setText("Volume: " + (int) currentvolume + "%");
         }
-        ///For the Brightness Slider
-        screenbrightnesslabel = new Label("Brightness 100%", corebringer.responsivelabelstyle);
-        screenbrightnessslider = new Slider(0f, 100f, 1f, false, corebringer.testskin);
-        float currentbrightnessalpha = corebringer.brightnessoverlay.getColor().a;
-        float currentbrightness = (1f - currentbrightnessalpha) * 100f;
-        screenbrightnessslider.setValue(currentbrightness);
-        screenbrightnesslabel = new Label("Brightness: " + (int) currentbrightness + "%", corebringer.testskin);
 
         ///This code gives function to the Volume Slider
         volumeslider.addListener(new ChangeListener() {
@@ -90,21 +81,6 @@ public class OptionsScreen implements Screen {
             }
         });
 
-        ///This code gives function to the Brightness Slider
-        screenbrightnessslider.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent changeEvent, Actor actor) {
-                int brightness = (int) screenbrightnessslider.getValue();
-                screenbrightnesslabel.setText("Brightness: " + brightness + "%");
-
-                /* This just means that the Brightness will take the value of the Brightness slider to
-                command the below code to color the Brightness Overlay Pixmap, being 1f for full darkness and
-                0f for full brightness*/
-                float brightnessalpha = 1f - (brightness / 100f);
-                corebringer.brightnessoverlay.setColor(0f, 0f, 0f, brightnessalpha);
-            }
-        });
-
         ///This code gives function to the Return Button
         returnbutton.addListener(new ClickListener() {
             @Override
@@ -117,8 +93,6 @@ public class OptionsScreen implements Screen {
         optionbuttonstable.add(volumelabel).pad(20f).row();
         optionbuttonstable.add(volumeslider).width(300f).pad(20f).row();
         optionbuttonstable.add(volumemutecheckbox).pad(20f).row();
-        optionbuttonstable.add(screenbrightnesslabel).pad(20f).row();
-        optionbuttonstable.add(screenbrightnessslider).width(300f).pad(20f).row();
         optionbuttonstable.add(returnbutton).width(250f).height(50f).pad(20f).row();
 
         ///Table calling here since IDE reads code per line
@@ -150,9 +124,6 @@ public class OptionsScreen implements Screen {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         optionstage.act(delta); ////Used to call the Stage and render the elements that is inside it
         optionstage.draw();
-
-        corebringer.brightnessoverlaystage.act(delta);
-        corebringer.brightnessoverlaystage.draw();
     }
 
     @Override public void resize(int width, int height) {
@@ -166,7 +137,6 @@ public class OptionsScreen implements Screen {
 
     }
     @Override public void hide() {
-        corebringer.brightnessoverlay.clear();
     }
 
     @Override

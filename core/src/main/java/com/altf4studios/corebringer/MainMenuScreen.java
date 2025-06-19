@@ -93,9 +93,6 @@ public class MainMenuScreen implements Screen {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         mainmenustage.act(delta); ////Used to call the Stage and render the elements that is inside it
         mainmenustage.draw();
-
-        corebringer.brightnessoverlaystage.act(delta);
-        corebringer.brightnessoverlaystage.draw();
     }
 
     @Override public void resize(int width, int height) {
@@ -109,7 +106,6 @@ public class MainMenuScreen implements Screen {
 
     }
     @Override public void hide() {
-        corebringer.brightnessoverlay.clear();
     }
 
     @Override

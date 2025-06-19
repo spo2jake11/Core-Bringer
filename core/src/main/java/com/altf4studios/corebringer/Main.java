@@ -23,10 +23,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
     public Music corebringerbgm;
-    public Pixmap corebringerpixmap;
-    public Texture whitepixel;
-    public Image brightnessoverlay;
-    public Stage brightnessoverlaystage;
     public boolean isMusicMuted;
     public Skin testskin;
     public Label.LabelStyle responsivelabelstyle;
@@ -41,25 +37,6 @@ public class Main extends Game {
         corebringerbgm.setVolume(1.0f);
         isMusicMuted = false;
         corebringerbgm.play();
-
-        ///Pixel Map is used for brightness changing as it fills the Brightness Overlay with 1x1 white pixel textures
-        corebringerpixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
-        corebringerpixmap.setColor(1,1,1,1);
-        corebringerpixmap.fill();
-        whitepixel = new Texture(corebringerpixmap);
-        corebringerpixmap.dispose();
-
-        /* This overlay is used as a kind of asset to be made and used by the game as a brightness mask where
-         * it is filled with black pixels to be transparent and the Brightness Slider filling it slowly with white
-         * pixels to brighten up*/
-        brightnessoverlaystage = new Stage(new ScreenViewport());
-        brightnessoverlay = new Image(new TextureRegionDrawable(new TextureRegion(whitepixel)));
-        brightnessoverlay.setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        brightnessoverlay.setColor(0f, 0f, 0f, 0f);
-        brightnessoverlay.setTouchable(Touchable.disabled);
-
-        ///Calling the Brightness Overlay here since IDE reads code per line
-        brightnessoverlaystage.addActor(brightnessoverlay);
 
         ///This is for the Skin to be declared and initialized so Screens can just call it
         testskin = new Skin(Gdx.files.internal("ui/uiskin.json")); ///Usage of sample skin, can be changed soon
@@ -109,21 +86,8 @@ public class Main extends Game {
         if (corebringerbgm != null) {
             corebringerbgm.dispose();
         }
-        if (whitepixel != null) {
-            whitepixel.dispose();
-        }
-        if (brightnessoverlaystage != null) {
-            brightnessoverlaystage.dispose();
-        }
     }
     @Override public void resize(int width, int height) {
         super.resize(width, height);
-
-        ///This makes the brightness overlay update its size
-        brightnessoverlaystage.getViewport().update(width, height, true);
-
-        ///Repositions the overlay so no matter what screen size, brightness setting follows
-        brightnessoverlay.setSize(width, height);
-        brightnessoverlay.setPosition(0, 0);
     }
 }
