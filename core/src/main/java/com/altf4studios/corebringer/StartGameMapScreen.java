@@ -99,8 +99,8 @@ public class StartGameMapScreen implements Screen{
         nodeA.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                testlabel = new Label("Nigga, I just got ", corebringer.testskin);
-                testlabel2 = new Label("raped :(", corebringer.testskin);
+                testlabel = new Label(" Nigga, I just got ", corebringer.testskin);
+                testlabel2 = new Label(" raped :(", corebringer.testskin);
                 sidebarmenutable.add(testlabel).row();
                 sidebarmenutable.add(testlabel2).row();
             }
