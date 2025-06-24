@@ -22,21 +22,27 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
-    public Music corebringerbgm;
+    public Music corebringerstartmenubgm;
+    public Music corebringermapstartbgm;
     public boolean isMusicMuted;
     public Skin testskin;
     public Label.LabelStyle responsivelabelstyle;
     public MainMenuScreen mainMenuScreen;
     public OptionsScreen optionsScreen;
+    public StartGameMapScreen startGameMapScreen;
+    public DebugScreen debugScreen;
 
     @Override
     public void create() {
         ///This is where music plays when the game starts
-        corebringerbgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
-        corebringerbgm.setLooping(true);
-        corebringerbgm.setVolume(1.0f);
+        corebringerstartmenubgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
+        corebringerstartmenubgm.setLooping(true);
+        corebringerstartmenubgm.setVolume(1.0f);
+        corebringermapstartbgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Drake - Hotline Bling (Lyrics).mp3"));
+        corebringermapstartbgm.setLooping(true);
+        corebringermapstartbgm.setVolume(1.0f);
         isMusicMuted = false;
-        corebringerbgm.play();
+        corebringerstartmenubgm.play();
 
         ///This is for the Skin to be declared and initialized so Screens can just call it
         testskin = new Skin(Gdx.files.internal("ui/uiskin.json")); ///Usage of sample skin, can be changed soon
@@ -45,6 +51,8 @@ public class Main extends Game {
 
         mainMenuScreen = new MainMenuScreen(this);
         optionsScreen = new OptionsScreen(this);
+        startGameMapScreen = new StartGameMapScreen(this);
+        debugScreen = new DebugScreen(this);
         setScreen(mainMenuScreen);
     }
 
@@ -70,21 +78,30 @@ public class Main extends Game {
     }
 
     @Override public void pause() {
-        if (!isMusicMuted && corebringerbgm.isPlaying()) {
-            corebringerbgm.pause();
+        if (!isMusicMuted && corebringerstartmenubgm.isPlaying()) {
+            corebringerstartmenubgm.pause();
+        } else if (!isMusicMuted && corebringermapstartbgm.isPlaying()) {
+            corebringermapstartbgm.pause();
         }
     }
     @Override public void resume() {
         super.resume();
-        if (!isMusicMuted && !corebringerbgm.isPlaying()) {
-            corebringerbgm.play();
+        if (!isMusicMuted) {
+            if (getScreen() == mainMenuScreen && !corebringerstartmenubgm.isPlaying()) {
+                corebringerstartmenubgm.play();
+            } else if (getScreen() == startGameMapScreen && !corebringermapstartbgm.isPlaying()) {
+                corebringermapstartbgm.play();
+            }
         }
     }
 
     @Override
     public void dispose() {
-        if (corebringerbgm != null) {
-            corebringerbgm.dispose();
+        if (corebringerstartmenubgm != null) {
+            corebringerstartmenubgm.dispose();
+        }
+        if (corebringermapstartbgm != null) {
+            corebringermapstartbgm.dispose();
         }
     }
     @Override public void resize(int width, int height) {
