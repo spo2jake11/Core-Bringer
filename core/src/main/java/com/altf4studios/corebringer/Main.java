@@ -1,23 +1,14 @@
 package com.altf4studios.corebringer;
 
-import com.badlogic.gdx.ApplicationAdapter;
+import com.altf4studios.corebringer.screens.GameScreen;
+import com.altf4studios.corebringer.screens.MainMenuScreen;
+import com.altf4studios.corebringer.screens.OptionsScreen;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.GL20;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -28,6 +19,7 @@ public class Main extends Game {
     public Label.LabelStyle responsivelabelstyle;
     public MainMenuScreen mainMenuScreen;
     public OptionsScreen optionsScreen;
+    public GameScreen gameScreen;
 
     @Override
     public void create() {
@@ -45,6 +37,7 @@ public class Main extends Game {
 
         mainMenuScreen = new MainMenuScreen(this);
         optionsScreen = new OptionsScreen(this);
+        gameScreen = new GameScreen(this);
         setScreen(mainMenuScreen);
     }
 

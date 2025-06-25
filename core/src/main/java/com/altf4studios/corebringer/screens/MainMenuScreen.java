@@ -1,19 +1,15 @@
-package com.altf4studios.corebringer;
+package com.altf4studios.corebringer.screens;
 
-import com.badlogic.gdx.ApplicationAdapter;
-import com.badlogic.gdx.Game;
+import com.altf4studios.corebringer.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 ///Now using Screens instead of ApplicationAdapter to implement button functionality and navigation
 public class MainMenuScreen implements Screen {
@@ -61,6 +57,13 @@ public class MainMenuScreen implements Screen {
         gamestartandnavigationtable.add(optionsbutton).width(250f).height(50f).pad(10f).row();
         gamestartandnavigationtable.add(exitbutton).width(250f).height(50f).pad(10f).row();
 
+
+        startbutton.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                corebringer.setScreen(corebringer.gameScreen);
+            }
+        });
         ///This gives function to the Options Button
         optionsbutton.addListener(new ClickListener() {
             @Override
