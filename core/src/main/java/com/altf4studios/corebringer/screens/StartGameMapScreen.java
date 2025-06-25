@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -40,7 +41,7 @@ public class StartGameMapScreen implements Screen{
 
         battleStage = new Stage(new ScreenViewport());
         editorStage = new Stage(new ScreenViewport());
-        cardStage = new Stage(new ScreenViewport());
+//        cardStage = new Stage(new ScreenViewport());
 
 
         battleStageUI();
@@ -48,6 +49,8 @@ public class StartGameMapScreen implements Screen{
         cardStageUI();
         /// Here's all the things that will initialize once the Start Button is clicked.
 
+        battleStage.setDebugAll(true);
+        editorStage.setDebugAll(true);
 //        startgamemapstage = new Stage(new FitViewport(1280, 720));
 //        startgamemapcoretable = new Table();
 //        startgamemapcoretable.setFillParent(true);
@@ -135,29 +138,55 @@ public class StartGameMapScreen implements Screen{
     }
 
     private void editorStageUI() {
+        Table editorTable = new Table();
+        Label codeLabel = new Label("This is where the code will be!", corebringer.testskin);
+        Label subMenuLabel = new Label("Submenu is here", corebringer.testskin);
+        editorTable.bottom();
+        editorTable.setFillParent(true);
+
+        editorTable.add(codeLabel).height(200).width(900).left().bottom();
+        editorTable.add(subMenuLabel).height(200).width(380).bottom();
+        editorStage.addActor(editorTable);
 
     }
 
     private void battleStageUI() {
-        ShapeRenderer shape = new ShapeRenderer();
 
+        Table actionTable = new Table();
+        actionTable.top();
+        actionTable.setFillParent(true);
+        Label userHpLabel = new Label("100", corebringer.testskin);
+        Label enemyHpLabel = new Label("100", corebringer.testskin);
+        Label userTemplate = new Label("Player", corebringer.testskin);
+        Label enemyTemplate = new Label("Enemy", corebringer.testskin);
+        actionTable.add(userHpLabel).height(25).width(500).padLeft(50);
+        actionTable.add(enemyHpLabel).height(25).width(500).padRight(50);
+        actionTable.row();
+        actionTable.add(userTemplate).height(50).pad(100).grow().center();
+        actionTable.add(enemyTemplate).height(50).pad(100).grow().center();
+        battleStage.addActor(actionTable);
     }
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(startgamemapstage);
+        Gdx.input.setInputProcessor(battleStage);
     }
 
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+        battleStage.act(delta);
+        battleStage.draw();
+
+        editorStage.act(delta);
+        editorStage.draw();
 //        startgamemapstage.act(delta); ////Used to call the Stage and render the elements that is inside it
-//        startgamemapstage.draw();
+//        startgamemapstage.draw();     bat
     }
 
     @Override public void resize(int width, int height) {
-        startgamemapstage.getViewport().update(width, height, true);
-        Gdx.input.setInputProcessor(startgamemapstage);
+//        startgamemapstage.getViewport().update(width, height, true);
+//        Gdx.input.setInputProcessor(startgamemapstage);
     }
     @Override public void pause() {
 
@@ -170,6 +199,8 @@ public class StartGameMapScreen implements Screen{
 
     @Override
     public void dispose() {
-        startgamemapstage.dispose();
+        battleStage.dispose();
+        editorStage.dispose();
+
     }
 }
