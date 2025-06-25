@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class OptionsScreen implements Screen {
+    /// Declaration of variables and elements here.
     private Main corebringer;
     private Stage optionstage;
     private Table optiontable;
@@ -26,7 +27,7 @@ public class OptionsScreen implements Screen {
 
     public OptionsScreen(Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
-        this.corebringer = corebringer;
+        this.corebringer = corebringer; /// The Master Key that holds all screens together
         optionstage = new Stage(new FitViewport(1280, 720));
         optiontable = new Table();
         optiontable.setFillParent(true);
@@ -46,7 +47,7 @@ public class OptionsScreen implements Screen {
         returnbutton = new TextButton("Back", corebringer.testskin);
         ///For the Volume Slider
         volumeslider = new Slider(0f, 100f, 1f, false, corebringer.testskin);
-        float currentvolume = corebringer.corebringerbgm.getVolume() * 100f;
+        float currentvolume = corebringer.corebringerstartmenubgm.getVolume() * 100f;
         volumeslider.setValue(currentvolume);
         volumelabel = new Label("Volume: " + (int) currentvolume + "%", corebringer.responsivelabelstyle);
         volumemutecheckbox = new CheckBox(" Mute Music?", corebringer.testskin);
@@ -100,12 +101,19 @@ public class OptionsScreen implements Screen {
     private void updateVolumeUI() {
         if (corebringer.isMusicMuted) {
             volumelabel.setText("Volume is Muted.");
-            corebringer.corebringerbgm.pause();
+            corebringer.corebringerstartmenubgm.pause();
+            corebringer.corebringermapstartbgm.pause();
         } else {
             float volume = volumeslider.getValue() / 100f;
             volumelabel.setText("Volume: " + (int) volumeslider.getValue() + "%");
-            corebringer.corebringerbgm.setVolume(volume);
-            corebringer.corebringerbgm.play();
+            corebringer.corebringerstartmenubgm.setVolume(volume);
+            corebringer.corebringermapstartbgm.setVolume(volume);
+
+            if (corebringer.getScreen() == corebringer.mainMenuScreen && !corebringer.corebringerstartmenubgm.isPlaying()) {
+                corebringer.corebringerstartmenubgm.play();
+            } else if (corebringer.getScreen() == corebringer.startGameMapScreen && !corebringer.corebringermapstartbgm.isPlaying()) {
+                corebringer.corebringermapstartbgm.play();
+            }
         }
     }
 
