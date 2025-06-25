@@ -1,8 +1,8 @@
 package com.altf4studios.corebringer.lwjgl3;
 
+import com.altf4studios.corebringer.screens.Main;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-import com.altf4studios.corebringer.Main;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {

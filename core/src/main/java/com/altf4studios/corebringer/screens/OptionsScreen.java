@@ -1,21 +1,15 @@
-package com.altf4studios.corebringer;
+package com.altf4studios.corebringer.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class OptionsScreen implements Screen {
     /// Declaration of variables and elements here.
@@ -30,7 +24,7 @@ public class OptionsScreen implements Screen {
     private Label volumelabel;
     private CheckBox volumemutecheckbox;
 
-    public OptionsScreen(Main corebringer) {
+    public OptionsScreen(com.altf4studios.corebringer.screens.Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
         this.corebringer = corebringer; /// The Master Key that holds all screens together
         optionstage = new Stage(new FitViewport(1280, 720));

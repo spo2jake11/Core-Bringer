@@ -1,21 +1,13 @@
-package com.altf4studios.corebringer;
+package com.altf4studios.corebringer.screens;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
-import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
-import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class DebugScreen implements Screen {
     private Main corebringer;
@@ -47,7 +39,7 @@ public class DebugScreen implements Screen {
         fpsdebug = new Label("FPS: ", corebringer.testskin);
 
         ///Parameters for the Return Button
-        returntomainmenu = new TextButton("Return to Main Menu?", corebringer.testskin);
+        returntomainmenu = new TextButton("Return to com.altf4studios.corebringer.screens.Main Menu?", corebringer.testskin);
 
         ///This will give function to the Return Button
         returntomainmenu.addListener(new ClickListener() {
