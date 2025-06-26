@@ -138,7 +138,7 @@ public class StartGameMapScreen implements Screen{
     }
 
     private void cardStageUI() {
-
+        
     }
 
     private void editorStageUI() {
@@ -168,8 +168,8 @@ public class StartGameMapScreen implements Screen{
         submenuTable.add(btnLog);
         submenuTable.add(btnCharacter);
         /// Everything is now added into the editorTable
-        editorTable.add(codeLabel).height(200).growX().bottom();
-        editorTable.add(submenuTable).height(200).bottom().right();
+        editorTable.add(codeLabel).height(editorStage.getHeight() * 0.42f).growX().bottom();
+        editorTable.add(submenuTable).height(editorStage.getHeight() * 0.42f).bottom().right();
 
         editorStage.addActor(editorTable);
 
@@ -230,9 +230,19 @@ public class StartGameMapScreen implements Screen{
                 optionsWindow.remove();
             }
         });
+
+        TextButton btnToMain = new TextButton("Title", corebringer.testskin);
+        btnToMain.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                corebringer.setScreen(corebringer.mainMenuScreen);
+                optionsWindow.remove();
+            }
+        });
         /// This is where we add objects into the optionsWindow
-        optionsWindow.add(new Label("Options go here", corebringer.testskin)).top().row();
-        optionsWindow.add(btnClose).padTop(20).bottom();
+        optionsWindow.add(new Label("Options go here", corebringer.testskin)).top().colspan(2).row();
+        optionsWindow.add(btnClose).growX().padTop(20).space(15).bottom();
+        optionsWindow.add(btnToMain).growX().padTop(20).space(15).bottom();
 
         /// This is where it is added into the stage
         editorStage.addActor(optionsWindow);

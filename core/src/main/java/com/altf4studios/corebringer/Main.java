@@ -74,40 +74,45 @@ public class Main extends Game {
     }
 
     @Override public void pause() {
-        if (!isMusicMuted && corebringerbgm.isPlaying()) {
-            corebringerbgm.pause();
-        }
+        super.pause();
+//        if (!isMusicMuted && corebringerbgm.isPlaying()) {
+//            corebringerbgm.stop();
+//        }
         if (!isMusicMuted && corebringerstartmenubgm.isPlaying()) {
             corebringerstartmenubgm.pause();
-        } else if (!isMusicMuted && corebringermapstartbgm.isPlaying()) {
+        }
+        if (!isMusicMuted && corebringermapstartbgm.isPlaying()) {
             corebringermapstartbgm.pause();
         }
     }
     @Override public void resume() {
         super.resume();
-        if (!isMusicMuted && !corebringerbgm.isPlaying()) {
-            corebringerbgm.play();
-        }
+//        if (!isMusicMuted && !corebringerbgm.isPlaying()) {
+//            corebringerbgm.play();
+//        }
         if (!isMusicMuted) {
             if (getScreen().equals(mainMenuScreen) && !corebringerstartmenubgm.isPlaying()) {
                 corebringerstartmenubgm.play();
-            } else if (getScreen() == startGameMapScreen && !corebringermapstartbgm.isPlaying()) {
+                isMusicMuted = false;
+            }
+            if (getScreen().equals(startGameMapScreen) && !corebringermapstartbgm.isPlaying()) {
                 corebringermapstartbgm.play();
+                isMusicMuted = false;
             }
         }
     }
 
     @Override
     public void dispose() {
-        if (corebringerbgm != null) {
-            corebringerbgm.dispose();
-        }
-        if (corebringerstartmenubgm != null) {
-            corebringerstartmenubgm.dispose();
-        }
-        if (corebringermapstartbgm != null) {
-            corebringermapstartbgm.dispose();
-        }
+//        if (corebringerbgm != null) {
+//            corebringerbgm.dispose();
+//        }
+//        if (corebringerstartmenubgm != null) {
+//            corebringerstartmenubgm.dispose();
+//        }
+//        if (corebringermapstartbgm != null) {
+//            corebringermapstartbgm.dispose();
+//        }
     }
     @Override public void resize(int width, int height) {
         super.resize(width, height);
