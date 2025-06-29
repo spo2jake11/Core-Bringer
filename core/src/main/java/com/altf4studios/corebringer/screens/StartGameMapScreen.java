@@ -4,33 +4,25 @@ import com.altf4studios.corebringer.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 public class StartGameMapScreen implements Screen{
     /// Declaration of variables and elements here.
     private Main corebringer;
-    private Stage startgamemapstage;
-    private Table startgamemapcoretable;
-    private Table sidebarmenutable;
-    private TextButton optionsbutton;
-    private TextButton returnbutton;
-    private Label testlabel;
-    private Label testlabel2;
-    private Table tiertable1;
-    private Table tiertable2;
-    private Table tiertable3;
-    private Table tiertable4;
-    private Table tiertable5;
-    private Table tiertable6;
-    private Table tiertable7;
 
     private Stage battleStage;
     private Stage cardStage;
@@ -45,6 +37,7 @@ public class StartGameMapScreen implements Screen{
         editorStage = new Stage(new ScreenViewport());
 //        cardStage = new Stage(new ScreenViewport());
 
+
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI();
@@ -53,114 +46,56 @@ public class StartGameMapScreen implements Screen{
         /// Here's all the things that will initialize once the Start Button is clicked.
 
         /// This provides lines to be able to monitor the objects' boundaries
-        battleStage.setDebugAll(true);
+//        battleStage.setDebugAll(true);
         editorStage.setDebugAll(true);
-//        startgamemapstage = new Stage(new FitViewport(1280, 720));
-//        startgamemapcoretable = new Table();
-//        startgamemapcoretable.setFillParent(true);
-//        sidebarmenutable = new Table();
-//        sidebarmenutable.setFillParent(true);
-//        startgamemapstage.addActor(startgamemapcoretable);
-//        startgamemapstage.addActor(sidebarmenutable);
-//
-//        ///Tier-based Logic System
-//        tiertable1 = new Table();
-//        TextButton nodeA = new TextButton("A", corebringer.testskin);
-//        TextButton nodeB = new TextButton("B", corebringer.testskin);
-//        TextButton nodeC = new TextButton("C", corebringer.testskin);
-//        TextButton nodeD = new TextButton("D", corebringer.testskin);
-//        tiertable1.add(nodeA).pad(20f);
-//        tiertable1.add(nodeB).pad(20f);
-//        tiertable1.add(nodeC).pad(20f);
-//        tiertable1.add(nodeD).pad(20f);
-//
-//        tiertable2 = new Table();
-//        TextButton nodeE = new TextButton("E", corebringer.testskin);
-//        TextButton nodeF = new TextButton("F", corebringer.testskin);
-//        TextButton nodeG = new TextButton("G", corebringer.testskin);
-//        TextButton nodeH = new TextButton("H", corebringer.testskin);
-//        tiertable2.add(nodeE).pad(20f);
-//        tiertable2.add(nodeF).pad(20f);
-//        tiertable2.add(nodeG).pad(20f);
-//        tiertable2.add(nodeH).pad(20f);
-//
-//        tiertable3 = new Table();
-//        TextButton nodeI = new TextButton("I", corebringer.testskin);
-//        TextButton nodeJ = new TextButton("J", corebringer.testskin);
-//        TextButton nodeK = new TextButton("K", corebringer.testskin);
-//        TextButton nodeL = new TextButton("L", corebringer.testskin);
-//        tiertable3.add(nodeI).pad(20f);
-//        tiertable3.add(nodeJ).pad(20f);
-//        tiertable3.add(nodeK).pad(20f);
-//        tiertable3.add(nodeL).pad(20f);
-//
-//        /// Buttons for the sidebar menu here
-//        optionsbutton = new TextButton("Options", corebringer.testskin);
-//        returnbutton = new TextButton("Main Menu", corebringer.testskin);
-//        sidebarmenutable.left();
-//        sidebarmenutable.add(optionsbutton).width(250f).height(50f).pad(10f).row();
-//        sidebarmenutable.add(returnbutton).width(250f).height(50f).pad(10f).row();
-//
-//        ///This is the sidebar menu for returning to main menu and tweaking things in options
-//        ///This gives function to the Options Button
-//        optionsbutton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                corebringer.setScreen(corebringer.optionsScreen);
-//            }
-//        });
-//
-//        ///This gives function to the Return Button
-//        returnbutton.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                corebringer.setScreen(corebringer.mainMenuScreen);
-//            }
-//        });
-//
-//
-//        ///Test function to Node A
-//        nodeA.addListener(new ClickListener() {
-//            @Override
-//            public void clicked(InputEvent event, float x, float y) {
-//                testlabel = new Label(" Nigga, I just got ", corebringer.testskin);
-//                testlabel2 = new Label(" raped :(", corebringer.testskin);
-//                sidebarmenutable.add(testlabel).row();
-//                sidebarmenutable.add(testlabel2).row();
-//            }
-//        });
-//
-//        /// Calling of tables here because IDE reads things code per line
-//        startgamemapcoretable.bottom();
-//        startgamemapcoretable.add(tiertable3).padTop(10f).row();
-//        startgamemapcoretable.add(tiertable2).padTop(10f).row();
-//        startgamemapcoretable.add(tiertable1).padTop(10f);
+
     }
 
     private void cardStageUI() {
-        
+
     }
+/// This for editorStageUI ONLY
+    private Table editorTable;
+    private Table submenuTable;
+    private Texture editorBG;
+    private Drawable editorTableDrawable;
+    private Label codeLabel;
+    private TextButton btnOptions;
+    private TextButton btnLog;
+    private TextButton btnCheckDeck;
+    private TextButton btnCharacter;
 
     private void editorStageUI() {
         /// This is where the code editor will be
-        Table editorTable = new Table();
-        Label codeLabel = new Label("This is where the code will be!", corebringer.testskin);
+        float worldHeight = editorStage.getViewport().getWorldHeight();
+        float worldWidth = editorStage.getViewport().getWorldWidth();
+
+        editorTable = new Table();
+        editorBG = new Texture(Gdx.files.internal("ui/UI_v3.png"));
+        editorTableDrawable = new TextureRegionDrawable(new TextureRegion(editorBG));
+        codeLabel = new Label("This is where the code will be!", corebringer.testskin);
         codeLabel.setAlignment(Align.center);
+
         editorTable.bottom();
-        editorTable.setFillParent(true);
+        editorTable.setFillParent(false);
+        editorTable.setSize(worldWidth, worldHeight * 0.3f);
+        editorTable.background(editorTableDrawable);
 
 
         /// These now will become the submenu buttons when created
-        Table submenuTable = new Table();
+        submenuTable = new Table();
         submenuTable.bottom();
         submenuTable.setFillParent(false);
-        TextButton btnOptions = new TextButton("Options", corebringer.testskin);
-        TextButton btnLog = new TextButton("Logs", corebringer.testskin);
-        TextButton btnCheckDeck = new TextButton("Deck", corebringer.testskin);
-        TextButton btnCharacter = new TextButton("Character", corebringer.testskin);
+        submenuTable.setSize(editorTable.getWidth() * 0.25f, editorTable.getHeight());
+
+        btnOptions = new TextButton("Options", corebringer.testskin);
+        btnLog = new TextButton("Logs", corebringer.testskin);
+        btnCheckDeck = new TextButton("Deck", corebringer.testskin);
+        btnCharacter = new TextButton("Character", corebringer.testskin);
+
 
         /// Default format for submenuTable
-        submenuTable.defaults().space(25).pad(5).fill().uniform();
+        submenuTable.defaults().padTop(30).padBottom(30).padRight(20).padLeft(20).fill().uniform();
         /// Row 1
         submenuTable.add(btnOptions);
         submenuTable.add(btnCheckDeck).row();
@@ -168,8 +103,9 @@ public class StartGameMapScreen implements Screen{
         submenuTable.add(btnLog);
         submenuTable.add(btnCharacter);
         /// Everything is now added into the editorTable
-        editorTable.add(codeLabel).height(editorStage.getHeight() * 0.42f).growX().bottom();
-        editorTable.add(submenuTable).height(editorStage.getHeight() * 0.42f).bottom().right();
+
+        editorTable.add(codeLabel).grow();
+        editorTable.add(submenuTable).growY().right();
 
         editorStage.addActor(editorTable);
 
@@ -213,7 +149,9 @@ public class StartGameMapScreen implements Screen{
 
     private void optionsWindowUI(){
         /// This creates an option window
-        Window optionsWindow = new Window("Options", corebringer.testskin);
+        Texture optionBG = new Texture(Gdx.files.internal("ui/optionsBG.png"));
+        Drawable optionBGDrawable = new TextureRegionDrawable(new TextureRegion(optionBG));
+        Window optionsWindow = new Window("", corebringer.testskin);
         optionsWindow.setModal(true);
         optionsWindow.setMovable(false);
         optionsWindow.pad(20);
@@ -222,6 +160,8 @@ public class StartGameMapScreen implements Screen{
             Gdx.graphics.getWidth() / 2 /2,
             Gdx.graphics.getHeight() /2 / 2
         );
+        optionsWindow.background(optionBGDrawable);
+        optionsWindow.setColor(1,1,1,1);
         /// This button will close the options menu
         TextButton btnClose = new TextButton("Close", corebringer.testskin);
         btnClose.addListener(new ClickListener(){
@@ -241,8 +181,8 @@ public class StartGameMapScreen implements Screen{
         });
         /// This is where we add objects into the optionsWindow
         optionsWindow.add(new Label("Options go here", corebringer.testskin)).top().colspan(2).row();
-        optionsWindow.add(btnClose).growX().padTop(20).space(15).bottom();
-        optionsWindow.add(btnToMain).growX().padTop(20).space(15).bottom();
+        optionsWindow.add(btnClose).growX().padLeft(20).padTop(20).space(15).bottom();
+        optionsWindow.add(btnToMain).growX().padRight(20).padTop(20).space(15).bottom();
 
         /// This is where it is added into the stage
         editorStage.addActor(optionsWindow);
@@ -266,15 +206,19 @@ public class StartGameMapScreen implements Screen{
 
         editorStage.act(delta);
         editorStage.draw();
-//        startgamemapstage.act(delta); ////Used to call the Stage and render the elements that is inside it
-//        startgamemapstage.draw();     bat
+
     }
 
+
     @Override public void resize(int width, int height) {
-//        startgamemapstage.getViewport().update(width, height, true);
-//        Gdx.input.setInputProcessor(startgamemapstage);
         battleStage.getViewport().update(width, height, true);
         editorStage.getViewport().update(width, height, true);
+
+        float screenHeight = editorStage.getViewport().getWorldHeight();
+        float screenWidth = editorStage.getViewport().getWorldWidth();
+        float bottomHeight = screenHeight * 0.3f;
+        editorTable.setSize(screenWidth, bottomHeight);
+
     }
     @Override public void pause() {
 
