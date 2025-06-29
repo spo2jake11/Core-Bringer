@@ -4,8 +4,10 @@ import com.altf4studios.corebringer.screens.*;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
 
@@ -22,9 +24,15 @@ public class Main extends Game {
     public GameScreen gameScreen;
     public StartGameMapScreen startGameMapScreen;
     public DebugScreen debugScreen;
-
+    private AssetManager assetManager;
     @Override
     public void create() {
+        //AssetManager is located here
+        assetManager =new AssetManager();
+        // TextArea, Texture, TextureAtlas class shows up, do test all three types to see what's useable
+        assetManager.load("asset/atlas", TextureAtlas.class);
+        assetManager.finishLoading();
+
         ///This is where music plays when the game starts
         corebringerbgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
         corebringerbgm.setLooping(true);
