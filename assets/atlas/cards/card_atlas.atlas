@@ -1,0 +1,7 @@
+card_atlas.png
+size:2048,1024
+repeat:none
+Card_backDesign
+bounds:2,2,710,950
+Card_frontDesign
+bounds:714,2,710,950

@@ -4,8 +4,10 @@ import com.altf4studios.corebringer.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -22,10 +24,17 @@ public class GameScreen implements Screen {
     private Stage battleStage;
     private Stage cardStage;
     private Stage editorStage;
-
+    private AssetManager assetManager;
 
     public GameScreen(Main corebringer) {
+
         this.corebringer = corebringer; /// The Master Key that holds all screens together
+
+        //AssetManager in GameScreen
+        assetManager = new AssetManager();
+        assetManager.load("asset/atlas", TextureAtlas.class);
+        assetManager.finishLoading();
+
 
         ///This stages are separated to lessen complications
         battleStage = new Stage(new ScreenViewport());
