@@ -32,7 +32,6 @@ public class GameScreen implements Screen {
 
         //AssetManager in GameScreen
         assetManager = new AssetManager();
-        assetManager.load("asset/atlas", TextureAtlas.class);
         assetManager.finishLoading();
 
 

@@ -29,8 +29,7 @@ public class Main extends Game {
     public void create() {
         //AssetManager is located here
         assetManager =new AssetManager();
-        // TextArea, Texture, TextureAtlas class shows up, do test all three types to see what's useable
-        assetManager.load("asset/atlas", TextureAtlas.class);
+        // TextArea, Texture, TextureAtlas class shows up, do test all three types to see what's useabl
         assetManager.finishLoading();
 
         ///This is where music plays when the game starts
