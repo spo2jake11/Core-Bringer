@@ -86,7 +86,7 @@ public class StartGameMapScreen implements Screen{
         submenuTable = new Table();
         submenuTable.bottom();
         submenuTable.setFillParent(false);
-        submenuTable.setSize(editorTable.getWidth() * 0.25f, editorTable.getHeight());
+        submenuTable.setSize(editorTable.getWidth() * 0.2f, editorTable.getHeight());
 
         btnOptions = new TextButton("Options", corebringer.testskin);
         btnLog = new TextButton("Logs", corebringer.testskin);
@@ -218,6 +218,7 @@ public class StartGameMapScreen implements Screen{
         float screenWidth = editorStage.getViewport().getWorldWidth();
         float bottomHeight = screenHeight * 0.3f;
         editorTable.setSize(screenWidth, bottomHeight);
+        submenuTable.setSize(screenWidth * 0.2f, bottomHeight);
 
     }
     @Override public void pause() {
