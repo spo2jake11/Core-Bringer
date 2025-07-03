@@ -29,12 +29,12 @@ public class Main extends Game {
     public void create() {
         //AssetManager is located here
         assetManager =new AssetManager();
-<<<<<<< HEAD
+//<<<<<<< HEAD
         // TextArea, Texture, TextureAtlas class shows up, do test all three types to see what's useabl
-=======
+//=======
         // TextArea, Texture, TextureAtlas class shows up, do test all three types to see what's useable
         assetManager.load("atlas/enemies/runicBoss_atlas.atlas", TextureAtlas.class);
->>>>>>> b66f6915176fb407bda3b55c016f26f41ac3da7a
+//>>>>>>> b66f6915176fb407bda3b55c016f26f41ac3da7a
         assetManager.finishLoading();
 
         ///This is where music plays when the game starts
