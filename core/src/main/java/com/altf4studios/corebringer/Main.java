@@ -29,18 +29,16 @@ public class Main extends Game {
     public void create() {
         //AssetManager is located here
         assetManager =new AssetManager();
-        // TextArea, Texture, TextureAtlas class shows up, do test all three types to see what's useable
-        assetManager.load("atlas/enemies/runicBoss_atlas.atlas", TextureAtlas.class);
         assetManager.finishLoading();
 
         ///This is where music plays when the game starts
-        corebringerbgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
+        corebringerbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
         corebringerbgm.setLooping(true);
         corebringerbgm.setVolume(1.0f);
-        corebringerstartmenubgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
+        corebringerstartmenubgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
         corebringerstartmenubgm.setLooping(true);
         corebringerstartmenubgm.setVolume(1.0f);
-        corebringermapstartbgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Drake - Hotline Bling (Lyrics).mp3"));
+        corebringermapstartbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Drake - Hotline Bling (Lyrics).mp3"));
         corebringermapstartbgm.setLooping(true);
         corebringermapstartbgm.setVolume(1.0f);
 
@@ -49,7 +47,8 @@ public class Main extends Game {
         corebringerstartmenubgm.play();
 
         ///This is for the Skin to be declared and initialized so Screens can just call it
-        testskin = new Skin(Gdx.files.internal("ui/uiskin.json")); ///Usage of sample skin, can be changed soon
+        //test skin used Utils.getInternalPath
+        testskin = new Skin(Utils.getInternalPath("ui/uiskin.json")); ///Usage of sample skin, can be changed soon
         responsivelabelstyle = new Label.LabelStyle(testskin.getFont("default"), Color.WHITE);
         responsivelabelstyle.font.getData().setScale(3f);
 
