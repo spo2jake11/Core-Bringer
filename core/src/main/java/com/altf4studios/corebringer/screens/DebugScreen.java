@@ -9,6 +9,8 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.InputMultiplexer;
+import com.altf4studios.corebringer.input.InputHandler;
 
 public class DebugScreen implements Screen {
     private Main corebringer;
@@ -18,6 +20,7 @@ public class DebugScreen implements Screen {
     private Table debugscreenbuttons;
     private Label fpsdebug;
     private TextButton returntomainmenu;
+    private InputHandler inputHandler;
 
     public DebugScreen(Main corebringer) {
         this.corebringer = corebringer; ///The Master Key that holds all screens together
@@ -58,10 +61,38 @@ public class DebugScreen implements Screen {
         coredebugscreentable.add(debugscreeninfotable).expand().top().left().pad(10f);
         coredebugscreentable.row();
         coredebugscreentable.add(debugscreenbuttons).expand().bottom().center().padBottom(20f);
+
+        inputHandler = new InputHandler(new InputHandler.ActionCallback() {
+            @Override
+            public void onPlayCard() {
+                System.out.println("[DEBUG] SPACE pressed in DebugScreen");
+            }
+            @Override
+            public void onCancel() {
+                System.out.println("[DEBUG] ESC pressed: Returning to Main Menu");
+                corebringer.setScreen(corebringer.mainMenuScreen);
+            }
+            @Override
+            public void onMoveUp() {
+                System.out.println("[DEBUG] UP pressed in DebugScreen");
+            }
+            @Override
+            public void onMoveDown() {
+                System.out.println("[DEBUG] DOWN pressed in DebugScreen");
+            }
+            @Override
+            public void onDebug() {
+                System.out.println("[DEBUG] D pressed in DebugScreen");
+            }
+        });
     }
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(coredebugscreenstage);
+        System.out.println("[DebugScreen] show() called, setting InputMultiplexer");
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(coredebugscreenstage);
+        multiplexer.addProcessor(inputHandler);
+        Gdx.input.setInputProcessor(multiplexer);
     }
     @Override
     public void render(float delta) {

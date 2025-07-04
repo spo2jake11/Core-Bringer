@@ -1,6 +1,7 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.input.InputHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -28,6 +29,8 @@ public class StartGameMapScreen implements Screen{
     private Stage cardStage;
     private Stage editorStage;
 
+    private InputHandler inputHandler;
+
 
     public StartGameMapScreen(Main corebringer) {
         this.corebringer = corebringer; /// The Master Key that holds all screens together
@@ -49,6 +52,30 @@ public class StartGameMapScreen implements Screen{
 //        battleStage.setDebugAll(true);
         editorStage.setDebugAll(true);
 
+        inputHandler = new InputHandler(new InputHandler.ActionCallback() {
+            @Override
+            public void onPlayCard() {
+                System.out.println("[START GAME MAP SCREEN] SPACE pressed");
+            }
+            @Override
+            public void onCancel() {
+                System.out.println("[START GAME MAP SCREEN] ESC pressed: Returning to Main Menu");
+                corebringer.setScreen(corebringer.mainMenuScreen);
+            }
+            @Override
+            public void onMoveUp() {
+                System.out.println("[START GAME MAP SCREEN] UP pressed");
+            }
+            @Override
+            public void onMoveDown() {
+                System.out.println("[START GAME MAP SCREEN] DOWN pressed");
+            }
+            @Override
+            public void onDebug() {
+                System.out.println("[START GAME MAP SCREEN] D pressed: Going to Debug Screen");
+                corebringer.setScreen(corebringer.debugScreen);
+            }
+        });
     }
 
     private void cardStageUI() {
@@ -190,10 +217,11 @@ public class StartGameMapScreen implements Screen{
 
     @Override
     public void show() {
-        /// This gives the button functions to become clickable
+        System.out.println("[StartGameMapScreen] show() called, setting InputMultiplexer");
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(editorStage);
-        Gdx.input.setInputProcessor(editorStage);
+        multiplexer.addProcessor(inputHandler);
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
