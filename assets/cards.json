@@ -1,0 +1,108 @@
+{
+  "cards": [
+    {
+      "id": "atk_card1",
+      "name": "Phase strike",
+      "description": "Deal 5 damage.",
+      "type": "ATTACK",
+      "tags": "COMMON",
+      "targetType": "ENEMY",
+      "cost": 1,
+      "baseEffect": "5",
+      "codeEffect": "enemy.hp -= 5;",
+      "suggestion": ""
+    },
+    {
+      "id": "atk_card2",
+      "name": "Psionic gun",
+      "description": "Deal 5 ranged damage.",
+      "type": "ATTACK",
+      "tags": "COMMON",
+      "targetType": "ENEMY",
+      "cost": 2,
+      "baseEffect": "5",
+      "codeEffect": "enemy.hp -= 5;",
+      "suggestion": ""
+    },
+    {
+      "id": "atk_card3",
+      "name": "Volatile Token",
+      "description": "Deal 10 damage to all enemies",
+      "type": "ATTACK",
+      "tags": "RARE",
+      "targetType": "ALL_ENEMIES",
+      "cost": 4,
+      "baseEffect": "10",
+      "codeEffect": "enemy.hp -= 10;",
+      "suggestion": ""
+    },
+    {
+      "id": "util_card1",
+      "name": "Holo Barrier",
+      "description": "Gain 5 shield.",
+      "type": "DEFENSE",
+      "tags": "COMMON",
+      "targetType": "SELF",
+      "cost": 2,
+      "baseEffect": "4",
+      "codeEffect": "player.shield += 4;",
+      "suggestion": ""
+    },
+    {
+      "id": "util_card2",
+      "name": "Astral Mirage",
+      "description": "Deal 3 Damage to all enemies and gain 8 shield.",
+      "type": "DEFENSE",
+      "tags": "RARE",
+      "targetType": "SELF, ALL_ENEMIES",
+      "cost": 4,
+      "baseEffect": "3, 8",
+      "codeEffect": "player.defense += 8; enemy.hp -= 3;",
+      "suggestion": ""
+    },
+    {
+      "id": "util_card3",
+      "name": "",
+      "description": "",
+      "type": "",
+      "tags": "",
+      "targetType": "",
+      "cost": "",
+      "baseEffect": "",
+      "codeEffect": ""
+    },
+    {
+      "id": "stat_card1",
+      "name": "",
+      "description": "",
+      "type": "",
+      "tags": "",
+      "targetType": "",
+      "cost": "",
+      "baseEffect": "",
+      "codeEffect": ""
+    },
+    {
+      "id": "stat_card2",
+      "name": "",
+      "description": "",
+      "type": "",
+      "tags": "",
+      "targetType": "",
+      "cost": "",
+      "baseEffect": "",
+      "codeEffect": ""
+    },
+    {
+      "id": "stat_card3",
+      "name": "",
+      "description": "",
+      "type": "",
+      "tags": "",
+      "targetType": "",
+      "cost": "",
+      "baseEffect": "",
+      "codeEffect": ""
+    }
+  ]
+}
