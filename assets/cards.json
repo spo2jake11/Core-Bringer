@@ -5,11 +5,10 @@
       "name": "Phase strike",
       "description": "Deal 5 damage.",
       "type": "ATTACK",
-      "tags": "COMMON",
       "targetType": "ENEMY",
       "cost": 1,
       "baseEffect": "5",
-      "codeEffect": "enemy.hp -= 5;",
+      "codeEffect": "",
       "suggestion": ""
     },
     {
@@ -17,11 +16,10 @@
       "name": "Psionic gun",
       "description": "Deal 5 ranged damage.",
       "type": "ATTACK",
-      "tags": "COMMON",
       "targetType": "ENEMY",
       "cost": 2,
       "baseEffect": "5",
-      "codeEffect": "enemy.hp -= 5;",
+      "codeEffect": "",
       "suggestion": ""
     },
     {
@@ -29,11 +27,10 @@
       "name": "Volatile Token",
       "description": "Deal 10 damage to all enemies",
       "type": "ATTACK",
-      "tags": "RARE",
       "targetType": "ALL_ENEMIES",
       "cost": 4,
       "baseEffect": "10",
-      "codeEffect": "enemy.hp -= 10;",
+      "codeEffect": "",
       "suggestion": ""
     },
     {
@@ -41,11 +38,10 @@
       "name": "Holo Barrier",
       "description": "Gain 5 shield.",
       "type": "DEFENSE",
-      "tags": "COMMON",
       "targetType": "SELF",
       "cost": 2,
       "baseEffect": "4",
-      "codeEffect": "player.shield += 4;",
+      "codeEffect": "",
       "suggestion": ""
     },
     {
@@ -53,21 +49,19 @@
       "name": "Astral Mirage",
       "description": "Deal 3 Damage to all enemies and gain 8 shield.",
       "type": "DEFENSE",
-      "tags": "RARE",
       "targetType": "SELF, ALL_ENEMIES",
       "cost": 4,
       "baseEffect": "3, 8",
-      "codeEffect": "player.defense += 8; enemy.hp -= 3;",
+      "codeEffect": "",
       "suggestion": ""
     },
     {
       "id": "util_card3",
       "name": "",
       "description": "",
-      "type": "",
-      "tags": "",
+      "type": "DEFENSE",
       "targetType": "",
-      "cost": "",
+      "cost": "2",
       "baseEffect": "",
       "codeEffect": ""
     },
@@ -75,10 +69,9 @@
       "id": "stat_card1",
       "name": "",
       "description": "",
-      "type": "",
-      "tags": "",
+      "type": "BUFF",
       "targetType": "",
-      "cost": "",
+      "cost": "1",
       "baseEffect": "",
       "codeEffect": ""
     },
@@ -86,10 +79,9 @@
       "id": "stat_card2",
       "name": "",
       "description": "",
-      "type": "",
-      "tags": "",
+      "type": "BUFF",
       "targetType": "",
-      "cost": "",
+      "cost": "2",
       "baseEffect": "",
       "codeEffect": ""
     },
@@ -97,10 +89,9 @@
       "id": "stat_card3",
       "name": "",
       "description": "",
-      "type": "",
-      "tags": "",
+      "type": "BUFF",
       "targetType": "",
-      "cost": "",
+      "cost": "3",
       "baseEffect": "",
       "codeEffect": ""
     }
