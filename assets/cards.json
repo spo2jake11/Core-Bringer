@@ -6,7 +6,7 @@
       "description": "Deal 5 damage.",
       "type": "ATTACK",
       "targetType": "ENEMY",
-      "cost": 1,
+      "cost": "1",
       "baseEffect": "5",
       "codeEffect": "",
       "suggestion": ""
@@ -17,7 +17,7 @@
       "description": "Deal 5 ranged damage.",
       "type": "ATTACK",
       "targetType": "ENEMY",
-      "cost": 2,
+      "cost": "2",
       "baseEffect": "5",
       "codeEffect": "",
       "suggestion": ""
@@ -28,7 +28,7 @@
       "description": "Deal 10 damage to all enemies",
       "type": "ATTACK",
       "targetType": "ALL_ENEMIES",
-      "cost": 4,
+      "cost": "4",
       "baseEffect": "10",
       "codeEffect": "",
       "suggestion": ""
@@ -39,7 +39,7 @@
       "description": "Gain 5 shield.",
       "type": "DEFENSE",
       "targetType": "SELF",
-      "cost": 2,
+      "cost": "2",
       "baseEffect": "4",
       "codeEffect": "",
       "suggestion": ""
@@ -50,7 +50,7 @@
       "description": "Deal 3 Damage to all enemies and gain 8 shield.",
       "type": "DEFENSE",
       "targetType": "SELF, ALL_ENEMIES",
-      "cost": 4,
+      "cost": "4",
       "baseEffect": "3, 8",
       "codeEffect": "",
       "suggestion": ""
