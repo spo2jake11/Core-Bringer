@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "cards": [
     {
@@ -97,3 +98,31 @@
     }
   ]
 }
+=======
+[
+  {
+    "idcard": "c001",
+    "cardname": "Fire Slash",
+    "cardtype": "attack",
+    "power": 50
+  },
+  {
+    "idcard": "c002",
+    "cardname": "Heal Light",
+    "cardtype": "heal",
+    "power": 30
+  },
+  {
+    "idcard": "c003",
+    "cardname": "Flame Strike",
+    "cardtype": "attack",
+    "power": 30
+  },
+  {
+    "idcard": "c004",
+    "cardname": "Healing Wind",
+    "cardtype": "heal",
+    "power": 20
+  }
+]
+>>>>>>> 950d3b32f6209b264721688f8f5630a77bf9ba6f
