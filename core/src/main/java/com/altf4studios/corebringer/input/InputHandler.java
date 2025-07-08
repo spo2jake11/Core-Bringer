@@ -1,4 +1,4 @@
-package com.altf4studios.corebringer.screens;
+package com.altf4studios.corebringer.input;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputAdapter;

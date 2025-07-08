@@ -1,6 +1,7 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.interpreter.JShellExecutor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -48,6 +49,7 @@ public class StartGameMapScreen implements Screen{
         /// This provides lines to be able to monitor the objects' boundaries
 //        battleStage.setDebugAll(true);
         editorStage.setDebugAll(true);
+        JShellExecutor shell = new JShellExecutor();
 
     }
 
