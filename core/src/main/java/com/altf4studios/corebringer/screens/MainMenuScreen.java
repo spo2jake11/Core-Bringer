@@ -12,6 +12,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.InputMultiplexer;
+import com.altf4studios.corebringer.input.InputHandler;
 
 ///Now using Screens instead of ApplicationAdapter to implement button functionality and navigation
 public class MainMenuScreen implements Screen {
@@ -28,6 +30,7 @@ public class MainMenuScreen implements Screen {
     private int debugclickingcount;
     private Label magicword;
     private boolean isDebugMessageInvisible = false;
+    private InputHandler inputHandler;
 
     public MainMenuScreen(Main corebringer) {
         ///Here's all the things that will initiate upon start-up
@@ -120,6 +123,30 @@ public class MainMenuScreen implements Screen {
             }
         });
 
+        inputHandler = new InputHandler(new InputHandler.ActionCallback() {
+            @Override
+            public void onPlayCard() {
+                System.out.println("[MAIN MENU] SPACE pressed");
+            }
+            @Override
+            public void onCancel() {
+                System.out.println("[MAIN MENU] ESC pressed: Exiting game");
+                Gdx.app.exit();
+            }
+            @Override
+            public void onMoveUp() {
+                System.out.println("[MAIN MENU] UP pressed");
+            }
+            @Override
+            public void onMoveDown() {
+                System.out.println("[MAIN MENU] DOWN pressed");
+            }
+            @Override
+            public void onDebug() {
+                System.out.println("[MAIN MENU] D pressed: Going to Debug Screen");
+                corebringer.setScreen(corebringer.debugScreen);
+            }
+        });
 
 
         ////Table calling here since IDE reads code per line
@@ -147,7 +174,11 @@ public class MainMenuScreen implements Screen {
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(mainmenustage);
+        System.out.println("[MainMenuScreen] show() called, setting InputMultiplexer");
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(mainmenustage);
+        multiplexer.addProcessor(inputHandler);
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override

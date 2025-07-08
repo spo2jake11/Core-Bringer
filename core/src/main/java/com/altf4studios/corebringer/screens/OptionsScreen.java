@@ -1,7 +1,9 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.input.InputHandler;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -24,6 +26,7 @@ public class OptionsScreen implements Screen {
     private Slider volumeslider;
     private Label volumelabel;
     private CheckBox volumemutecheckbox;
+    private InputHandler inputHandler;
 
     public OptionsScreen(Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
@@ -95,6 +98,31 @@ public class OptionsScreen implements Screen {
         optiontable.add(optionlabeltable).expandX().padTop(10f).row();
         optiontable.row();
         optiontable.add(optionbuttonstable).expandX().padTop(10f).center();
+
+        inputHandler = new InputHandler(new InputHandler.ActionCallback() {
+            @Override
+            public void onPlayCard() {
+                System.out.println("[OPTIONS SCREEN] SPACE pressed");
+            }
+            @Override
+            public void onCancel() {
+                System.out.println("[OPTIONS SCREEN] ESC pressed: Returning to Main Menu");
+                corebringer.setScreen(corebringer.mainMenuScreen);
+            }
+            @Override
+            public void onMoveUp() {
+                System.out.println("[OPTIONS SCREEN] UP pressed");
+            }
+            @Override
+            public void onMoveDown() {
+                System.out.println("[OPTIONS SCREEN] DOWN pressed");
+            }
+            @Override
+            public void onDebug() {
+                System.out.println("[OPTIONS SCREEN] D pressed: Going to Debug Screen");
+                corebringer.setScreen(corebringer.debugScreen);
+            }
+        });
     }
 
     ///This is for updating Music UI for the logic to be reusable in Options Screen
@@ -119,7 +147,11 @@ public class OptionsScreen implements Screen {
 
     @Override
     public void show() {
-        Gdx.input.setInputProcessor(optionstage);
+        System.out.println("[OptionsScreen] show() called, setting InputMultiplexer");
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(optionstage);
+        multiplexer.addProcessor(inputHandler);
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
@@ -129,9 +161,14 @@ public class OptionsScreen implements Screen {
         optionstage.draw();
     }
 
-    @Override public void resize(int width, int height) {
+    @Override
+    public void resize(int width, int height) {
         optionstage.getViewport().update(width, height, true);
-        Gdx.input.setInputProcessor(optionstage);
+        // Restore the multiplexer after resizing
+        InputMultiplexer multiplexer = new InputMultiplexer();
+        multiplexer.addProcessor(optionstage);
+        multiplexer.addProcessor(inputHandler);
+        Gdx.input.setInputProcessor(multiplexer);
     }
     @Override public void pause() {
 

@@ -15,7 +15,7 @@ public abstract class Cards {
     public int cost;
     public String codeEffect;
     public String suggestion;
-
+    public abstract Cards copy(); // ← add this line
 
     public enum TargetSelection{
         PLAYER, ENEMY, AREA;
