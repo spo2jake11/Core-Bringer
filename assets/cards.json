@@ -1,26 +1,99 @@
-[
-  {
-    "idcard": "c001",
-    "cardname": "Fire Slash",
-    "cardtype": "attack",
-    "power": 50
-  },
-  {
-    "idcard": "c002",
-    "cardname": "Heal Light",
-    "cardtype": "heal",
-    "power": 30
-  },
-  {
-    "idcard": "c003",
-    "cardname": "Flame Strike",
-    "cardtype": "attack",
-    "power": 30
-  },
-  {
-    "idcard": "c004",
-    "cardname": "Healing Wind",
-    "cardtype": "heal",
-    "power": 20
-  }
-]
+{
+  "cards": [
+    {
+      "id": "atk_card1",
+      "name": "Phase strike",
+      "description": "Deal 5 damage.",
+      "type": "ATTACK",
+      "targetType": "ENEMY",
+      "cost": "1",
+      "baseEffect": "5",
+      "codeEffect": "",
+      "suggestion": ""
+    },
+    {
+      "id": "atk_card2",
+      "name": "Psionic gun",
+      "description": "Deal 5 ranged damage.",
+      "type": "ATTACK",
+      "targetType": "ENEMY",
+      "cost": "2",
+      "baseEffect": "5",
+      "codeEffect": "",
+      "suggestion": ""
+    },
+    {
+      "id": "atk_card3",
+      "name": "Volatile Token",
+      "description": "Deal 10 damage to all enemies",
+      "type": "ATTACK",
+      "targetType": "ALL_ENEMIES",
+      "cost": "4",
+      "baseEffect": "10",
+      "codeEffect": "",
+      "suggestion": ""
+    },
+    {
+      "id": "util_card1",
+      "name": "Holo Barrier",
+      "description": "Gain 5 shield.",
+      "type": "DEFENSE",
+      "targetType": "SELF",
+      "cost": "2",
+      "baseEffect": "4",
+      "codeEffect": "",
+      "suggestion": ""
+    },
+    {
+      "id": "util_card2",
+      "name": "Astral Mirage",
+      "description": "Deal 3 Damage to all enemies and gain 8 shield.",
+      "type": "DEFENSE",
+      "targetType": "SELF, ALL_ENEMIES",
+      "cost": "4",
+      "baseEffect": "3, 8",
+      "codeEffect": "",
+      "suggestion": ""
+    },
+    {
+      "id": "util_card3",
+      "name": "",
+      "description": "",
+      "type": "DEFENSE",
+      "targetType": "",
+      "cost": "2",
+      "baseEffect": "",
+      "codeEffect": ""
+    },
+    {
+      "id": "stat_card1",
+      "name": "",
+      "description": "",
+      "type": "BUFF",
+      "targetType": "",
+      "cost": "1",
+      "baseEffect": "",
+      "codeEffect": ""
+    },
+    {
+      "id": "stat_card2",
+      "name": "",
+      "description": "",
+      "type": "BUFF",
+      "targetType": "",
+      "cost": "2",
+      "baseEffect": "",
+      "codeEffect": ""
+    },
+    {
+      "id": "stat_card3",
+      "name": "",
+      "description": "",
+      "type": "BUFF",
+      "targetType": "",
+      "cost": "3",
+      "baseEffect": "",
+      "codeEffect": ""
+    }
+  ]
+}
