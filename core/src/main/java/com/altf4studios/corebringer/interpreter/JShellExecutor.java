@@ -1,4 +1,6 @@
 package com.altf4studios.corebringer.interpreter;
+import jdk.jshell.JShell;
+import jdk.jshell.SnippetEvent;
 
 import jdk.jshell.JShell;
 
@@ -8,6 +10,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 public class JShellExecutor {
+<<<<<<< HEAD
     private JShell shell = JShell.create();
     final Duration timeout = Duration.ofSeconds(900);
 
@@ -38,4 +41,12 @@ public class JShellExecutor {
         }
     }
 
+=======
+    private JShell shell;
+
+    public JShellExecutor(){
+        shell = JShell.create();
+        System.out.println(shell.eval("System.out.println('Hello World')"));
+    }
+>>>>>>> 5e4b9dc6da09a5abb75e1ad864474c84b0c0491e
 }

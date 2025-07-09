@@ -4,22 +4,23 @@ import com.altf4studios.corebringer.slots.SlotType;
 
 import java.util.List;
 
-public abstract class Cards {
+public class Cards {
     public String id;
     public String name;
     public String description;
-    public int baseEffect;
+    public int baseDamage;
     public SlotType type;
-    public List<String> tags;
-    public String targetType;
+    public Tags tags;
+    public TargetType targetType;
     public int cost;
     public String codeEffect;
     public String suggestion;
 
-
-    public enum TargetSelection{
-        PLAYER, ENEMY, AREA;
+    public enum TargetType{
+        SELF, ENEMY;
     }
 
-
+    public enum Tags{
+        BUFF, DEBUFF, ATTACK, DEFENSE;
+    }
 }
