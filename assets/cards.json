@@ -6,10 +6,11 @@
       "description": "Deal 5 damage.",
       "type": "ATTACK",
       "targetType": "ENEMY",
-      "cost": "1",
-      "baseEffect": "5",
+      "cost": 1,
+      "baseEffect": 5,
       "codeEffect": "",
-      "suggestion": ""
+      "suggestion": "",
+      "tags": []
     },
     {
       "id": "atk_card2",
@@ -17,10 +18,11 @@
       "description": "Deal 5 ranged damage.",
       "type": "ATTACK",
       "targetType": "ENEMY",
-      "cost": "2",
-      "baseEffect": "5",
+      "cost": 2,
+      "baseEffect": 5,
       "codeEffect": "",
-      "suggestion": ""
+      "suggestion": "",
+      "tags": []
     },
     {
       "id": "atk_card3",
@@ -28,10 +30,11 @@
       "description": "Deal 10 damage to all enemies",
       "type": "ATTACK",
       "targetType": "ALL_ENEMIES",
-      "cost": "4",
-      "baseEffect": "10",
+      "cost": 4,
+      "baseEffect": 10,
       "codeEffect": "",
-      "suggestion": ""
+      "suggestion": "",
+      "tags": []
     },
     {
       "id": "util_card1",
@@ -39,10 +42,11 @@
       "description": "Gain 5 shield.",
       "type": "DEFENSE",
       "targetType": "SELF",
-      "cost": "2",
-      "baseEffect": "4",
+      "cost": 2,
+      "baseEffect": 4,
       "codeEffect": "",
-      "suggestion": ""
+      "suggestion": "",
+      "tags": []
     },
     {
       "id": "util_card2",
@@ -50,10 +54,11 @@
       "description": "Deal 3 Damage to all enemies and gain 8 shield.",
       "type": "DEFENSE",
       "targetType": "SELF, ALL_ENEMIES",
-      "cost": "4",
-      "baseEffect": "3, 8",
+      "cost": 4,
+      "baseEffect": 3,
       "codeEffect": "",
-      "suggestion": ""
+      "suggestion": "",
+      "tags": []
     },
     {
       "id": "util_card3",
@@ -61,9 +66,10 @@
       "description": "",
       "type": "DEFENSE",
       "targetType": "",
-      "cost": "2",
-      "baseEffect": "",
-      "codeEffect": ""
+      "cost": 2,
+      "baseEffect": 0,
+      "codeEffect": "",
+      "tags": []
     },
     {
       "id": "stat_card1",
@@ -71,9 +77,10 @@
       "description": "",
       "type": "BUFF",
       "targetType": "",
-      "cost": "1",
-      "baseEffect": "",
-      "codeEffect": ""
+      "cost": 1,
+      "baseEffect": 0,
+      "codeEffect": "",
+      "tags": []
     },
     {
       "id": "stat_card2",
@@ -81,9 +88,10 @@
       "description": "",
       "type": "BUFF",
       "targetType": "",
-      "cost": "2",
-      "baseEffect": "",
-      "codeEffect": ""
+      "cost": 2,
+      "baseEffect": 0,
+      "codeEffect": "",
+      "tags": []
     },
     {
       "id": "stat_card3",
@@ -91,9 +99,10 @@
       "description": "",
       "type": "BUFF",
       "targetType": "",
-      "cost": "3",
-      "baseEffect": "",
-      "codeEffect": ""
+      "cost": 3,
+      "baseEffect": 0,
+      "codeEffect": "",
+      "tags": []
     }
   ]
 }
