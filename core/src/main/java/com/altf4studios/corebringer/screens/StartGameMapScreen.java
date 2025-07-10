@@ -1,6 +1,7 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.interpreter.JShellExecutor;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -35,7 +36,7 @@ public class StartGameMapScreen implements Screen{
         ///This stages are separated to lessen complications
         battleStage = new Stage(new ScreenViewport());
         editorStage = new Stage(new ScreenViewport());
-//        cardStage = new Stage(new ScreenViewport());
+        cardStage = new Stage(new ScreenViewport());
 
 
         ///Every stages provides a main method for them
@@ -48,12 +49,12 @@ public class StartGameMapScreen implements Screen{
         /// This provides lines to be able to monitor the objects' boundaries
 //        battleStage.setDebugAll(true);
         editorStage.setDebugAll(true);
+        cardStage.setDebugAll(true);
+        JShellExecutor shell = new JShellExecutor();
 
     }
 
-    private void cardStageUI() {
 
-    }
 /// This for editorStageUI ONLY
     private Table editorTable;
     private Table submenuTable;
@@ -116,6 +117,51 @@ public class StartGameMapScreen implements Screen{
                 optionsWindowUI();
             }
         });
+    }
+
+    private void cardStageUI() {
+        /// Calculate responsive dimensions
+        float worldWidth = Gdx.graphics.getWidth();
+        float worldHeight = Gdx.graphics.getHeight();
+        float cardHeight = worldHeight * 0.2f; // 15% of screen height
+        float cardWidth = (worldWidth * 0.8f) / 5; // 80% of screen width divided by 5 cards
+
+        /// This is where the card display will be
+        Table cardTable = new Table();
+        cardTable.bottom();
+        cardTable.padBottom((worldHeight * 0.3f) + 15);
+        cardTable.setFillParent(true);
+
+        /// Create 5 card placeholders with even height and width
+        Label card1 = new Label("Card 1", corebringer.testskin);
+        Label card2 = new Label("Card 2", corebringer.testskin);
+        Label card3 = new Label("Card 3", corebringer.testskin);
+        Label card4 = new Label("Card 4", corebringer.testskin);
+        Label card5 = new Label("Card 5", corebringer.testskin);
+
+        /// Set alignment for all card labels
+        card1.setAlignment(Align.center);
+        card2.setAlignment(Align.center);
+        card3.setAlignment(Align.center);
+        card4.setAlignment(Align.center);
+        card5.setAlignment(Align.center);
+
+
+
+        /// Configure table defaults for even spacing
+        cardTable.defaults().space(10).pad(5).fill().uniform();
+
+        /// Add all 5 cards in a single row
+        cardTable.add(card1).height(cardHeight).width(cardWidth);
+        cardTable.add(card2).height(cardHeight).width(cardWidth);
+        cardTable.add(card3).height(cardHeight).width(cardWidth);
+        cardTable.add(card4).height(cardHeight).width(cardWidth);
+        cardTable.add(card5).height(cardHeight).width(cardWidth);
+
+        /// Position the card table at the top with some padding
+        cardTable.padTop(20);
+
+        cardStage.addActor(cardTable);
     }
 
     private void battleStageUI() {
@@ -193,7 +239,8 @@ public class StartGameMapScreen implements Screen{
         /// This gives the button functions to become clickable
         InputMultiplexer multiplexer = new InputMultiplexer();
         multiplexer.addProcessor(editorStage);
-        Gdx.input.setInputProcessor(editorStage);
+        multiplexer.addProcessor(cardStage);
+        Gdx.input.setInputProcessor(multiplexer);
     }
 
     @Override
@@ -203,6 +250,9 @@ public class StartGameMapScreen implements Screen{
         /// Since there are multiple stages, they are needed to be drawn separately
         battleStage.act(delta);
         battleStage.draw();
+
+        cardStage.act(delta);
+        cardStage.draw();
 
         editorStage.act(delta);
         editorStage.draw();
@@ -234,6 +284,6 @@ public class StartGameMapScreen implements Screen{
     public void dispose() {
         battleStage.dispose();
         editorStage.dispose();
-
+        cardStage.dispose();
     }
 }

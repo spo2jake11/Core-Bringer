@@ -87,7 +87,7 @@ public class CardTestScren implements Screen {
         try {
             Json json = new Json();
             JsonValue root = new JsonReader().parse(Gdx.files.internal("cards.json"));
-            for (JsonValue cardJson : root) {
+            for (JsonValue cardJson : root.get("cards")) {
                 SampleCardHandler cardHandler = json.readValue(SampleCardHandler.class, cardJson);
                 carddescription.add(cardHandler.toString());
             }
@@ -104,11 +104,11 @@ public class CardTestScren implements Screen {
                     try {
                         Json json = new Json();
                         JsonValue root = new JsonReader().parse(Gdx.files.internal("cards.json"));
-                        for (JsonValue cardJson : root) {
+                        for (JsonValue cardJson : root.get("cards")) {
                             SampleCardHandler cardHandler = json.readValue(SampleCardHandler.class, cardJson);
                             if (cardHandler.toString().equals(selected)) {
                                 selectedcard = cardHandler;
-                                Gdx.app.log("CardSelect", "Selected: " + selectedcard.cardname);
+                                Gdx.app.log("CardSelect", "Selected: " + selectedcard.name);
                                 break;
                             }
                         }
@@ -246,22 +246,22 @@ public class CardTestScren implements Screen {
             int playerHp = Integer.parseInt(userHpLabel.getText().toString());
             int enemyHp = Integer.parseInt(enemyHpLabel.getText().toString());
 
-            switch (card.cardtype.toLowerCase()) {
+            switch (card.type.toLowerCase()) {
                 case "attack":
-                    enemyHp -= card.power;
+                    enemyHp -= card.baseEffect;
                     if (enemyHp < 0) enemyHp = 0;
                     enemyHpLabel.setText(String.valueOf(enemyHp));
-                    Gdx.app.log("CardEffect", "Attacked enemy for " + card.power + " damage.");
+                    Gdx.app.log("CardEffect", "Attacked enemy for " + card.baseEffect + " damage.");
                     break;
 
                 case "heal":
-                    playerHp += card.power;
+                    playerHp += card.baseEffect;
                     userHpLabel.setText(String.valueOf(playerHp));
-                    Gdx.app.log("CardEffect", "Healed player for " + card.power + " HP.");
+                    Gdx.app.log("CardEffect", "Healed player for " + card.baseEffect + " HP.");
                     break;
 
                 default:
-                    Gdx.app.log("CardEffect", "Unknown card type: " + card.cardtype);
+                    Gdx.app.log("CardEffect", "Unknown card type: " + card.type);
                     break;
             }
         } catch (Exception e) {
