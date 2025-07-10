@@ -1,0 +1,9 @@
+hud_atlas.png
+size:2048,1024
+repeat:none
+code_bar
+bounds:2,94,1050,690
+deck_bar
+bounds:2,2,860,90
+menus_bar
+bounds:1054,124,250,660
