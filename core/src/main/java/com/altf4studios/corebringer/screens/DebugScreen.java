@@ -80,7 +80,7 @@ public class DebugScreen implements Screen {
                 try {
                     Json json = new Json();
                     JsonValue root = new JsonReader().parse(Gdx.files.internal("cards.json"));
-                    for (JsonValue cardJson : root) {
+                    for (JsonValue cardJson : root.get("cards")) {
                         SampleCardHandler cardHandler = json.readValue(SampleCardHandler.class, cardJson);
                         carddescription.add(cardHandler.toString());
                     }
