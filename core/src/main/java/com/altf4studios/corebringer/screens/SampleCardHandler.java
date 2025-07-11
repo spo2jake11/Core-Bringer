@@ -9,15 +9,22 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.utils.Array;
 
 public class SampleCardHandler {
-    public String idcard;
-    public String cardname;
-    public String cardtype;
-    public int power;
+    public String id;
+    public String name;
+    public String type;
+    public String description;
+    public String targetType;
+    public int cost;
+    public int baseEffect;
+    public String codeEffect;
+    public String suggestion;
+    public Array<String> tags; // or List<String> tags;
 
     @Override
     public String toString() {
-        return ("Card{id= '" + idcard + "', name= '" + cardname + "', type= '" + cardtype + "', power=" + power + "}");
+        return ("Card{id= '" + id + "', name= '" + name + "', type= '" + type + "', power=" + baseEffect + "}");
     }
 }

@@ -72,12 +72,12 @@ public class MainMenuScreen implements Screen {
         gamestartandnavigationtable.add(exitbutton).width(250f).height(50f).pad(10f).row();
 
 
-        startbutton.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(corebringer.gameScreen);
-            }
-        });
+//        startbutton.addListener(new ClickListener(){
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                corebringer.setScreen(corebringer.gameScreen);
+//            }
+//        });
         ///This gives function to the Options Button
         optionsbutton.addListener(new ClickListener() {
             @Override
@@ -101,7 +101,7 @@ public class MainMenuScreen implements Screen {
                 corebringer.corebringerstartmenubgm.stop();
                 corebringer.corebringermapstartbgm.setVolume(1f);
                 corebringer.corebringermapstartbgm.play();
-                corebringer.setScreen(corebringer.startGameMapScreen);
+                corebringer.setScreen(corebringer.gameScreen);
             }
         });
 

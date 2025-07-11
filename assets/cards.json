@@ -9,7 +9,8 @@
       "cost": 1,
       "baseEffect": 5,
       "codeEffect": "",
-      "suggestion": ""
+      "suggestion": "",
+      "tags": []
     },
     {
       "id": "atk_card2",
@@ -20,7 +21,8 @@
       "cost": 2,
       "baseEffect": 5,
       "codeEffect": "",
-      "suggestion": ""
+      "suggestion": "",
+      "tags": []
     },
     {
       "id": "atk_card3",
@@ -31,7 +33,8 @@
       "cost": 4,
       "baseEffect": 10,
       "codeEffect": "",
-      "suggestion": ""
+      "suggestion": "",
+      "tags": []
     },
     {
       "id": "util_card1",
@@ -42,7 +45,8 @@
       "cost": 2,
       "baseEffect": 4,
       "codeEffect": "",
-      "suggestion": ""
+      "suggestion": "",
+      "tags": []
     },
     {
       "id": "util_card2",
@@ -51,6 +55,7 @@
       "type": "DEFENSE",
       "targetType": "SELF, ALL_ENEMIES",
       "cost": 4,
+<<<<<<< HEAD
       "baseEffect": "3, 8",
       "codeEffect": "",
       "suggestion": ""
@@ -94,6 +99,12 @@
       "cost": 3,
       "baseEffect": 5,
       "codeEffect": ""
+=======
+      "baseEffect": 3,
+      "codeEffect": "",
+      "suggestion": "",
+      "tags": []
+>>>>>>> 5e868e613200962f8be41e26d936cdcf04b26f7e
     }
   ]
 }

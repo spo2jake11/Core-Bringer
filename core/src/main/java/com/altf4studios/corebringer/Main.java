@@ -56,6 +56,11 @@ public class Main extends Game {
         optionsScreen = new OptionsScreen(this);
         startGameMapScreen = new StartGameMapScreen(this);
         debugScreen = new DebugScreen(this);
+<<<<<<< HEAD
+=======
+        cardTestScren = new CardTestScren(this);
+        gameScreen = new GameScreen(this);
+>>>>>>> 5e868e613200962f8be41e26d936cdcf04b26f7e
         setScreen(mainMenuScreen);
     }
 
