@@ -34,12 +34,22 @@ public class GameScreen implements Screen{
     // CardParser instance for managing card data
     private CardParser cardParser;
 
+    // CodeSimulator for running user code
+    private com.altf4studios.corebringer.interpreter.CodeSimulator codeSimulator;
+    // TextArea for code input
+    private TextArea codeInputArea;
+    // Run button
+    private TextButton btnRunCode;
+
 
     public GameScreen(Main corebringer) {
         this.corebringer = corebringer; /// The Master Key that holds all screens together
 
         // Initialize CardParser
         cardParser = CardParser.getInstance();
+
+        // Initialize CodeSimulator
+        codeSimulator = new com.altf4studios.corebringer.interpreter.CodeSimulator();
 
         ///This stages are separated to lessen complications
         battleStage = new Stage(new ScreenViewport());
@@ -83,14 +93,32 @@ public class GameScreen implements Screen{
         editorTable = new Table();
         editorBG = new Texture(Gdx.files.internal("ui/UI_v3.png"));
         editorTableDrawable = new TextureRegionDrawable(new TextureRegion(editorBG));
-        codeLabel = new Label("This is where the code will be!", corebringer.testskin);
-        codeLabel.setAlignment(Align.center);
+        // Create code input area and run button
+        codeInputArea = new TextArea("// Write your code here\n", corebringer.testskin);
+        codeInputArea.setPrefRows(6);
+
+        btnRunCode = new TextButton("Run", corebringer.testskin);
+
+        // Table for code input and run button
+        Table codeInputTable = new Table();
+        codeInputTable.left().top();
+        codeInputTable.add(codeInputArea).growX().padRight(10);
+        codeInputTable.add(btnRunCode).width(80).height(40).top();
+
+        // When Run is clicked, execute code and show result in codeLabel
+        btnRunCode.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String code = codeInputArea.getText();
+                String result = codeSimulator.simulate(code);
+                
+            }
+        });
 
         editorTable.bottom();
         editorTable.setFillParent(false);
         editorTable.setSize(worldWidth, worldHeight * 0.3f);
         editorTable.background(editorTableDrawable);
-
 
         /// These now will become the submenu buttons when created
         submenuTable = new Table();
@@ -103,7 +131,6 @@ public class GameScreen implements Screen{
         btnCheckDeck = new TextButton("Deck", corebringer.testskin);
         btnCharacter = new TextButton("Character", corebringer.testskin);
 
-
         /// Default format for submenuTable
         submenuTable.defaults().padTop(30).padBottom(30).padRight(20).padLeft(20).fill().uniform();
         /// Row 1
@@ -114,7 +141,12 @@ public class GameScreen implements Screen{
         submenuTable.add(btnCharacter);
         /// Everything is now added into the editorTable
 
-        editorTable.add(codeLabel).grow();
+
+        // Add code input table and codeLabel to the left, submenu to the right
+        Table leftEditorTable = new Table();
+        leftEditorTable.add(codeInputTable).growX().row();
+
+        editorTable.add(leftEditorTable).grow();
         editorTable.add(submenuTable).growY().right();
 
         editorStage.addActor(editorTable);
