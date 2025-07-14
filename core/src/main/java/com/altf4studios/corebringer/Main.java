@@ -24,6 +24,8 @@ public class Main extends Game {
     public GameScreen gameScreen;
     public StartGameMapScreen startGameMapScreen;
     public DebugScreen debugScreen;
+    public CardTestScren cardTestScren;
+    public SampleCardHandler selecteddebugcard;
     private AssetManager assetManager;
     @Override
     public void create() {
@@ -44,7 +46,7 @@ public class Main extends Game {
 
         isMusicMuted = false;
 //        corebringerbgm.play();
-        corebringerstartmenubgm.play();
+        //corebringerstartmenubgm.play();
 
         ///This is for the Skin to be declared and initialized so Screens can just call it
         //test skin used Utils.getInternalPath
@@ -52,15 +54,15 @@ public class Main extends Game {
         responsivelabelstyle = new Label.LabelStyle(testskin.getFont("default"), Color.WHITE);
         responsivelabelstyle.font.getData().setScale(3f);
 
+        ///This is just temporary reference for the Card Handler to be used in the debug screen
+        selecteddebugcard = null;
+
         mainMenuScreen = new MainMenuScreen(this);
         optionsScreen = new OptionsScreen(this);
         startGameMapScreen = new StartGameMapScreen(this);
         debugScreen = new DebugScreen(this);
-<<<<<<< HEAD
-=======
         cardTestScren = new CardTestScren(this);
         gameScreen = new GameScreen(this);
->>>>>>> 5e868e613200962f8be41e26d936cdcf04b26f7e
         setScreen(mainMenuScreen);
     }
 

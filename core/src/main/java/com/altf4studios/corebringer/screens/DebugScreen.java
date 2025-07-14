@@ -9,6 +9,11 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.scenes.scene2d.ui.ScrollPane;
 
 public class DebugScreen implements Screen {
     private Main corebringer;
@@ -18,6 +23,12 @@ public class DebugScreen implements Screen {
     private Table debugscreenbuttons;
     private Label fpsdebug;
     private TextButton returntomainmenu;
+    private TextButton reloadcardsbutton;
+    private List<String> listofcards;
+    private ScrollPane scrolllistofcards;
+    private Array<String> carddescription;
+    private Array<SampleCardHandler> loadedcards;
+    private TextButton cardtestscreenbutton;
 
     public DebugScreen(Main corebringer) {
         this.corebringer = corebringer; ///The Master Key that holds all screens together
@@ -50,8 +61,6 @@ public class DebugScreen implements Screen {
             }
         });
 
-<<<<<<< HEAD
-=======
         ///This is the parameters of the Reload Cards button for the cards to be reloaded
         reloadcardsbutton = new TextButton("Reload Cards?", corebringer.testskin);
 
@@ -102,9 +111,12 @@ public class DebugScreen implements Screen {
             }
         });
 
->>>>>>> 5e868e613200962f8be41e26d936cdcf04b26f7e
         ///This is where the debug info and the return button will be called
         debugscreeninfotable.add(fpsdebug);
+        debugscreeninfotable.row().padTop(20f);
+        debugscreeninfotable.add(scrolllistofcards).width(1200).height(400);
+        debugscreenbuttons.add(reloadcardsbutton).padRight(20f);
+        debugscreenbuttons.add(cardtestscreenbutton).padRight(20f);
         debugscreenbuttons.add(returntomainmenu);
 
         ///Table calling here since IDE reads code per line

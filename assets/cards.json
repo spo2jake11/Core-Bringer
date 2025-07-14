@@ -55,56 +55,10 @@
       "type": "DEFENSE",
       "targetType": "SELF, ALL_ENEMIES",
       "cost": 4,
-<<<<<<< HEAD
-      "baseEffect": "3, 8",
-      "codeEffect": "",
-      "suggestion": ""
-    },
-    {
-      "id": "util_card3",
-      "name": "Mutagen Will",
-      "description": "Gain 20 shield",
-      "type": "DEFENSE",
-      "targetType": "",
-      "cost": 4,
-      "baseEffect": "",
-      "codeEffect": ""
-    },
-    {
-      "id": "stat_card1",
-      "name": "Augment Override",
-      "description": "Increase attack by 5",
-      "type": "BUFF",
-      "targetType": "SELF",
-      "cost": 1,
-      "baseEffect": 5,
-      "codeEffect": ""
-    },
-    {
-      "id": "stat_card2",
-      "name": "Data Nullifier",
-      "description": "Deal 15 damage to all enemies when you get attacked",
-      "type": "BUFF",
-      "targetType": "ALL_ENEMIES",
-      "cost": 2,
-      "baseEffect": 15,
-      "codeEffect": ""
-    },
-    {
-      "id": "stat_card3",
-      "name": "Glow of the Core",
-      "description": "Increase dodge chance by 5",
-      "type": "BUFF",
-      "targetType": "SELF",
-      "cost": 3,
-      "baseEffect": 5,
-      "codeEffect": ""
-=======
       "baseEffect": 3,
       "codeEffect": "",
       "suggestion": "",
       "tags": []
->>>>>>> 5e868e613200962f8be41e26d936cdcf04b26f7e
     }
   ]
 }
