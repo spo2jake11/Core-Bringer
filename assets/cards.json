@@ -59,50 +59,6 @@
       "codeEffect": "",
       "suggestion": "",
       "tags": []
-    },
-    {
-      "id": "util_card3",
-      "name": "",
-      "description": "",
-      "type": "DEFENSE",
-      "targetType": "",
-      "cost": 2,
-      "baseEffect": 0,
-      "codeEffect": "",
-      "tags": []
-    },
-    {
-      "id": "stat_card1",
-      "name": "",
-      "description": "",
-      "type": "BUFF",
-      "targetType": "",
-      "cost": 1,
-      "baseEffect": 0,
-      "codeEffect": "",
-      "tags": []
-    },
-    {
-      "id": "stat_card2",
-      "name": "",
-      "description": "",
-      "type": "BUFF",
-      "targetType": "",
-      "cost": 2,
-      "baseEffect": 0,
-      "codeEffect": "",
-      "tags": []
-    },
-    {
-      "id": "stat_card3",
-      "name": "",
-      "description": "",
-      "type": "BUFF",
-      "targetType": "",
-      "cost": 3,
-      "baseEffect": 0,
-      "codeEffect": "",
-      "tags": []
     }
   ]
 }
