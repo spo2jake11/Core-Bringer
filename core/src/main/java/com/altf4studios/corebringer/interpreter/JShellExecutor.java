@@ -28,7 +28,7 @@ public class JShellExecutor {
             } else if (event.value() != null) {
                 output.append(event.value()).append("\n");
             } else if (event.status() == Snippet.Status.REJECTED) {
-                output.append("Error: ").append(event.snippet().source()).append(" was rejected.\n");
+                output.append("Error: ").append(event.snippet().source()).append(" was rejectedx.\n");
             }
         }
         return output.toString();
