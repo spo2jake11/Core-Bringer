@@ -79,7 +79,6 @@ public class GameScreen implements Screen{
     private Table submenuTable;
     private Texture editorBG;
     private Drawable editorTableDrawable;
-    private Label codeLabel;
     private TextButton btnOptions;
     private TextButton btnLog;
     private TextButton btnCheckDeck;
@@ -95,8 +94,8 @@ public class GameScreen implements Screen{
         editorTableDrawable = new TextureRegionDrawable(new TextureRegion(editorBG));
         // Create code input area and run button
         codeInputArea = new TextArea("// Write your code here\n", corebringer.testskin);
-        codeInputArea.setPrefRows(6);
-
+        codeInputArea.setPrefRows(4);
+        codeInputArea.setScale(1f);
         btnRunCode = new TextButton("Run", corebringer.testskin);
 
         // Table for code input and run button
@@ -111,7 +110,6 @@ public class GameScreen implements Screen{
             public void clicked(InputEvent event, float x, float y) {
                 String code = codeInputArea.getText();
                 String result = codeSimulator.simulate(code);
-                
             }
         });
 
