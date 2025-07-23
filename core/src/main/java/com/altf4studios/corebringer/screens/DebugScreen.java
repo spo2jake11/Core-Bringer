@@ -1,6 +1,7 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.utils.LoggingCollector;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -29,6 +30,12 @@ public class DebugScreen implements Screen {
     private Array<String> carddescription;
     private Array<SampleCardHandler> loadedcards;
     private TextButton cardtestscreenbutton;
+    private Table debugscreenjshelltable;
+    private TextField jshellinput;
+    private TextButton executebutton;
+    private TextArea outputarea;
+    private ScrollPane outputareascroll;
+    private TextButton viewlogsbutton;
 
     public DebugScreen(Main corebringer) {
         this.corebringer = corebringer; ///The Master Key that holds all screens together
@@ -46,6 +53,10 @@ public class DebugScreen implements Screen {
         ///Parameters for the Buttons in the Debug Screen
         debugscreenbuttons = new Table();
         debugscreenbuttons.bottom().center().padBottom(20f);
+
+        ///Parameters for the JShell Console Table in the Debug Screen
+        debugscreenjshelltable = new Table();
+        debugscreenjshelltable.bottom().center().padBottom(20f);
 
         ///Parameters for the FPS
         fpsdebug = new Label("FPS: ", corebringer.testskin);
@@ -111,16 +122,61 @@ public class DebugScreen implements Screen {
             }
         });
 
-        ///This is where the debug info and the return button will be called
+        ///This is for implementing the JShell Snippet
+        jshellinput = new TextField("", corebringer.testskin);
+        executebutton = new TextButton("Run Input",corebringer.testskin);
+        outputarea = new TextArea("", corebringer.testskin);
+        viewlogsbutton = new TextButton("View Logs?", corebringer.testskin);
+        outputarea.setDisabled(true);
+        outputarea.setPrefRows(10);
+
+        outputareascroll = new ScrollPane(outputarea, corebringer.testskin);
+        outputareascroll.setFadeScrollBars(false);
+        outputareascroll.setScrollingDisabled(true, false);
+        outputareascroll.setForceScroll(false, true);
+
+        ///This is to make the Execute Button functional
+        executebutton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String input = jshellinput.getText();
+                String output = corebringer.evaluateJShellInput(input);
+
+                outputarea.setText(output);
+                outputarea.invalidateHierarchy();
+                outputareascroll.layout();
+            }
+        });
+
+        ///This is to make the View Logs button funtional
+        viewlogsbutton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String logs = LoggingCollector.getLogsAsString(); ///Importing the log history from Logging Collector
+                outputarea.setText(logs.isEmpty() ? "No logs yet." : logs);
+                outputarea.invalidateHierarchy();
+                outputareascroll.layout();
+            }
+        });
+
+        ///This is where the debug info, return button, and various other features will be added to tables
         debugscreeninfotable.add(fpsdebug);
         debugscreeninfotable.row().padTop(20f);
-        debugscreeninfotable.add(scrolllistofcards).width(1200).height(400);
+        debugscreeninfotable.add(scrolllistofcards).width(1200).height(200);
         debugscreenbuttons.add(reloadcardsbutton).padRight(20f);
         debugscreenbuttons.add(cardtestscreenbutton).padRight(20f);
         debugscreenbuttons.add(returntomainmenu);
+        debugscreenjshelltable.add(outputareascroll).width(1200).height(200).colspan(2).padBottom(20f);
+        debugscreenjshelltable.row().padTop(20f);
+        debugscreenjshelltable.add(jshellinput).width(900).padRight(20f);
+        debugscreenjshelltable.add(executebutton).padRight(10f);
+        debugscreenjshelltable.row().padTop(20f);
+        debugscreenjshelltable.add(viewlogsbutton);
 
         ///Table calling here since IDE reads code per line
         coredebugscreentable.add(debugscreeninfotable).expand().top().left().pad(10f);
+        coredebugscreentable.row();
+        coredebugscreentable.add(debugscreenjshelltable).expand().top().right().padBottom(20f);
         coredebugscreentable.row();
         coredebugscreentable.add(debugscreenbuttons).expand().bottom().center().padBottom(20f);
     }

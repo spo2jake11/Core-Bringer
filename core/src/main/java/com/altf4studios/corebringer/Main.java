@@ -9,6 +9,12 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import jdk.jshell.JShell;
+import jdk.jshell.Snippet;
+import jdk.jshell.SnippetEvent;
+import java.util.List;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -27,6 +33,9 @@ public class Main extends Game {
     public CardTestScren cardTestScren;
     public SampleCardHandler selecteddebugcard;
     private AssetManager assetManager;
+    public JShell jshell;
+    private final ByteArrayOutputStream jshellOutputStream = new ByteArrayOutputStream();
+
     @Override
     public void create() {
         //AssetManager is located here
@@ -57,6 +66,9 @@ public class Main extends Game {
         ///This is just temporary reference for the Card Handler to be used in the debug screen
         selecteddebugcard = null;
 
+        ///This is for initalizing JShell
+        initJShell();
+
         mainMenuScreen = new MainMenuScreen(this);
         optionsScreen = new OptionsScreen(this);
         startGameMapScreen = new StartGameMapScreen(this);
@@ -64,6 +76,45 @@ public class Main extends Game {
         cardTestScren = new CardTestScren(this);
         gameScreen = new GameScreen(this);
         setScreen(mainMenuScreen);
+    }
+
+    ///The method that initializes JShell as well as things it will import
+    public void initJShell() {
+        jshell = JShell.builder()
+            .out(new PrintStream(jshellOutputStream))
+            .err(new PrintStream(jshellOutputStream))
+            .build();
+
+        jshell.eval("import com.badlogic.gdx.*;");
+        jshell.eval("import com.altf4studios.corebringer.*;");
+    }
+
+    ///This is for JShell input evaluation
+    public String evaluateJShellInput(String input) {
+        jshellOutputStream.reset(); ///This clears JShell's previous output snippers
+
+        StringBuilder result = new StringBuilder();
+
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        PrintStream pS = new PrintStream(outputStream);
+
+        List<SnippetEvent> events = jshell.eval(input);
+        for (SnippetEvent e : events) {
+            if (e.exception() != null) {
+                result.append("Exception: ").append(e.exception().getMessage()).append("\n");
+            } else if (e.status() == Snippet.Status.REJECTED) {
+                result.append("Rejected: ").append(e.snippet().source()).append("\n");
+            } else if (e.value() != null) {
+                result.append(e.value()).append("\n");
+            }
+        }
+        ///This will get everything JShell printed
+        String jshellOutput = jshellOutputStream.toString();
+        if (!jshellOutput.isEmpty()) {
+            result.append(jshellOutput);
+        }
+
+        return result.toString().isEmpty() ? "No output." : result.toString();
     }
 
     @Override
