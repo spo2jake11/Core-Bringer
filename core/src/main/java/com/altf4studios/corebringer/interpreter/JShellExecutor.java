@@ -1,5 +1,6 @@
 package com.altf4studios.corebringer.interpreter;
 
+import com.altf4studios.corebringer.entities.Entity;
 import jdk.jshell.JShell;
 import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
@@ -10,10 +11,30 @@ import java.util.concurrent.TimeoutException;
 
 public class JShellExecutor {
     private JShell shell;
+    private static JShellExecutor instance;
 
     public JShellExecutor() {
         shell = JShell.create();
         // Optionally preload game objects here
+    }
+
+    public static JShellExecutor getInstance() {
+        if (instance == null) {
+            instance = new JShellExecutor();
+        }
+        return instance;
+    }
+
+    public void setContext(Entity user, Entity target) {
+        this.shell.eval(String.format("com.altf4studios.corebringer.entities.Entity target = (%s) shell.varValue(\"target\");", target.getClass().getName()));
+        this.shell.eval("import com.altf4studios.corebringer.entities.*;");
+    }
+
+    public static void runScript(String codeEffect, Entity user, Entity target) {
+        JShellExecutor executor = getInstance();
+        executor.setContext(user, target);
+        System.out.println("Executing JShell script: " + codeEffect);
+        executor.submitCode(codeEffect);
     }
 
     /**
