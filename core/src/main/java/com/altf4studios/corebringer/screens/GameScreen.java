@@ -3,6 +3,10 @@ package com.altf4studios.corebringer.screens;
 import com.altf4studios.corebringer.Main;
 import com.altf4studios.corebringer.interpreter.JShellExecutor;
 import com.altf4studios.corebringer.utils.CardParser;
+import com.altf4studios.corebringer.turns.TurnManager;
+import com.altf4studios.corebringer.entities.Player;
+import com.altf4studios.corebringer.entities.Enemy;
+import com.altf4studios.corebringer.screens.SampleCardHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -22,6 +26,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.graphics.Pixmap;
+import com.badlogic.gdx.graphics.g2d.Batch;
 
 public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
@@ -41,6 +47,12 @@ public class GameScreen implements Screen{
     // Run button
     private TextButton btnRunCode;
 
+    // --- TurnManager Integration ---
+    private TurnManager turnManager;
+    private Player player;
+    private Enemy enemy;
+    // --- End TurnManager Integration ---
+
 
     public GameScreen(Main corebringer) {
         this.corebringer = corebringer; /// The Master Key that holds all screens together
@@ -56,6 +68,12 @@ public class GameScreen implements Screen{
         editorStage = new Stage(new ScreenViewport());
         cardStage = new Stage(new ScreenViewport());
 
+        // --- TurnManager Integration ---
+        // Initialize player and enemy (example values, adjust as needed)
+        player = new Player("Player", 100, 10, 5, 3);
+        enemy = new Enemy("enemy1", "Enemy", 100, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
+        turnManager = new TurnManager(player, enemy);
+        // --- End TurnManager Integration ---
 
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
@@ -110,6 +128,7 @@ public class GameScreen implements Screen{
             public void clicked(InputEvent event, float x, float y) {
                 String code = codeInputArea.getText();
                 String result = codeSimulator.simulate(code);
+                System.out.println(result);
             }
         });
 
@@ -176,8 +195,9 @@ public class GameScreen implements Screen{
 
         /// Load and randomize cards using CardParser
         Array<String> cardNames = new Array<>();
+        Array<SampleCardHandler> allCards;
         if (cardParser.isCardsLoaded()) {
-            Array<SampleCardHandler> allCards = cardParser.getAllCards();
+            allCards = cardParser.getAllCards();
             int cardCount = Math.min(5, allCards.size); // Limit to 5 cards
 
             // Create a list of available card names
@@ -198,6 +218,7 @@ public class GameScreen implements Screen{
 
             Gdx.app.log("CardStage", "Loaded " + cardNames.size + " random cards");
         } else {
+            allCards = null;
             // Fallback if cards couldn't be loaded
             cardNames.add("Card 1");
             cardNames.add("Card 2");
@@ -214,40 +235,82 @@ public class GameScreen implements Screen{
         Label card4 = new Label(cardNames.get(3), corebringer.testskin);
         Label card5 = new Label(cardNames.get(4), corebringer.testskin);
 
+        // --- TurnManager Integration: Card click queues card instead of direct effect ---
         card1.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                cardInput(card1);
+                cardInput(card1); // Commented: old direct effect
+                if (allCards != null) {
+                    for (SampleCardHandler card : allCards) {
+                        if (card.name.equals(card1.getText().toString())) {
+                            turnManager.queuePlayerCard(card);
+                            break;
+                        }
+                    }
+                }
             }
         });
 
         card2.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                cardInput(card2);
+                cardInput(card2); // Commented: old direct effect
+                if (allCards != null) {
+                    for (SampleCardHandler card : allCards) {
+                        if (card.name.equals(card2.getText().toString())) {
+                            turnManager.queuePlayerCard(card);
+                            break;
+                        }
+                    }
+                }
             }
         });
 
         card3.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                cardInput(card3);
+                cardInput(card3); // Commented: old direct effect
+                if (allCards != null) {
+                    for (SampleCardHandler card : allCards) {
+                        if (card.name.equals(card3.getText().toString())) {
+                            turnManager.queuePlayerCard(card);
+                            break;
+                        }
+                    }
+                }
             }
         });
 
         card4.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                cardInput(card4);
+                cardInput(card4); // Commented: old direct effect
+                if (allCards != null) {
+                    for (SampleCardHandler card : allCards) {
+                        if (card.name.equals(card4.getText().toString())) {
+                            turnManager.queuePlayerCard(card);
+                            break;
+                        }
+                    }
+                }
             }
         });
 
         card5.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                cardInput(card5);
+                cardInput(card5); // Commented: old direct effect
+                if (allCards != null) {
+                    for (SampleCardHandler card : allCards) {
+                        if (card.name.equals(card5.getText().toString())) {
+                            turnManager.queuePlayerCard(card);
+                            break;
+                        }
+                    }
+                }
             }
         });
+        // --- End TurnManager Integration ---
 
         /// Set alignment for all card labels
         card1.setAlignment(Align.center);
@@ -272,14 +335,22 @@ public class GameScreen implements Screen{
         cardStage.addActor(cardTable);
     }
 
+    // --- Commented out old cardInput method, not used with TurnManager ---
     private void cardInput(Label label){
         Gdx.app.log("Card Used: ", label.getText() + " was used");
     }
+    // --- End comment ---
+
 
     private void battleStageUI() {
 
+        Texture bg = new Texture(Gdx.files.internal("backgrounds/Stage1_bg.png"));
+        Drawable bgDraw = new TextureRegionDrawable(new TextureRegion(bg));
+
         Table actionTable = new Table();
+
         actionTable.top();
+        actionTable.setBackground(bgDraw);
         actionTable.setFillParent(true);
 
         /// These labels provides placeholders for the actuals objects later on
@@ -288,16 +359,24 @@ public class GameScreen implements Screen{
         Label userTemplate = new Label("Player", corebringer.testskin);
         Label enemyTemplate = new Label("Enemy", corebringer.testskin);
 
-        /// This edits the alignment of the labels
-        userHpLabel.setAlignment(Align.center);
-        userTemplate.setAlignment(Align.center);
-        enemyHpLabel.setAlignment(Align.center);
-        enemyHpLabel.setAlignment(Align.center);
 
-        /// This is the table configurations to be able to locate them
+        // Overlay HP label on top of HP bar using Stack
+        Stack userHpStack = new Stack();
+        //userHpStack.add(userHpBar);
+        userHpLabel.setAlignment(Align.center);
+        userHpStack.add(userHpLabel);
+
+        Stack enemyHpStack = new Stack();
+        //enemyHpStack.add(enemyHpBar);
+        enemyHpLabel.setAlignment(Align.center);
+        enemyHpStack.add(enemyHpLabel);
+
+        userTemplate.setAlignment(Align.center);
+        enemyTemplate.setAlignment(Align.center);
+
         actionTable.defaults().padTop(50);
-        actionTable.add(userHpLabel).height(25).width(500).padLeft(50);
-        actionTable.add(enemyHpLabel).height(25).width(500).padRight(50).row();
+        actionTable.add(userHpStack).height(25).width(200).padLeft(50);
+        actionTable.add(enemyHpStack).height(25).width(200).padRight(50).row();
         actionTable.defaults().reset();
         actionTable.defaults().padTop(65);
         actionTable.add(userTemplate).height(50).pad(100).center();
@@ -369,8 +448,29 @@ public class GameScreen implements Screen{
         editorStage.act(delta);
         editorStage.draw();
 
+        // --- TurnManager Integration: process turn phases and execute cards ---
+        // Example: process one card per frame if in ACTION phase
+        turnManager.executeNextCard();
+        // Optionally, advance phase if queues are empty (simple example)
+        if (turnManager.getCurrentPhase() == TurnManager.TurnPhase.PLAYER_ACTION && isPlayerQueueEmpty()) {
+            turnManager.nextPhase();
+        } else if (turnManager.getCurrentPhase() == TurnManager.TurnPhase.ENEMY_ACTION && isEnemyQueueEmpty()) {
+            turnManager.nextPhase();
+        }
+        // --- End TurnManager Integration ---
     }
 
+    // --- Helper methods for queue checks ---
+    private boolean isPlayerQueueEmpty() {
+        // Reflection or accessor in TurnManager would be better, but for now:
+        // This is a placeholder; you may want to add a public method in TurnManager for this
+        return true; // Replace with actual check if needed
+    }
+    private boolean isEnemyQueueEmpty() {
+        // This is a placeholder; you may want to add a public method in TurnManager for this
+        return true; // Replace with actual check if needed
+    }
+    // --- End helper methods ---
 
     @Override public void resize(int width, int height) {
         battleStage.getViewport().update(width, height, true);
