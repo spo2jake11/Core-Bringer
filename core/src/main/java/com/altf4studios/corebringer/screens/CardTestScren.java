@@ -1,6 +1,7 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.utils.LoggingUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -108,12 +109,12 @@ public class CardTestScren implements Screen {
                             SampleCardHandler cardHandler = json.readValue(SampleCardHandler.class, cardJson);
                             if (cardHandler.toString().equals(selected)) {
                                 selectedcard = cardHandler;
-                                Gdx.app.log("CardSelect", "Selected: " + selectedcard.name);
+                                LoggingUtils.log("CardSelect", "Selected: " + selectedcard.name);
                                 break;
                             }
                         }
                     } catch (Exception e) {
-                        Gdx.app.error("CardSelect", "Error selecting card: " + e.getMessage());
+                        LoggingUtils.log("CardSelect", "Error selecting card: " + e.getMessage());
                     }
                 }
             }
@@ -143,7 +144,7 @@ public class CardTestScren implements Screen {
                 if (selectedcard != null) {
                     applyCardEffect(selectedcard);
                 } else {
-                    Gdx.app.log("CardEffect", "No card selected.");
+                    LoggingUtils.log("CardEffect", "No card selected.");
                 }
             }
         });
@@ -251,21 +252,21 @@ public class CardTestScren implements Screen {
                     enemyHp -= card.baseEffect;
                     if (enemyHp < 0) enemyHp = 0;
                     enemyHpLabel.setText(String.valueOf(enemyHp));
-                    Gdx.app.log("CardEffect", "Attacked enemy for " + card.baseEffect + " damage.");
+                    LoggingUtils.log("CardEffect", "Attacked enemy for " + card.baseEffect + " damage.");
                     break;
 
                 case "heal":
                     playerHp += card.baseEffect;
                     userHpLabel.setText(String.valueOf(playerHp));
-                    Gdx.app.log("CardEffect", "Healed player for " + card.baseEffect + " HP.");
+                    LoggingUtils.log("CardEffect", "Healed player for " + card.baseEffect + " HP.");
                     break;
 
                 default:
-                    Gdx.app.log("CardEffect", "Unknown card type: " + card.type);
+                    LoggingUtils.log("CardEffect", "Unknown card type: " + card.type);
                     break;
             }
         } catch (Exception e) {
-            Gdx.app.error("CardEffect", "Error applying card effect: " + e.getMessage());
+            LoggingUtils.log("CardEffect", "Error applying card effect: " + e.getMessage());
         }
     }
 
