@@ -1,6 +1,7 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler;
 import com.altf4studios.corebringer.utils.LoggingCollector;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;

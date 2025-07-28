@@ -6,9 +6,10 @@ import com.altf4studios.corebringer.utils.CardParser;
 import com.altf4studios.corebringer.turns.TurnManager;
 import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
-import com.altf4studios.corebringer.screens.SampleCardHandler;
+import com.altf4studios.corebringer.screens.gamescreen.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -28,6 +29,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 
 public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
@@ -42,16 +45,19 @@ public class GameScreen implements Screen{
 
     // CodeSimulator for running user code
     private com.altf4studios.corebringer.interpreter.CodeSimulator codeSimulator;
-    // TextArea for code input
-    private TextArea codeInputArea;
-    // Run button
-    private TextButton btnRunCode;
+
 
     // --- TurnManager Integration ---
     private TurnManager turnManager;
     private Player player;
     private Enemy enemy;
     // --- End TurnManager Integration ---
+
+    // --- UI Components ---
+    private BattleStageUI battleStageUI;
+    private CardStageUI cardStageUI;
+    private EditorStageUI editorStageUI;
+    // --- End UI Components ---
 
 
     public GameScreen(Main corebringer) {
@@ -77,9 +83,15 @@ public class GameScreen implements Screen{
 
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
-        battleStageUI();
-        cardStageUI();
-        editorStageUI();
+        battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
+        cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser);
+        editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer, codeSimulator);
+        
+        // Test output to verify new UI classes are working
+        Gdx.app.log("GameScreen", "Successfully initialized all UI components:");
+        Gdx.app.log("GameScreen", "- BattleStageUI: " + (battleStageUI != null ? "OK" : "FAILED"));
+        Gdx.app.log("GameScreen", "- CardStageUI: " + (cardStageUI != null ? "OK" : "FAILED"));
+        Gdx.app.log("GameScreen", "- EditorStageUI: " + (editorStageUI != null ? "OK" : "FAILED"));
 
         /// Here's all the things that will initialize once the Start Button is clicked.
 
@@ -92,338 +104,16 @@ public class GameScreen implements Screen{
     }
 
 
-/// This for editorStageUI ONLY
-    private Table editorTable;
-    private Table submenuTable;
-    private Texture editorBG;
-    private Drawable editorTableDrawable;
-    private TextButton btnOptions;
-    private TextButton btnLog;
-    private TextButton btnCheckDeck;
-    private TextButton btnCharacter;
-
-    private void editorStageUI() {
-        /// This is where the code editor will be
-        float worldHeight = editorStage.getViewport().getWorldHeight();
-        float worldWidth = editorStage.getViewport().getWorldWidth();
-
-        editorTable = new Table();
-        editorBG = new Texture(Gdx.files.internal("ui/UI_v3.png"));
-        editorTableDrawable = new TextureRegionDrawable(new TextureRegion(editorBG));
-        // Create code input area and run button
-        codeInputArea = new TextArea("// Write your code here\n", corebringer.testskin);
-        codeInputArea.setPrefRows(4);
-        codeInputArea.setScale(1f);
-        btnRunCode = new TextButton("Run", corebringer.testskin);
-
-        // Table for code input and run button
-        Table codeInputTable = new Table();
-        codeInputTable.left().top();
-        codeInputTable.add(codeInputArea).growX().padRight(10);
-        codeInputTable.add(btnRunCode).width(80).height(40).top();
-
-        // When Run is clicked, execute code and show result in codeLabel
-        btnRunCode.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                String code = codeInputArea.getText();
-                String result = codeSimulator.simulate(code);
-                System.out.println(result);
-            }
-        });
-
-        editorTable.bottom();
-        editorTable.setFillParent(false);
-        editorTable.setSize(worldWidth, worldHeight * 0.3f);
-        editorTable.background(editorTableDrawable);
-
-        /// These now will become the submenu buttons when created
-        submenuTable = new Table();
-        submenuTable.bottom();
-        submenuTable.setFillParent(false);
-        submenuTable.setSize(editorTable.getWidth() * 0.2f, editorTable.getHeight());
-
-        btnOptions = new TextButton("Options", corebringer.testskin);
-        btnLog = new TextButton("Logs", corebringer.testskin);
-        btnCheckDeck = new TextButton("Deck", corebringer.testskin);
-        btnCharacter = new TextButton("Character", corebringer.testskin);
-
-        /// Default format for submenuTable
-        submenuTable.defaults().padTop(30).padBottom(30).padRight(20).padLeft(20).fill().uniform();
-        /// Row 1
-        submenuTable.add(btnOptions);
-        submenuTable.add(btnCheckDeck).row();
-        /// Row 2
-        submenuTable.add(btnLog);
-        submenuTable.add(btnCharacter);
-        /// Everything is now added into the editorTable
 
 
-        // Add code input table and codeLabel to the left, submenu to the right
-        Table leftEditorTable = new Table();
-        leftEditorTable.add(codeInputTable).growX().row();
-
-        editorTable.add(leftEditorTable).grow();
-        editorTable.add(submenuTable).growY().right();
-
-        editorStage.addActor(editorTable);
-
-        /// This Click Listener opens the option window
-        btnOptions.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                optionsWindowUI();
-            }
-        });
-    }
-
-    /// This is for cardStageUI only
-    Table cardTable = new Table();
-
-    private void cardStageUI() {
-        /// Calculate responsive dimensions
-        float worldWidth = Gdx.graphics.getWidth();
-        float worldHeight = Gdx.graphics.getHeight();
-        float cardHeight = worldHeight * 0.2f; // 20% of screen height
-        float cardWidth = (worldWidth * 0.8f) / 5; // 80% of screen width divided by 5 cards
-
-        /// This is where the card display will be
-
-        cardTable.bottom();
-        cardTable.padBottom((worldHeight * 0.3f) + 15);
-        cardTable.setFillParent(true);
-
-        /// Load and randomize cards using CardParser
-        Array<String> cardNames = new Array<>();
-        Array<SampleCardHandler> allCards;
-        if (cardParser.isCardsLoaded()) {
-            allCards = cardParser.getAllCards();
-            int cardCount = Math.min(5, allCards.size); // Limit to 5 cards
-
-            // Create a list of available card names
-            Array<String> availableCardNames = new Array<>();
-            for (SampleCardHandler card : allCards) {
-                availableCardNames.add(card.name);
-            }
-
-            // Randomly select up to 5 cards
-            for (int i = 0; i < cardCount; i++) {
-                if (availableCardNames.size > 0) {
-                    int randomIndex = (int) (Math.random() * availableCardNames.size);
-                    cardNames.add(availableCardNames.get(randomIndex));
-                    Gdx.app.log("Card Loaded", availableCardNames.get(randomIndex));
-                    availableCardNames.removeIndex(randomIndex); // Remove to avoid duplicates
-                }
-            }
-
-            Gdx.app.log("CardStage", "Loaded " + cardNames.size + " random cards");
-        } else {
-            allCards = null;
-            // Fallback if cards couldn't be loaded
-            cardNames.add("Card 1");
-            cardNames.add("Card 2");
-            cardNames.add("Card 3");
-            cardNames.add("Card 4");
-            cardNames.add("Card 5");
-            Gdx.app.error("CardStage", "Failed to load cards, using fallback names");
-        }
-
-        /// Create 5 card placeholders with card names
-        Label card1 = new Label(cardNames.get(0), corebringer.testskin);
-        Label card2 = new Label(cardNames.get(1), corebringer.testskin);
-        Label card3 = new Label(cardNames.get(2), corebringer.testskin);
-        Label card4 = new Label(cardNames.get(3), corebringer.testskin);
-        Label card5 = new Label(cardNames.get(4), corebringer.testskin);
-
-        // --- TurnManager Integration: Card click queues card instead of direct effect ---
-        card1.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                cardInput(card1); // Commented: old direct effect
-                if (allCards != null) {
-                    for (SampleCardHandler card : allCards) {
-                        if (card.name.equals(card1.getText().toString())) {
-                            turnManager.queuePlayerCard(card);
-                            break;
-                        }
-                    }
-                }
-            }
-        });
-
-        card2.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                cardInput(card2); // Commented: old direct effect
-                if (allCards != null) {
-                    for (SampleCardHandler card : allCards) {
-                        if (card.name.equals(card2.getText().toString())) {
-                            turnManager.queuePlayerCard(card);
-                            break;
-                        }
-                    }
-                }
-            }
-        });
-
-        card3.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                cardInput(card3); // Commented: old direct effect
-                if (allCards != null) {
-                    for (SampleCardHandler card : allCards) {
-                        if (card.name.equals(card3.getText().toString())) {
-                            turnManager.queuePlayerCard(card);
-                            break;
-                        }
-                    }
-                }
-            }
-        });
-
-        card4.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                cardInput(card4); // Commented: old direct effect
-                if (allCards != null) {
-                    for (SampleCardHandler card : allCards) {
-                        if (card.name.equals(card4.getText().toString())) {
-                            turnManager.queuePlayerCard(card);
-                            break;
-                        }
-                    }
-                }
-            }
-        });
-
-        card5.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                cardInput(card5); // Commented: old direct effect
-                if (allCards != null) {
-                    for (SampleCardHandler card : allCards) {
-                        if (card.name.equals(card5.getText().toString())) {
-                            turnManager.queuePlayerCard(card);
-                            break;
-                        }
-                    }
-                }
-            }
-        });
-        // --- End TurnManager Integration ---
-
-        /// Set alignment for all card labels
-        card1.setAlignment(Align.center);
-        card2.setAlignment(Align.center);
-        card3.setAlignment(Align.center);
-        card4.setAlignment(Align.center);
-        card5.setAlignment(Align.center);
-
-        /// Configure table defaults for even spacing
-        cardTable.defaults().space(15).pad(5).fill().uniform();
-
-        /// Add all 5 cards in a single row
-        cardTable.add(card1).height(cardHeight).width(cardWidth);
-        cardTable.add(card2).height(cardHeight).width(cardWidth);
-        cardTable.add(card3).height(cardHeight).width(cardWidth);
-        cardTable.add(card4).height(cardHeight).width(cardWidth);
-        cardTable.add(card5).height(cardHeight).width(cardWidth);
-
-        /// Position the card table at the top with some padding
-        cardTable.padTop(20);
-
-        cardStage.addActor(cardTable);
-    }
-
-    // --- Commented out old cardInput method, not used with TurnManager ---
-    private void cardInput(Label label){
-        Gdx.app.log("Card Used: ", label.getText() + " was used");
-    }
-    // --- End comment ---
 
 
-    private void battleStageUI() {
-
-        Texture bg = new Texture(Gdx.files.internal("backgrounds/Stage1_bg.png"));
-        Drawable bgDraw = new TextureRegionDrawable(new TextureRegion(bg));
-
-        Table actionTable = new Table();
-
-        actionTable.top();
-        actionTable.setBackground(bgDraw);
-        actionTable.setFillParent(true);
-
-        /// These labels provides placeholders for the actuals objects later on
-        Label userHpLabel = new Label("100", corebringer.testskin);
-        Label enemyHpLabel = new Label("100", corebringer.testskin);
-        Label userTemplate = new Label("Player", corebringer.testskin);
-        Label enemyTemplate = new Label("Enemy", corebringer.testskin);
 
 
-        // Overlay HP label on top of HP bar using Stack
-        Stack userHpStack = new Stack();
-        //userHpStack.add(userHpBar);
-        userHpLabel.setAlignment(Align.center);
-        userHpStack.add(userHpLabel);
 
-        Stack enemyHpStack = new Stack();
-        //enemyHpStack.add(enemyHpBar);
-        enemyHpLabel.setAlignment(Align.center);
-        enemyHpStack.add(enemyHpLabel);
 
-        userTemplate.setAlignment(Align.center);
-        enemyTemplate.setAlignment(Align.center);
 
-        actionTable.defaults().padTop(50);
-        actionTable.add(userHpStack).height(25).width(200).padLeft(50);
-        actionTable.add(enemyHpStack).height(25).width(200).padRight(50).row();
-        actionTable.defaults().reset();
-        actionTable.defaults().padTop(65);
-        actionTable.add(userTemplate).height(50).pad(100).center();
-        actionTable.add(enemyTemplate).height(50).pad(100).center();
-        battleStage.addActor(actionTable);
-    }
 
-    private void optionsWindowUI(){
-        /// This creates an option window
-        Texture optionBG = new Texture(Gdx.files.internal("ui/optionsBG.png"));
-        Drawable optionBGDrawable = new TextureRegionDrawable(new TextureRegion(optionBG));
-        Window optionsWindow = new Window("", corebringer.testskin);
-        optionsWindow.setModal(true);
-        optionsWindow.setMovable(false);
-        optionsWindow.pad(20);
-        optionsWindow.setSize(640, 480);
-        optionsWindow.setPosition(
-            Gdx.graphics.getWidth() / 2 /2,
-            Gdx.graphics.getHeight() /2 / 2
-        );
-        optionsWindow.background(optionBGDrawable);
-        optionsWindow.setColor(1,1,1,1);
-        /// This button will close the options menu
-        TextButton btnClose = new TextButton("Close", corebringer.testskin);
-        btnClose.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                optionsWindow.remove();
-            }
-        });
-
-        TextButton btnToMain = new TextButton("Title", corebringer.testskin);
-        btnToMain.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(corebringer.mainMenuScreen);
-                optionsWindow.remove();
-            }
-        });
-        /// This is where we add objects into the optionsWindow
-        optionsWindow.add(new Label("Options go here", corebringer.testskin)).top().colspan(2).row();
-        optionsWindow.add(btnClose).growX().padLeft(20).padTop(20).space(15).bottom();
-        optionsWindow.add(btnToMain).growX().padRight(20).padTop(20).space(15).bottom();
-
-        /// This is where it is added into the stage
-        editorStage.addActor(optionsWindow);
-    }
 
     @Override
     public void show() {
@@ -481,12 +171,7 @@ public class GameScreen implements Screen{
         float screenHeight = editorStage.getViewport().getWorldHeight();
         float screenWidth = editorStage.getViewport().getWorldWidth();
         float bottomHeight = screenHeight * 0.3f;
-        editorTable.setSize(screenWidth, bottomHeight);
-        submenuTable.setSize(screenWidth * 0.2f, bottomHeight);
-
-        //This here is the resize for cardUI
-        float worldHeight = cardStage.getViewport().getWorldHeight();
-        cardTable.padBottom((worldHeight * 0.3f) + 15);
+        editorStageUI.resize(screenWidth, screenHeight, bottomHeight);
 
     }
     @Override public void pause() {

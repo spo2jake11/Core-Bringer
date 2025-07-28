@@ -1,6 +1,6 @@
 package com.altf4studios.corebringer.utils;
 
-import com.altf4studios.corebringer.screens.SampleCardHandler;
+import com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;

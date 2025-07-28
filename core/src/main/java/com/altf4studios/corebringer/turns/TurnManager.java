@@ -2,7 +2,7 @@ package com.altf4studios.corebringer.turns;
 
 import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
-import com.altf4studios.corebringer.screens.SampleCardHandler;
+import com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler;
 import java.util.Queue;
 import java.util.LinkedList;
 
