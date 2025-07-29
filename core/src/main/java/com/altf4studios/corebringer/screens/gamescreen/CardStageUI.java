@@ -114,4 +114,28 @@ public class CardStageUI {
     public CardDragAndDrop getCardDragAndDrop() {
         return cardDragAndDrop;
     }
+    
+    public void refreshCardHand() {
+        Gdx.app.log("CardStageUI", "Refreshing card hand with new random cards...");
+        
+        // Get new random card names
+        String[] newCardNames = getCardNames();
+        
+        // Update card labels with new names
+        for (int i = 0; i < cardHandTable.cardLabels.length && i < newCardNames.length; i++) {
+            cardHandTable.cardLabels[i].setText(newCardNames[i]);
+            Gdx.app.log("CardStageUI", "Card " + (i + 1) + " updated to: " + newCardNames[i]);
+        }
+        
+        // Re-setup drag and drop with new cards
+        if (cardDragAndDrop != null) {
+            Label[] slotLabels = {cardSlotTable.slotBasic, cardSlotTable.slotCombine, cardSlotTable.slotExtend};
+            cardDragAndDrop = new CardDragAndDrop(cardHandTable.cardLabels, slotLabels, skin);
+        }
+        
+        // Re-setup click listeners
+        setupCardClickListeners();
+        
+        Gdx.app.log("CardStageUI", "Card hand refreshed successfully");
+    }
 } 

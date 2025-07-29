@@ -101,6 +101,15 @@ public class MainMenuScreen implements Screen {
                 corebringer.corebringerstartmenubgm.stop();
                 corebringer.corebringermapstartbgm.setVolume(1f);
                 corebringer.corebringermapstartbgm.play();
+                
+                // Show random selection message
+                showRandomSelectionMessage();
+                
+                // Trigger random enemy and card selection
+                if (corebringer.gameScreen != null) {
+                    corebringer.gameScreen.triggerRandomSelection();
+                }
+                
                 corebringer.setScreen(corebringer.gameScreen);
             }
         });
@@ -141,6 +150,18 @@ public class MainMenuScreen implements Screen {
             Actions.delay(duration),
             Actions.fadeOut(0.5f),
             Actions.run(() -> isDebugMessageInvisible = false) ///This updates the state of the magic word
+        ));
+    }
+    
+    private void showRandomSelectionMessage() {
+        magicword.setText("Randomizing enemies and cards...");
+        magicword.clearActions();
+        magicword.getColor().a = 1f; ///Make it visible immediately
+        
+        ///Show message briefly before transitioning
+        magicword.addAction(Actions.sequence(
+            Actions.delay(1f),
+            Actions.fadeOut(0.5f)
         ));
     }
 

@@ -31,6 +31,7 @@ import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.Batch;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
@@ -92,6 +93,13 @@ public class GameScreen implements Screen{
         Gdx.app.log("GameScreen", "- BattleStageUI: " + (battleStageUI != null ? "OK" : "FAILED"));
         Gdx.app.log("GameScreen", "- CardStageUI: " + (cardStageUI != null ? "OK" : "FAILED"));
         Gdx.app.log("GameScreen", "- EditorStageUI: " + (editorStageUI != null ? "OK" : "FAILED"));
+        
+        // Test enemy atlas loading
+        if (battleStageUI != null) {
+            Gdx.app.log("GameScreen", "Current enemy: " + battleStageUI.getCurrentEnemyName());
+            Gdx.app.log("GameScreen", "Atlas loaded: " + battleStageUI.isEnemyAtlasLoaded());
+            Gdx.app.log("GameScreen", "Available enemies: " + battleStageUI.getAvailableEnemies().size);
+        }
 
         /// Here's all the things that will initialize once the Start Button is clicked.
 
@@ -160,7 +168,66 @@ public class GameScreen implements Screen{
         // This is a placeholder; you may want to add a public method in TurnManager for this
         return true; // Replace with actual check if needed
     }
-    // --- End helper methods ---
+    
+    // --- Test methods for enemy changing ---
+    public void testChangeEnemy() {
+        if (battleStageUI != null) {
+            battleStageUI.changeEnemy();
+            Gdx.app.log("GameScreen", "Changed enemy to: " + battleStageUI.getCurrentEnemyName());
+        }
+    }
+    
+    public void testChangeToSpecificEnemy(String enemyName) {
+        if (battleStageUI != null) {
+            battleStageUI.changeEnemy(enemyName);
+            Gdx.app.log("GameScreen", "Changed enemy to: " + battleStageUI.getCurrentEnemyName());
+        }
+    }
+    
+    public void triggerRandomSelection() {
+        Gdx.app.log("GameScreen", "Triggering random enemy and card selection...");
+        
+        // Random enemy selection
+        if (battleStageUI != null) {
+            battleStageUI.changeEnemy();
+            Gdx.app.log("GameScreen", "Random enemy selected: " + battleStageUI.getCurrentEnemyName());
+        }
+        
+        // Random card selection (refresh card hand)
+        if (cardStageUI != null) {
+            refreshCardHand();
+            Gdx.app.log("GameScreen", "Random cards selected");
+        }
+        
+        // Show a brief message that random selection occurred
+        showRandomSelectionMessage();
+    }
+    
+    private void showRandomSelectionMessage() {
+        // Create a temporary label to show random selection message
+        Label randomMessage = new Label("Random Selection Complete!", corebringer.testskin);
+        randomMessage.setAlignment(Align.center);
+        randomMessage.setPosition(
+            Gdx.graphics.getWidth() / 2f - 150f,
+            Gdx.graphics.getHeight() / 2f + 100f
+        );
+        
+        // Add to editor stage for display
+        editorStage.addActor(randomMessage);
+        
+        // Remove after 2 seconds
+        randomMessage.addAction(Actions.sequence(
+            Actions.delay(2f),
+            Actions.removeActor()
+        ));
+    }
+    
+    private void refreshCardHand() {
+        if (cardStageUI != null) {
+            cardStageUI.refreshCardHand();
+        }
+    }
+    // --- End test methods ---
 
     @Override public void resize(int width, int height) {
         battleStage.getViewport().update(width, height, true);
@@ -185,6 +252,9 @@ public class GameScreen implements Screen{
 
     @Override
     public void dispose() {
+        if (battleStageUI != null) {
+            battleStageUI.dispose();
+        }
         battleStage.dispose();
         editorStage.dispose();
         cardStage.dispose();
