@@ -89,8 +89,8 @@ public class BattleStageUI {
         // HP Labels
         Label userHpLabel = new Label("100", skin);
         Label enemyHpLabel = new Label("100", skin);
-        Label userTemplate = new Label("Player", skin);
-        Label enemyTemplate = new Label("Enemy", skin);
+        Label userTemplate = new Label("", skin);
+        Label enemyTemplate = new Label("", skin);
 
         // HP Stacks
         Stack userHpStack = new Stack();
@@ -158,7 +158,7 @@ public class BattleStageUI {
 
             // Add new enemy image and template label
             enemyTemplateStack.add(enemyImageBG);
-            Label enemyTemplate = new Label("Enemy", skin);
+            Label enemyTemplate = new Label("", skin);
             enemyTemplate.setAlignment(Align.center);
             enemyTemplateStack.add(enemyTemplate);
         }

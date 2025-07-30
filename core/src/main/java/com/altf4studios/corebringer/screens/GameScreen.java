@@ -87,13 +87,13 @@ public class GameScreen implements Screen{
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
         cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser);
         editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer, codeSimulator);
-        
+
         // Test output to verify new UI classes are working
         Gdx.app.log("GameScreen", "Successfully initialized all UI components:");
         Gdx.app.log("GameScreen", "- BattleStageUI: " + (battleStageUI != null ? "OK" : "FAILED"));
         Gdx.app.log("GameScreen", "- CardStageUI: " + (cardStageUI != null ? "OK" : "FAILED"));
         Gdx.app.log("GameScreen", "- EditorStageUI: " + (editorStageUI != null ? "OK" : "FAILED"));
-        
+
         // Test enemy atlas loading
         if (battleStageUI != null) {
             Gdx.app.log("GameScreen", "Current enemy: " + battleStageUI.getCurrentEnemyName());
@@ -105,23 +105,11 @@ public class GameScreen implements Screen{
 
         /// This provides lines to be able to monitor the objects' boundaries
 //        battleStage.setDebugAll(true);
-        editorStage.setDebugAll(true);
+//        editorStage.setDebugAll(true);
         cardStage.setDebugAll(true);
         JShellExecutor shell = new JShellExecutor();
 
     }
-
-
-
-
-
-
-
-
-
-
-
-
 
     @Override
     public void show() {
@@ -168,7 +156,7 @@ public class GameScreen implements Screen{
         // This is a placeholder; you may want to add a public method in TurnManager for this
         return true; // Replace with actual check if needed
     }
-    
+
     // --- Test methods for enemy changing ---
     public void testChangeEnemy() {
         if (battleStageUI != null) {
@@ -176,33 +164,33 @@ public class GameScreen implements Screen{
             Gdx.app.log("GameScreen", "Changed enemy to: " + battleStageUI.getCurrentEnemyName());
         }
     }
-    
+
     public void testChangeToSpecificEnemy(String enemyName) {
         if (battleStageUI != null) {
             battleStageUI.changeEnemy(enemyName);
             Gdx.app.log("GameScreen", "Changed enemy to: " + battleStageUI.getCurrentEnemyName());
         }
     }
-    
+
     public void triggerRandomSelection() {
         Gdx.app.log("GameScreen", "Triggering random enemy and card selection...");
-        
+
         // Random enemy selection
         if (battleStageUI != null) {
             battleStageUI.changeEnemy();
             Gdx.app.log("GameScreen", "Random enemy selected: " + battleStageUI.getCurrentEnemyName());
         }
-        
+
         // Random card selection (refresh card hand)
         if (cardStageUI != null) {
             refreshCardHand();
             Gdx.app.log("GameScreen", "Random cards selected");
         }
-        
+
         // Show a brief message that random selection occurred
         showRandomSelectionMessage();
     }
-    
+
     private void showRandomSelectionMessage() {
         // Create a temporary label to show random selection message
         Label randomMessage = new Label("Random Selection Complete!", corebringer.testskin);
@@ -211,17 +199,17 @@ public class GameScreen implements Screen{
             Gdx.graphics.getWidth() / 2f - 150f,
             Gdx.graphics.getHeight() / 2f + 100f
         );
-        
+
         // Add to editor stage for display
         editorStage.addActor(randomMessage);
-        
+
         // Remove after 2 seconds
         randomMessage.addAction(Actions.sequence(
             Actions.delay(2f),
             Actions.removeActor()
         ));
     }
-    
+
     private void refreshCardHand() {
         if (cardStageUI != null) {
             cardStageUI.refreshCardHand();
