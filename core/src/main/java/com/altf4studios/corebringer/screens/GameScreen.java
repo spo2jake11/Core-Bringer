@@ -106,7 +106,7 @@ public class GameScreen implements Screen{
         /// This provides lines to be able to monitor the objects' boundaries
 //        battleStage.setDebugAll(true);
 //        editorStage.setDebugAll(true);
-        cardStage.setDebugAll(true);
+//        cardStage.setDebugAll(true);
         JShellExecutor shell = new JShellExecutor();
 
     }

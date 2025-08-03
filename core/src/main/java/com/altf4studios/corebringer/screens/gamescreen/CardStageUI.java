@@ -55,8 +55,8 @@ public class CardStageUI {
         createDrawButton();
 
         // Add draw button to the card table in a new row
-        cardHandTable.cardTable.row();
-        cardHandTable.cardTable.add(drawButton).colspan(5).padTop(10);
+//        cardHandTable.cardTable.row();
+//        cardHandTable.cardTable.add(drawButton).colspan(5).padTop(10);
 
         // Create parent table
         Table parentTable = new Table();
