@@ -122,10 +122,12 @@ public class Main extends Game {
     public void render() {
         super.render();
 
+        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+
         ///This is to give function to the F11 key
-        if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
+        /*if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
             toggleFullscreen();
-        }
+        }*/
     }
 
     ///This method makes the F11 key to work properly for the game to achieve true fullscreen
