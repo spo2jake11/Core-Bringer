@@ -3,6 +3,7 @@ package com.altf4studios.corebringer.turns;
 import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
 import com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler;
+import com.altf4studios.corebringer.utils.CombatLog;
 import java.util.Queue;
 import java.util.LinkedList;
 
@@ -39,6 +40,7 @@ public class TurnManager {
             case PLAYER_START:
                 // Setup for player turn (e.g., draw cards, reset energy)
                 currentPhase = TurnPhase.PLAYER_ACTION;
+                CombatLog.logSystem("Player's turn begins!");
                 break;
             case PLAYER_ACTION:
                 currentPhase = TurnPhase.PLAYER_END;
@@ -49,6 +51,7 @@ public class TurnManager {
             case ENEMY_START:
                 // Setup for enemy turn (e.g., choose actions)
                 currentPhase = TurnPhase.ENEMY_ACTION;
+                CombatLog.logSystem("Enemy's turn begins!");
                 break;
             case ENEMY_ACTION:
                 currentPhase = TurnPhase.ENEMY_END;
@@ -80,8 +83,10 @@ public class TurnManager {
     private void executeCard(SampleCardHandler card, Player player, Enemy enemy) {
         // Example: Only basic attack/heal logic, expand as needed
         if (card.type.equalsIgnoreCase("attack")) {
+            CombatLog.logAttack(player.getName(), enemy.getName(), card.baseEffect);
             enemy.takeDamage(card.baseEffect);
         } else if (card.type.equalsIgnoreCase("heal")) {
+            CombatLog.logInfo(player.getName() + " heals for " + card.baseEffect + " HP");
             player.heal(card.baseEffect);
         }
         // Add more card types and effects as needed
@@ -90,6 +95,7 @@ public class TurnManager {
     private void executeCard(SampleCardHandler card, Enemy enemy, Player player) {
         // Example: Only basic attack logic for enemy
         if (card.type.equalsIgnoreCase("attack")) {
+            CombatLog.logAttack(enemy.getName(), player.getName(), card.baseEffect);
             player.takeDamage(card.baseEffect);
         }
         // Add more card types and effects as needed

@@ -10,6 +10,8 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.altf4studios.corebringer.screens.gamescreen.CombatLogUI;
+import com.altf4studios.corebringer.utils.CombatLog;
 
 public class BattleStageUI {
     private Stage battleStage;
@@ -19,12 +21,14 @@ public class BattleStageUI {
     private String currentEnemyName;
     private Image enemyImageBG;
     private Stack enemyTemplateStack;
+    private CombatLogUI combatLogUI;
 
     public BattleStageUI(Stage battleStage, Skin skin) {
         this.battleStage = battleStage;
         this.skin = skin;
         loadEnemyAtlas();
         setupBattleUI();
+        setupCombatLog();
         Gdx.app.log("BattleStageUI", "Battle stage UI initialized successfully");
     }
 
@@ -130,6 +134,28 @@ public class BattleStageUI {
 
         battleStage.addActor(actionTable);
     }
+    
+    private void setupCombatLog() {
+        // Create combat log UI
+        combatLogUI = new CombatLogUI(skin);
+        
+        // Position the combat log on the right side of the screen
+        float logWidth = 300;
+        float logHeight = 200;
+        float logX = battleStage.getViewport().getWorldWidth() - logWidth - 20;
+        float logY = 20;
+        
+        combatLogUI.setSize(logWidth, logHeight);
+        combatLogUI.setPosition(logX, logY);
+        
+        // Add combat log to the battle stage
+        battleStage.addActor(combatLogUI.getLogContainer());
+        
+        // Add some initial log entries for testing
+        CombatLog.logSystem("Combat started!");
+        CombatLog.logInfo("Player HP: 100 | Enemy HP: 100");
+        combatLogUI.updateLog();
+    }
 
     public String getCurrentEnemyName() {
         return currentEnemyName;
@@ -178,5 +204,23 @@ public class BattleStageUI {
         if (enemyAtlas != null) {
             enemyAtlas.dispose();
         }
+    }
+    
+    // Method to update the combat log display
+    public void updateCombatLog() {
+        if (combatLogUI != null) {
+            combatLogUI.updateLog();
+        }
+    }
+    
+    // Method to add a custom log entry
+    public void addLogEntry(String message, CombatLog.LogType type) {
+        CombatLog.addEntry(message, type);
+        updateCombatLog();
+    }
+    
+    // Get the combat log UI for external access
+    public CombatLogUI getCombatLogUI() {
+        return combatLogUI;
     }
 }
