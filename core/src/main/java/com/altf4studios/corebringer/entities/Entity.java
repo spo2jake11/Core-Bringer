@@ -2,6 +2,9 @@ package com.altf4studios.corebringer.entities;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
+import com.altf4studios.corebringer.status.Poison;
 
 public abstract class Entity implements BattleEntity {
     protected String name;
@@ -12,6 +15,7 @@ public abstract class Entity implements BattleEntity {
     protected boolean alive = true;
     protected int block = 0; // Block points, absorbs damage before HP
     protected Map<String, Integer> statusEffects = new HashMap<>(); // Status effects (e.g., "Vulnerable", "Weakened")
+    protected List<Poison> poisonEffects = new ArrayList<>(); // Poison status effects
 
     public Entity(String name, int maxHealth, int attack, int defense) {
         this.name = name;
@@ -27,6 +31,19 @@ public abstract class Entity implements BattleEntity {
 
     public int getHealth() {
         return health;
+    }
+
+    /// This is for obtaining HP for usage
+    public int getHp() {
+        return getHealth(); /// This delegates it to existing method
+    }
+
+    public void setHp(int hp) {
+        this.health = Math.max(0, Math.min(hp, maxHealth)); /// Prevents HP from going beyond Max HP
+        if (this.health == 0) {
+            alive = false;
+            onDeath();
+        }
     }
 
     public int getMaxHealth() {
@@ -60,6 +77,56 @@ public abstract class Entity implements BattleEntity {
 
     public boolean hasStatus(String status) {
         return statusEffects.containsKey(status) && statusEffects.get(status) > 0;
+    }
+
+    // Poison management
+    public void addPoison(Poison poison) {
+        if (poison != null) {
+            poisonEffects.add(poison);
+            poison.onApply();
+        }
+    }
+
+    public void removePoison(Poison poison) {
+        if (poison != null) {
+            poisonEffects.remove(poison);
+        }
+    }
+
+    public List<Poison> getPoisonEffects() {
+        return new ArrayList<>(poisonEffects);
+    }
+
+    public boolean hasPoison() {
+        return !poisonEffects.isEmpty();
+    }
+
+    public int getTotalPoisonPower() {
+        int totalPower = 0;
+        for (Poison poison : poisonEffects) {
+            totalPower += poison.getPower();
+        }
+        return totalPower;
+    }
+
+    /**
+     * Apply all poison effects and remove expired ones
+     * This should be called at the start of each turn
+     */
+    public void applyPoisonEffects() {
+        List<Poison> expiredPoisons = new ArrayList<>();
+        
+        for (Poison poison : poisonEffects) {
+            poison.applyPoisonDamage(this);
+            if (poison.isExpired()) {
+                expiredPoisons.add(poison);
+            }
+        }
+        
+        // Remove expired poison effects
+        for (Poison expiredPoison : expiredPoisons) {
+            poisonEffects.remove(expiredPoison);
+        }
     }
 
     // Block gain and modifiers

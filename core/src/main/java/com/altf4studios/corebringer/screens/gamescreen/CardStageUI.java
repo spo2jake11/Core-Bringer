@@ -1,6 +1,9 @@
 package com.altf4studios.corebringer.screens.gamescreen;
 
 import com.altf4studios.corebringer.utils.CardParser;
+import com.altf4studios.corebringer.entities.Player;
+import com.altf4studios.corebringer.entities.Enemy;
+import com.altf4studios.corebringer.status.Poison;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -20,10 +23,14 @@ public class CardStageUI {
     private int cardsInHand;
     private Button drawButton;
     private Array<String> availableCardNames;
+    private Player player;
+    private Enemy enemy;
 
-    public CardStageUI(Stage cardStage, Skin skin, CardParser cardParser) {
+    public CardStageUI(Stage cardStage, Skin skin, CardParser cardParser, Player player, Enemy enemy) {
         this.cardStage = cardStage;
         this.skin = skin;
+        this.player = player;
+        this.enemy = enemy;
         this.cardParser = cardParser;
         this.discardedCards = new boolean[5];
         this.cardsInHand = 5;
@@ -55,8 +62,8 @@ public class CardStageUI {
         createDrawButton();
 
         // Add draw button to the card table in a new row
-//        cardHandTable.cardTable.row();
-//        cardHandTable.cardTable.add(drawButton).colspan(5).padTop(10);
+        cardHandTable.cardTable.row();
+        cardHandTable.cardTable.add(drawButton).colspan(5).padTop(10);
 
         // Create parent table
         Table parentTable = new Table();
@@ -69,12 +76,19 @@ public class CardStageUI {
 
     private void initializeAvailableCards() {
         availableCardNames = new Array<>();
+        Gdx.app.log("CardStageUI", "Initializing available cards...");
+        Gdx.app.log("CardStageUI", "CardParser isCardsLoaded: " + cardParser.isCardsLoaded());
+        Gdx.app.log("CardStageUI", "CardParser card count: " + cardParser.getCardCount());
+
         if (cardParser.isCardsLoaded()) {
             Array<SampleCardHandler> allCards = cardParser.getAllCards();
+            Gdx.app.log("CardStageUI", "Loading " + allCards.size + " cards from CardParser");
             for (SampleCardHandler card : allCards) {
                 availableCardNames.add(card.name);
+                Gdx.app.log("CardStageUI", "Added card: " + card.name + " (Type: " + card.type + ")");
             }
         } else {
+            Gdx.app.log("CardStageUI", "Cards not loaded, using fallback names");
             // Fallback card names if cards aren't loaded
             availableCardNames.add("Card 1");
             availableCardNames.add("Card 2");
@@ -87,6 +101,8 @@ public class CardStageUI {
             availableCardNames.add("Card 9");
             availableCardNames.add("Card 10");
         }
+
+        Gdx.app.log("CardStageUI", "Total available card names: " + availableCardNames.size);
     }
 
     private String[] getCardNames() {
@@ -99,7 +115,8 @@ public class CardStageUI {
                 Gdx.app.log("Card Loaded", availableCardNames.get(randomIndex));
                 availableCardNames.removeIndex(randomIndex);
             } else {
-                cardNames[i] = "Empty";
+                cardNames[i] = "Corrupted Card";
+                discardedCards[i] = true;
             }
         }
 
@@ -114,8 +131,12 @@ public class CardStageUI {
             cardLabel.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if (!discardedCards[cardIndex] && !cardLabel.getText().toString().equals("Empty")) {
-                        // Discard the card
+                    if (!discardedCards[cardIndex] && !cardLabel.getText().toString().equals("Corrupted Card") || discardedCards[cardIndex] && cardLabel.getText().toString().equals("Corrupted Card")) {
+
+                        /// Call the effect resolver before discarding
+                        resolveCardEffect(cardLabel.getText().toString());
+
+                        /// Discard the card (the logic now somehow works when discarding "corrupted" cards)
                         discardedCards[cardIndex] = true;
                         cardLabel.setText("Discarded");
                         cardLabel.setColor(0.5f, 0.5f, 0.5f, 0.5f); // Gray out the card
@@ -167,7 +188,7 @@ public class CardStageUI {
         if (availableCardNames.size > 0 && cardsInHand < 5) {
             // Find an empty slot
             for (int i = 0; i < cardHandTable.cardLabels.length; i++) {
-                if (discardedCards[i] || cardHandTable.cardLabels[i].getText().toString().equals("Empty")) {
+                if (discardedCards[i] || cardHandTable.cardLabels[i].getText().toString().equals("Corrupted Card")) {
                     // Draw a new card
                     int randomIndex = (int) (Math.random() * availableCardNames.size);
                     String newCardName = availableCardNames.get(randomIndex);
@@ -227,5 +248,90 @@ public class CardStageUI {
         hideDrawButton();
 
         Gdx.app.log("CardStageUI", "Card hand refreshed successfully");
+    }
+
+    private void resolveCardEffect(String cardName) {
+        SampleCardHandler card = cardParser.findCardByName(cardName);
+
+        if (card != null) {
+            Gdx.app.log("CardEffect", "Processing card: " + card.name + " (Type: " + card.type + ", Effect: " + card.baseEffect + ")");
+
+            if (card.type.equalsIgnoreCase("ATTACK")) {
+                int damage = card.baseEffect;
+
+                Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Deals " + damage + " damage to enemy.");
+
+                // Apply damage to enemy
+                if (enemy != null && enemy.isAlive()) {
+                    enemy.takeDamage(damage);
+                    Gdx.app.log("CardEffect", "Enemy HP reduced to: " + enemy.getHp());
+                }
+
+            } else if (card.type.equalsIgnoreCase("DEFENSE")) {
+                int block = card.baseEffect;
+
+                Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Gains " + block + " block.");
+
+                // Apply block to player
+                if (player != null && player.isAlive()) {
+                    player.gainBlock(block);
+                    Gdx.app.log("CardEffect", "Player block increased to: " + player.getBlock());
+                }
+
+            } else if (card.type.equalsIgnoreCase("BUFF")) {
+                // Handle buff effects based on tags
+                if (card.tags != null && card.tags.contains("INCREASE_ATTACK", false)) {
+                    Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Increases attack by " + card.baseEffect);
+                    // For now, just log the buff - you can implement attack buffing later
+                } else if (card.tags != null && card.tags.contains("APPLY_STATS", false)) {
+                    Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Applies stat buff: " + card.baseEffect);
+                    // For now, just log the buff - you can implement stat buffing later
+                } else {
+                    Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Generic buff effect: " + card.baseEffect);
+                }
+
+            } else if (card.type.equalsIgnoreCase("DEBUFF")) {
+                // Handle debuff effects
+                Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Applies debuff: " + card.baseEffect);
+                // You can implement debuff effects here
+
+            } else {
+                Gdx.app.log("CardEffect", "Unknown card type: " + card.type);
+            }
+
+            // Check for poison application in card description or tags
+            if (card.description != null && card.description.toLowerCase().contains("poison")) {
+                int poisonPower = 5; // Default poison power
+                int poisonDuration = 3; // Default duration
+
+                // Try to extract poison power from description
+                if (card.description.contains("apply") && card.description.contains("poison")) {
+                    // Look for numbers in the description
+                    String[] words = card.description.split("\\s+");
+                    for (int i = 0; i < words.length; i++) {
+                        if (words[i].toLowerCase().contains("poison") && i > 0) {
+                            try {
+                                poisonPower = Integer.parseInt(words[i-1]);
+                                break;
+                            } catch (NumberFormatException e) {
+                                // Use default value
+                            }
+                        }
+                    }
+                }
+
+                Gdx.app.log("CardEffect", "Card '" + card.name + "' applies " + poisonPower + " poison for " + poisonDuration + " turns.");
+
+                // Apply poison to enemy
+                if (enemy != null && enemy.isAlive()) {
+                    Poison poison = new Poison("Poison", poisonPower, poisonDuration);
+                    enemy.addPoison(poison);
+                    Gdx.app.log("CardEffect", "Enemy now has " + enemy.getPoisonEffects().size() + " poison effects");
+                }
+            }
+
+        } else {
+            Gdx.app.log("CardEffect", "No such card found: " + cardName);
+        }
     }
 }

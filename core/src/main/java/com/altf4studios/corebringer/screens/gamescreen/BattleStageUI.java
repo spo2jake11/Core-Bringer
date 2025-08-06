@@ -19,6 +19,8 @@ public class BattleStageUI {
     private String currentEnemyName;
     private Image enemyImageBG;
     private Stack enemyTemplateStack;
+    private Label userHpLabel;
+    private Label enemyHpLabel;
 
     public BattleStageUI(Stage battleStage, Skin skin) {
         this.battleStage = battleStage;
@@ -87,8 +89,8 @@ public class BattleStageUI {
         actionTable.setFillParent(true);
 
         // HP Labels
-        Label userHpLabel = new Label("100", skin);
-        Label enemyHpLabel = new Label("100", skin);
+        userHpLabel = new Label("100", skin);
+        enemyHpLabel = new Label("100", skin);
         Label userTemplate = new Label("", skin);
         Label enemyTemplate = new Label("", skin);
 
@@ -129,6 +131,15 @@ public class BattleStageUI {
         actionTable.add(enemyTemplateStack).height(200).width(200).pad(100).center();
 
         battleStage.addActor(actionTable);
+    }
+    /// HP Bar Updating mechanism
+    public void updateHpBars(int playerHp, int enemyHp) {
+        if (userHpLabel != null) {
+            userHpLabel.setText(String.valueOf(playerHp));
+        }
+        if (enemyHpLabel != null) {
+            enemyHpLabel.setText(String.valueOf(enemyHp));
+        }
     }
 
     public String getCurrentEnemyName() {

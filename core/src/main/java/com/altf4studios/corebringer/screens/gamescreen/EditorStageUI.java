@@ -1,7 +1,10 @@
 package com.altf4studios.corebringer.screens.gamescreen;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.entities.Enemy;
+import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.interpreter.CodeSimulator;
+import com.altf4studios.corebringer.utils.LoggingUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -11,13 +14,17 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 
 public class EditorStageUI {
     private Stage editorStage;
     private Skin skin;
     private Main corebringer;
     private CodeSimulator codeSimulator;
-    
+
     // UI Components
     private Table editorTable;
     private Table submenuTable;
@@ -27,16 +34,30 @@ public class EditorStageUI {
     private TextButton btnLog;
     private TextButton btnCheckDeck;
     private TextButton btnCharacter;
-    
-    public EditorStageUI(Stage editorStage, Skin skin, Main corebringer, CodeSimulator codeSimulator) {
+    private Player player;
+    private Enemy enemy;
+    private List<String> listofcards;
+    private ScrollPane scrolllistofcards;
+    private Array<String> carddescription;
+    private SampleCardHandler selectedcard;
+
+    public EditorStageUI(Stage editorStage, Skin skin, Main corebringer, CodeSimulator codeSimulator, Player player, Enemy enemy) {
         this.editorStage = editorStage;
         this.skin = skin;
         this.corebringer = corebringer;
         this.codeSimulator = codeSimulator;
+        this.editorStage = editorStage;
+        this.skin = skin;
+        this.corebringer = corebringer;
+        this.codeSimulator = codeSimulator;
+        this.player = player;
+        this.enemy = enemy;
+        setupEditorUI();
+        Gdx.app.log("EditorStageUI", "Editor stage UI initialized successfully");
         setupEditorUI();
         Gdx.app.log("EditorStageUI", "Editor stage UI initialized successfully");
     }
-    
+
     private void setupEditorUI() {
         float worldHeight = editorStage.getViewport().getWorldHeight();
         float worldWidth = editorStage.getViewport().getWorldWidth();
@@ -44,7 +65,7 @@ public class EditorStageUI {
         editorTable = new Table();
         Texture editorBG = new Texture(Gdx.files.internal("ui/UI_v3.png"));
         Drawable editorTableDrawable = new TextureRegionDrawable(new TextureRegion(editorBG));
-        
+
         // Create code input area and run button
         codeInputArea = new TextArea("// Write your code here\n", skin);
         codeInputArea.setPrefRows(4);
@@ -101,7 +122,7 @@ public class EditorStageUI {
         // Add click listeners
         setupButtonListeners();
     }
-    
+
     private void setupButtonListeners() {
         btnOptions.addListener(new ClickListener() {
             @Override
@@ -110,7 +131,7 @@ public class EditorStageUI {
             }
         });
     }
-    
+
     private void optionsWindowUI() {
         Texture optionBG = new Texture(Gdx.files.internal("ui/optionsBG.png"));
         Drawable optionBGDrawable = new TextureRegionDrawable(new TextureRegion(optionBG));
@@ -125,7 +146,7 @@ public class EditorStageUI {
         );
         optionsWindow.background(optionBGDrawable);
         optionsWindow.setColor(1, 1, 1, 1);
-        
+
         TextButton btnClose = new TextButton("Close", skin);
         btnClose.addListener(new ClickListener() {
             @Override
@@ -142,24 +163,24 @@ public class EditorStageUI {
                 optionsWindow.remove();
             }
         });
-        
+
         optionsWindow.add(new Label("Options go here", skin)).top().colspan(2).row();
         optionsWindow.add(btnClose).growX().padLeft(20).padTop(20).space(15).bottom();
         optionsWindow.add(btnToMain).growX().padRight(20).padTop(20).space(15).bottom();
 
         editorStage.addActor(optionsWindow);
     }
-    
+
     public void resize(float screenWidth, float screenHeight, float bottomHeight) {
         editorTable.setSize(screenWidth, bottomHeight);
         submenuTable.setSize(screenWidth * 0.2f, bottomHeight);
     }
-    
+
     public TextArea getCodeInputArea() {
         return codeInputArea;
     }
-    
+
     public TextButton getBtnRunCode() {
         return btnRunCode;
     }
-} 
+}

@@ -35,6 +35,17 @@
       "codeEffect": "",
       "suggestion": "",
       "tags": ["APPLY_STATUS", "MULTIHIT"]
+    },{
+      "id": "atk_card4",
+      "name": "Beta Ray",
+      "description": "Deal 7 damage and apply 5 poison stacks",
+      "type": "ATTACK",
+      "targetType": "ENEMY",
+      "cost": 4,
+      "baseEffect": 7,
+      "codeEffect": "",
+      "suggestion": "",
+      "tags": ["APPLY_STATUS", "ATTACK"]
     },
     {
       "id": "util_card1",

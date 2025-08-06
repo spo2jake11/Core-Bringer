@@ -85,8 +85,8 @@ public class GameScreen implements Screen{
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
-        cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser);
-        editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer, codeSimulator);
+        cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy);
+        editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer, codeSimulator, player, enemy);
 
         // Test output to verify new UI classes are working
         Gdx.app.log("GameScreen", "Successfully initialized all UI components:");
@@ -144,6 +144,9 @@ public class GameScreen implements Screen{
             turnManager.nextPhase();
         }
         // --- End TurnManager Integration ---
+
+        /// For wiring the HP values properly
+        battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
     }
 
     // --- Helper methods for queue checks ---
