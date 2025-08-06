@@ -1,9 +1,18 @@
 package com.altf4studios.corebringer.entities;
 
+import java.util.ArrayList;
+import java.util.List;
+import com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler;
+
 public class Player extends Entity {
     private int currentCardCount;
     private final int totalCardCount = 15;
     private int energy;
+    public static final int MAX_HAND_SIZE = 10;
+    private List<SampleCardHandler> hand = new ArrayList<>();
+    private List<SampleCardHandler> drawPile = new ArrayList<>();
+    private List<SampleCardHandler> discardPile = new ArrayList<>();
+    private List<SampleCardHandler> exhaustPile = new ArrayList<>();
 
     public Player(String name, int maxHealth, int attack, int defense, int energy) {
         super(name, maxHealth, attack, defense);
@@ -59,4 +68,50 @@ public class Player extends Entity {
     public void target(Enemy enemy) {
         // Player targets an enemy (e.g., attack)
     }
+
+    // Draw a card, enforcing hand size limit
+    public void drawCard() {
+        if (hand.size() >= MAX_HAND_SIZE) {
+            // Hand is full, skip drawing
+            return;
+        }
+        if (drawPile.isEmpty()) {
+            shuffleDiscardIntoDraw();
+        }
+        if (!drawPile.isEmpty()) {
+            hand.add(drawPile.remove(0));
+        }
+    }
+    // Discard a specific card from hand
+    public void discardCard(SampleCardHandler card) {
+        if (hand.contains(card)) {
+            hand.remove(card);
+            discardPile.add(card);
+        }
+    }
+    // Discard all cards from hand
+    public void discardHand() {
+        discardPile.addAll(hand);
+        hand.clear();
+    }
+    // Exhaust a specific card from hand
+    public void exhaustCard(SampleCardHandler card) {
+        if (hand.contains(card)) {
+            hand.remove(card);
+            exhaustPile.add(card);
+        }
+    }
+    // Shuffle discard pile into draw pile
+    private void shuffleDiscardIntoDraw() {
+        if (!discardPile.isEmpty()) {
+            drawPile.addAll(discardPile);
+            discardPile.clear();
+            java.util.Collections.shuffle(drawPile);
+        }
+    }
+    // Getters for the piles
+    public List<SampleCardHandler> getHand() { return hand; }
+    public List<SampleCardHandler> getDrawPile() { return drawPile; }
+    public List<SampleCardHandler> getDiscardPile() { return discardPile; }
+    public List<SampleCardHandler> getExhaustPile() { return exhaustPile; }
 }

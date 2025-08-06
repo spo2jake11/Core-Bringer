@@ -23,6 +23,11 @@ public class TurnManager {
     private Player player;
     private Enemy enemy;
 
+    // Slot queues for player
+    private Queue<SampleCardHandler> basicSlotQueue = new LinkedList<>();
+    private Queue<SampleCardHandler> combineSlotQueue = new LinkedList<>();
+    private Queue<SampleCardHandler> extendSlotQueue = new LinkedList<>();
+
     public TurnManager(Player player, Enemy enemy) {
         this.player = player;
         this.enemy = enemy;
@@ -106,4 +111,19 @@ public class TurnManager {
         enemyCardQueue.clear();
         currentPhase = TurnPhase.PLAYER_START;
     }
+
+    // Add card to a specific slot queue
+    public void addToBasicSlot(SampleCardHandler card) {
+        basicSlotQueue.add(card);
+    }
+    public void addToCombineSlot(SampleCardHandler card) {
+        combineSlotQueue.add(card);
+    }
+    public void addToExtendSlot(SampleCardHandler card) {
+        extendSlotQueue.add(card);
+    }
+    // Getters for slot queues
+    public Queue<SampleCardHandler> getBasicSlotQueue() { return basicSlotQueue; }
+    public Queue<SampleCardHandler> getCombineSlotQueue() { return combineSlotQueue; }
+    public Queue<SampleCardHandler> getExtendSlotQueue() { return extendSlotQueue; }
 } 
