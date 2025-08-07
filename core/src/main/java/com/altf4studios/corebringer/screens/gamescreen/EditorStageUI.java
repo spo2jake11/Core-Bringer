@@ -48,7 +48,7 @@ public class EditorStageUI {
 
         // Create code input area and run buttons
         codeInputArea = new TextArea("// Write your code here\n// Examples:\n// - Snippets: int x = 5; System.out.println(x);\n// - Classes: public class MyClass { ... }\n// - Methods: public static void main(String[] args) { ... }\n", skin);
-        codeInputArea.setPrefRows(6);
+        codeInputArea.setPrefRows(5);
         codeInputArea.setScale(0.8f);
         btnRunCode = new TextButton("Run Code", skin);
         btnRunClass = new TextButton("Run Class", skin);
@@ -87,7 +87,7 @@ public class EditorStageUI {
 
         editorTable.bottom();
         editorTable.setFillParent(false);
-        editorTable.setSize(worldWidth, worldHeight * 0.45f);
+        editorTable.setSize(worldWidth, worldHeight * 0.4f);
         editorTable.background(editorTableDrawable);
 
         // Submenu buttons

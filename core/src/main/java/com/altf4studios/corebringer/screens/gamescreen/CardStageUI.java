@@ -62,7 +62,7 @@ public class CardStageUI {
         Table parentTable = new Table();
         parentTable.setFillParent(true);
         parentTable.bottom();
-        parentTable.add(cardHandTable.cardTable).expandX().padBottom(worldHeight * 0.45f);
+        parentTable.add(cardHandTable.cardTable).expandX().padBottom(worldHeight * 0.55f);
 
         cardStage.addActor(parentTable);
     }
