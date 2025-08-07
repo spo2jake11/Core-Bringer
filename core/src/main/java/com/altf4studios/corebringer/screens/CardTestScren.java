@@ -179,6 +179,7 @@ public class CardTestScren implements Screen {
         actionTable.top();
         actionTable.setFillParent(true);
 
+
         /// These labels provides placeholders for the actuals objects later on
         userHpLabel = new Label("100", corebringer.testskin);
         enemyHpLabel = new Label("100", corebringer.testskin);

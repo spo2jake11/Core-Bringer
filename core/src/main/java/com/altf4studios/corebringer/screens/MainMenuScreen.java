@@ -121,8 +121,7 @@ public class MainMenuScreen implements Screen {
                 debugclickingcount++;
                 if (debugclickingcount == 19) {
                     /// Message and Duration insie the parameter, this is only a test message
-                    showthemagicword("You suck COCK, gobble on BALLS and swallow CUM!!! " +
-                        " - Ronald ", 2.5f);
+                    showthemagicword("Exited Debug!!! ", 2.5f);
                     debugclickingcount = 0; ///This will reset the count so not everytime you can go to Debug
                     corebringer.setScreen(corebringer.debugScreen);
                 }
