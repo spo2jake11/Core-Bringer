@@ -225,7 +225,7 @@ public class GameScreen implements Screen{
         //This here is the resize for editorUI
         float screenHeight = editorStage.getViewport().getWorldHeight();
         float screenWidth = editorStage.getViewport().getWorldWidth();
-        float bottomHeight = screenHeight * 0.3f;
+        float bottomHeight = screenHeight * 0.45f;
         editorStageUI.resize(screenWidth, screenHeight, bottomHeight);
 
     }

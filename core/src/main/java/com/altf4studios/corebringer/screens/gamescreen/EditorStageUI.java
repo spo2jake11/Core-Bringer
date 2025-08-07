@@ -17,17 +17,18 @@ public class EditorStageUI {
     private Skin skin;
     private Main corebringer;
     private CodeSimulator codeSimulator;
-    
+
     // UI Components
     private Table editorTable;
     private Table submenuTable;
     private TextArea codeInputArea;
     private TextButton btnRunCode;
+    private TextButton btnRunClass;
     private TextButton btnOptions;
     private TextButton btnLog;
     private TextButton btnCheckDeck;
     private TextButton btnCharacter;
-    
+
     public EditorStageUI(Stage editorStage, Skin skin, Main corebringer, CodeSimulator codeSimulator) {
         this.editorStage = editorStage;
         this.skin = skin;
@@ -36,7 +37,7 @@ public class EditorStageUI {
         setupEditorUI();
         Gdx.app.log("EditorStageUI", "Editor stage UI initialized successfully");
     }
-    
+
     private void setupEditorUI() {
         float worldHeight = editorStage.getViewport().getWorldHeight();
         float worldWidth = editorStage.getViewport().getWorldWidth();
@@ -44,32 +45,49 @@ public class EditorStageUI {
         editorTable = new Table();
         Texture editorBG = new Texture(Gdx.files.internal("ui/UI_v3.png"));
         Drawable editorTableDrawable = new TextureRegionDrawable(new TextureRegion(editorBG));
-        
-        // Create code input area and run button
-        codeInputArea = new TextArea("// Write your code here\n", skin);
-        codeInputArea.setPrefRows(4);
-        codeInputArea.setScale(0.8f);
-        btnRunCode = new TextButton("Run", skin);
 
-        // Table for code input and run button
+        // Create code input area and run buttons
+        codeInputArea = new TextArea("// Write your code here\n// Examples:\n// - Snippets: int x = 5; System.out.println(x);\n// - Classes: public class MyClass { ... }\n// - Methods: public static void main(String[] args) { ... }\n", skin);
+        codeInputArea.setPrefRows(6);
+        codeInputArea.setScale(0.8f);
+        btnRunCode = new TextButton("Run Code", skin);
+        btnRunClass = new TextButton("Run Class", skin);
+
+        // Table for code input and run buttons
         Table codeInputTable = new Table();
         codeInputTable.left().top();
         codeInputTable.add(codeInputArea).growX().padRight(10).padLeft(15);
-        codeInputTable.add(btnRunCode).width(80).height(40).top();
 
-        // When Run is clicked, execute code and show result
+        // Button table
+        Table buttonTable = new Table();
+        buttonTable.add(btnRunCode).width(100).height(40).padRight(5).row();
+        buttonTable.add(btnRunClass).width(100).height(40);
+
+        codeInputTable.add(buttonTable).top();
+
+        // When Run Code is clicked, execute code snippet and show result
         btnRunCode.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 String code = codeInputArea.getText();
                 String result = codeSimulator.simulate(code);
-                System.out.println(result);
+                System.out.println("Code Result: " + result);
+            }
+        });
+
+        // When Run Class is clicked, compile and execute class code
+        btnRunClass.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String code = codeInputArea.getText();
+                String result = codeSimulator.compileAndExecute(code);
+                System.out.println("Class Result: " + result);
             }
         });
 
         editorTable.bottom();
         editorTable.setFillParent(false);
-        editorTable.setSize(worldWidth, worldHeight * 0.3f);
+        editorTable.setSize(worldWidth, worldHeight * 0.45f);
         editorTable.background(editorTableDrawable);
 
         // Submenu buttons
@@ -101,7 +119,7 @@ public class EditorStageUI {
         // Add click listeners
         setupButtonListeners();
     }
-    
+
     private void setupButtonListeners() {
         btnOptions.addListener(new ClickListener() {
             @Override
@@ -110,7 +128,7 @@ public class EditorStageUI {
             }
         });
     }
-    
+
     private void optionsWindowUI() {
         Texture optionBG = new Texture(Gdx.files.internal("ui/optionsBG.png"));
         Drawable optionBGDrawable = new TextureRegionDrawable(new TextureRegion(optionBG));
@@ -125,7 +143,7 @@ public class EditorStageUI {
         );
         optionsWindow.background(optionBGDrawable);
         optionsWindow.setColor(1, 1, 1, 1);
-        
+
         TextButton btnClose = new TextButton("Close", skin);
         btnClose.addListener(new ClickListener() {
             @Override
@@ -142,24 +160,24 @@ public class EditorStageUI {
                 optionsWindow.remove();
             }
         });
-        
+
         optionsWindow.add(new Label("Options go here", skin)).top().colspan(2).row();
         optionsWindow.add(btnClose).growX().padLeft(20).padTop(20).space(15).bottom();
         optionsWindow.add(btnToMain).growX().padRight(20).padTop(20).space(15).bottom();
 
         editorStage.addActor(optionsWindow);
     }
-    
+
     public void resize(float screenWidth, float screenHeight, float bottomHeight) {
         editorTable.setSize(screenWidth, bottomHeight);
         submenuTable.setSize(screenWidth * 0.2f, bottomHeight);
     }
-    
+
     public TextArea getCodeInputArea() {
         return codeInputArea;
     }
-    
+
     public TextButton getBtnRunCode() {
         return btnRunCode;
     }
-} 
+}
