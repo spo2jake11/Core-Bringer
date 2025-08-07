@@ -3,7 +3,6 @@ package com.altf4studios.corebringer.turns;
 import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
 import com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler;
-import com.altf4studios.corebringer.utils.CombatLog;
 import java.util.Queue;
 import java.util.LinkedList;
 
@@ -44,8 +43,11 @@ public class TurnManager {
         switch (currentPhase) {
             case PLAYER_START:
                 // Setup for player turn (e.g., draw cards, reset energy)
+                // Apply poison effects at the start of player turn
+                if (player.hasPoison()) {
+                    player.applyPoisonEffects();
+                }
                 currentPhase = TurnPhase.PLAYER_ACTION;
-                CombatLog.logSystem("Player's turn begins!");
                 break;
             case PLAYER_ACTION:
                 currentPhase = TurnPhase.PLAYER_END;
@@ -55,8 +57,11 @@ public class TurnManager {
                 break;
             case ENEMY_START:
                 // Setup for enemy turn (e.g., choose actions)
+                // Apply poison effects at the start of enemy turn
+                if (enemy.hasPoison()) {
+                    enemy.applyPoisonEffects();
+                }
                 currentPhase = TurnPhase.ENEMY_ACTION;
-                CombatLog.logSystem("Enemy's turn begins!");
                 break;
             case ENEMY_ACTION:
                 currentPhase = TurnPhase.ENEMY_END;
@@ -86,24 +91,82 @@ public class TurnManager {
     }
 
     private void executeCard(SampleCardHandler card, Player player, Enemy enemy) {
-        // Example: Only basic attack/heal logic, expand as needed
-        if (card.type.equalsIgnoreCase("attack")) {
-            CombatLog.logAttack(player.getName(), enemy.getName(), card.baseEffect);
+        // Handle different card types based on the cards.json structure
+        if (card.type.equalsIgnoreCase("ATTACK")) {
             enemy.takeDamage(card.baseEffect);
-        } else if (card.type.equalsIgnoreCase("heal")) {
-            CombatLog.logInfo(player.getName() + " heals for " + card.baseEffect + " HP");
-            player.heal(card.baseEffect);
+        } else if (card.type.equalsIgnoreCase("DEFENSE")) {
+            player.gainBlock(card.baseEffect);
+        } else if (card.type.equalsIgnoreCase("BUFF")) {
+            // Handle buff effects - for now just log them
+            if (card.tags != null && card.tags.contains("INCREASE_ATTACK", false)) {
+                // TODO: Implement attack buffing
+            } else if (card.tags != null && card.tags.contains("APPLY_STATS", false)) {
+                // TODO: Implement stat buffing
+            }
+        } else if (card.type.equalsIgnoreCase("DEBUFF")) {
+            // Handle debuff effects - for now just log them
         }
-        // Add more card types and effects as needed
+
+        // Check for poison application in card description
+        if (card.description != null && card.description.toLowerCase().contains("poison")) {
+            int poisonPower = 5; // Default poison power
+            int poisonDuration = 3; // Default duration
+
+            // Try to extract poison power from description
+            if (card.description.contains("apply") && card.description.contains("poison")) {
+                String[] words = card.description.split("\\s+");
+                for (int i = 0; i < words.length; i++) {
+                    if (words[i].toLowerCase().contains("poison") && i > 0) {
+                        try {
+                            poisonPower = Integer.parseInt(words[i-1]);
+                            break;
+                        } catch (NumberFormatException e) {
+                            // Use default value
+                        }
+                    }
+                }
+            }
+
+            com.altf4studios.corebringer.status.Poison poison = new com.altf4studios.corebringer.status.Poison("Poison", poisonPower, poisonDuration);
+            enemy.addPoison(poison);
+        }
     }
 
     private void executeCard(SampleCardHandler card, Enemy enemy, Player player) {
-        // Example: Only basic attack logic for enemy
-        if (card.type.equalsIgnoreCase("attack")) {
-            CombatLog.logAttack(enemy.getName(), player.getName(), card.baseEffect);
+        // Handle different card types for enemy actions
+        if (card.type.equalsIgnoreCase("ATTACK")) {
             player.takeDamage(card.baseEffect);
+        } else if (card.type.equalsIgnoreCase("DEFENSE")) {
+            enemy.gainBlock(card.baseEffect);
+        } else if (card.type.equalsIgnoreCase("BUFF")) {
+            // Handle buff effects for enemy - for now just log them
+        } else if (card.type.equalsIgnoreCase("DEBUFF")) {
+            // Handle debuff effects for enemy - for now just log them
         }
-        // Add more card types and effects as needed
+
+        // Check for poison application in card description (enemy applying poison to player)
+        if (card.description != null && card.description.toLowerCase().contains("poison")) {
+            int poisonPower = 5; // Default poison power
+            int poisonDuration = 3; // Default duration
+
+            // Try to extract poison power from description
+            if (card.description.contains("apply") && card.description.contains("poison")) {
+                String[] words = card.description.split("\\s+");
+                for (int i = 0; i < words.length; i++) {
+                    if (words[i].toLowerCase().contains("poison") && i > 0) {
+                        try {
+                            poisonPower = Integer.parseInt(words[i-1]);
+                            break;
+                        } catch (NumberFormatException e) {
+                            // Use default value
+                        }
+                    }
+                }
+            }
+
+            com.altf4studios.corebringer.status.Poison poison = new com.altf4studios.corebringer.status.Poison("Poison", poisonPower, poisonDuration);
+            player.addPoison(poison);
+        }
     }
 
     public void reset() {
@@ -126,4 +189,4 @@ public class TurnManager {
     public Queue<SampleCardHandler> getBasicSlotQueue() { return basicSlotQueue; }
     public Queue<SampleCardHandler> getCombineSlotQueue() { return combineSlotQueue; }
     public Queue<SampleCardHandler> getExtendSlotQueue() { return extendSlotQueue; }
-} 
+}

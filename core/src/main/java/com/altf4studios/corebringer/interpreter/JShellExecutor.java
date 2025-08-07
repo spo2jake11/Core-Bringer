@@ -4,6 +4,8 @@ import com.altf4studios.corebringer.entities.Entity;
 import jdk.jshell.JShell;
 import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
+import java.io.ByteArrayOutputStream;
+import java.io.PrintStream;
 import java.util.List;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
@@ -39,18 +41,34 @@ public class JShellExecutor {
 
     /**
      * Submits code to the JShell session and returns output/errors as a string.
+     * Captures System.out output during execution.
      */
     public String submitCode(String code) {
         StringBuilder output = new StringBuilder();
-        List<SnippetEvent> events = shell.eval(code);
-        for (SnippetEvent event : events) {
-            if (event.exception() != null) {
-                output.append("Exception: ").append(event.exception().getMessage()).append("\n");
-            } else if (event.value() != null) {
-                output.append(event.value()).append("\n");
-            } else if (event.status() == Snippet.Status.REJECTED) {
-                output.append("Error: ").append(event.snippet().source()).append(" was rejectedx.\n");
+        // Capture System.out
+        PrintStream originalOut = System.out;
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        System.setOut(ps);
+        try {
+            List<SnippetEvent> events = shell.eval(code);
+            for (SnippetEvent event : events) {
+                if (event.exception() != null) {
+                    output.append("Exception: ").append(event.exception().getMessage()).append("\n");
+                } else if (event.value() != null) {
+                    output.append(event.value()).append("\n");
+                } else if (event.status() == Snippet.Status.REJECTED) {
+                    output.append("Error: ").append(event.snippet().source()).append(" was rejected.\n");
+                }
             }
+        } finally {
+            System.out.flush();
+            System.setOut(originalOut);
+        }
+        // Append captured System.out output
+        String stdOut = baos.toString();
+        if (!stdOut.isEmpty()) {
+            output.append(stdOut);
         }
         return output.toString();
     }

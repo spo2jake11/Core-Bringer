@@ -15,6 +15,7 @@ public class CodeSimulator {
 
     /**
      * Simulates code execution: validates, then executes if valid.
+     * Handles snippets, methods, and classes.
      * @param code User-submitted code
      * @return Output or error message
      */
@@ -22,9 +23,27 @@ public class CodeSimulator {
         if (!validator.isValid(code)) {
             return "Validation Error: " + validator.getLastError();
         }
-        return executor.submitCode(code);
+        // Detect if code is a method (not inside a class)
+        if (isMethodOnly(code)) {
+            // Wrap in a class with a main method that calls the method
+            String className = "UserMethod";
+            String methodName = extractMethodName(code);
+            StringBuilder mainContent = new StringBuilder();
+            if (methodName != null) {
+                // Try to call the method with default arguments if possible
+                mainContent.append(methodName).append("();");
+            }
+            String wrapped = "public class " + className + " {\n" + code + "\npublic static void main(String[] args) {\n" + mainContent + "\n}\n}";
+            return compileAndExecute(wrapped);
+        } else if (isClassWithMain(code)) {
+            // It's a class with a main method, treat as class
+            return compileAndExecute(code);
+        } else {
+            // Treat as snippet
+            return executor.submitCode(code);
+        }
     }
-    
+
     /**
      * Compiles and executes class-based code
      * @param code Complete class code
@@ -32,53 +51,40 @@ public class CodeSimulator {
      */
     public String compileAndExecute(String code) {
         ClassManager.CompilationResult compilation = classManager.compileClasses(code);
-        
         if (!compilation.isSuccess()) {
             return "Compilation Error: " + compilation.getOutput();
         }
-        
         // Try to find and execute main method
         String mainClassName = extractMainClassName(code);
         if (mainClassName != null) {
             ClassManager.ExecutionResult execution = classManager.executeMainMethod(mainClassName);
-            return "Compilation: Success\n" + 
-                   "Execution: " + (execution.isSuccess() ? "Success" : "Failed") + "\n" +
-                   "Output: " + execution.getOutput();
+            return (execution.getOutput().isEmpty() ? "(No output)\n" : "") + execution.getOutput();
         }
-        
-        return "Compilation: Success\n" + compilation.getOutput();
+        return "(No output)\n" + compilation.getOutput();
     }
-    
-    /**
-     * Creates a simple class with the given content
-     */
-    public String createClass(String className, String classContent) {
-        codeBuilder.clear();
-        codeBuilder.addClass(className, classContent);
-        return compileAndExecute(codeBuilder.build());
+
+    // --- Helper methods ---
+    private boolean isMethodOnly(String code) {
+        // Detects if code is a method definition (not inside a class)
+        String methodPattern = "(public|private|protected)?\\s*static\\s+\\w+\\s+\\w+\\s*\\([^)]*\\)\\s*\\{";
+        return code.trim().matches(methodPattern + ".*");
     }
-    
-    /**
-     * Creates a class with a main method
-     */
-    public String createMainClass(String className, String mainMethodContent) {
-        codeBuilder.clear();
-        codeBuilder.addMainClass(className, mainMethodContent);
-        return compileAndExecute(codeBuilder.build());
+
+    private boolean isClassWithMain(String code) {
+        // Detects if code contains a class with a main method
+        return code.contains("class") && code.contains("static void main");
     }
-    
-    /**
-     * Creates a utility class with static methods
-     */
-    public String createUtilityClass(String className, String methods) {
-        codeBuilder.clear();
-        codeBuilder.addUtilityClass(className, methods);
-        return compileAndExecute(codeBuilder.build());
+
+    private String extractMethodName(String code) {
+        // Extracts the method name from a method definition
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(public|private|protected)?\\s*static\\s+\\w+\\s+(\\w+)\\s*\\(");
+        java.util.regex.Matcher matcher = pattern.matcher(code);
+        if (matcher.find()) {
+            return matcher.group(2);
+        }
+        return null;
     }
-    
-    /**
-     * Extracts the main class name from code
-     */
+
     private String extractMainClassName(String code) {
         // Simple regex to find class with main method
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile(

@@ -10,8 +10,6 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
-import com.altf4studios.corebringer.screens.gamescreen.CombatLogUI;
-import com.altf4studios.corebringer.utils.CombatLog;
 
 public class BattleStageUI {
     private Stage battleStage;
@@ -21,14 +19,14 @@ public class BattleStageUI {
     private String currentEnemyName;
     private Image enemyImageBG;
     private Stack enemyTemplateStack;
-    private CombatLogUI combatLogUI;
+    private Label userHpLabel;
+    private Label enemyHpLabel;
 
     public BattleStageUI(Stage battleStage, Skin skin) {
         this.battleStage = battleStage;
         this.skin = skin;
         loadEnemyAtlas();
         setupBattleUI();
-        setupCombatLog();
         Gdx.app.log("BattleStageUI", "Battle stage UI initialized successfully");
     }
 
@@ -91,8 +89,8 @@ public class BattleStageUI {
         actionTable.setFillParent(true);
 
         // HP Labels
-        Label userHpLabel = new Label("100", skin);
-        Label enemyHpLabel = new Label("100", skin);
+        userHpLabel = new Label("100", skin);
+        enemyHpLabel = new Label("100", skin);
         Label userTemplate = new Label("", skin);
         Label enemyTemplate = new Label("", skin);
 
@@ -134,27 +132,14 @@ public class BattleStageUI {
 
         battleStage.addActor(actionTable);
     }
-    
-    private void setupCombatLog() {
-        // Create combat log UI
-        combatLogUI = new CombatLogUI(skin);
-        
-        // Position the combat log on the right side of the screen
-        float logWidth = 300;
-        float logHeight = 200;
-        float logX = battleStage.getViewport().getWorldWidth() - logWidth - 20;
-        float logY = 20;
-        
-        combatLogUI.setSize(logWidth, logHeight);
-        combatLogUI.setPosition(logX, logY);
-        
-        // Add combat log to the battle stage
-        battleStage.addActor(combatLogUI.getLogContainer());
-        
-        // Add some initial log entries for testing
-        CombatLog.logSystem("Combat started!");
-        CombatLog.logInfo("Player HP: 100 | Enemy HP: 100");
-        combatLogUI.updateLog();
+    /// HP Bar Updating mechanism
+    public void updateHpBars(int playerHp, int enemyHp) {
+        if (userHpLabel != null) {
+            userHpLabel.setText(String.valueOf(playerHp));
+        }
+        if (enemyHpLabel != null) {
+            enemyHpLabel.setText(String.valueOf(enemyHp));
+        }
     }
 
     public String getCurrentEnemyName() {
@@ -204,23 +189,5 @@ public class BattleStageUI {
         if (enemyAtlas != null) {
             enemyAtlas.dispose();
         }
-    }
-    
-    // Method to update the combat log display
-    public void updateCombatLog() {
-        if (combatLogUI != null) {
-            combatLogUI.updateLog();
-        }
-    }
-    
-    // Method to add a custom log entry
-    public void addLogEntry(String message, CombatLog.LogType type) {
-        CombatLog.addEntry(message, type);
-        updateCombatLog();
-    }
-    
-    // Get the combat log UI for external access
-    public CombatLogUI getCombatLogUI() {
-        return combatLogUI;
     }
 }

@@ -1,7 +1,10 @@
 package com.altf4studios.corebringer.screens.gamescreen;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.entities.Enemy;
+import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.interpreter.CodeSimulator;
+import com.altf4studios.corebringer.utils.LoggingUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -11,6 +14,10 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Json;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 
 public class EditorStageUI {
     private Stage editorStage;
@@ -28,14 +35,28 @@ public class EditorStageUI {
     private TextButton btnLog;
     private TextButton btnCheckDeck;
     private TextButton btnCharacter;
+    private Player player;
+    private Enemy enemy;
+    private List<String> listofcards;
+    private ScrollPane scrolllistofcards;
+    private Array<String> carddescription;
+    private SampleCardHandler selectedcard;
 
-    public EditorStageUI(Stage editorStage, Skin skin, Main corebringer, CodeSimulator codeSimulator) {
+    public EditorStageUI(Stage editorStage, Skin skin, Main corebringer, CodeSimulator codeSimulator, Player player, Enemy enemy) {
         this.editorStage = editorStage;
         this.skin = skin;
         this.corebringer = corebringer;
         this.codeSimulator = codeSimulator;
+        this.editorStage = editorStage;
+        this.skin = skin;
+        this.corebringer = corebringer;
+        this.codeSimulator = codeSimulator;
+        this.player = player;
+        this.enemy = enemy;
         setupEditorUI();
         Gdx.app.log("EditorStageUI", "Editor stage UI initialized successfully");
+//        setupEditorUI();
+//        Gdx.app.log("EditorStageUI", "Editor stage UI initialized successfully");
     }
 
     private void setupEditorUI() {
@@ -46,6 +67,7 @@ public class EditorStageUI {
         Texture editorBG = new Texture(Gdx.files.internal("ui/UI_v3.png"));
         Drawable editorTableDrawable = new TextureRegionDrawable(new TextureRegion(editorBG));
 
+
         // Create code input area and run buttons
         codeInputArea = new TextArea("// Write your code here\n// Examples:\n// - Snippets: int x = 5; System.out.println(x);\n// - Classes: public class MyClass { ... }\n// - Methods: public static void main(String[] args) { ... }\n", skin);
         codeInputArea.setPrefRows(5);
@@ -53,7 +75,7 @@ public class EditorStageUI {
         btnRunCode = new TextButton("Run Code", skin);
         btnRunClass = new TextButton("Run Class", skin);
 
-        // Table for code input and run buttons
+        // Table for code input and run button
         Table codeInputTable = new Table();
         codeInputTable.left().top();
         codeInputTable.add(codeInputArea).growX().padRight(10).padLeft(15);
@@ -71,6 +93,7 @@ public class EditorStageUI {
             public void clicked(InputEvent event, float x, float y) {
                 String code = codeInputArea.getText();
                 String result = codeSimulator.simulate(code);
+                System.out.println(result);
                 System.out.println("Code Result: " + result);
             }
         });
@@ -87,7 +110,7 @@ public class EditorStageUI {
 
         editorTable.bottom();
         editorTable.setFillParent(false);
-        editorTable.setSize(worldWidth, worldHeight * 0.4f);
+        editorTable.setSize(worldWidth, worldHeight * 0.3f);
         editorTable.background(editorTableDrawable);
 
         // Submenu buttons
