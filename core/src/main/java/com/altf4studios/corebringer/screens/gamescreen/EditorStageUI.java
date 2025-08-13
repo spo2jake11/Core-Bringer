@@ -55,8 +55,6 @@ public class EditorStageUI {
         this.enemy = enemy;
         setupEditorUI();
         Gdx.app.log("EditorStageUI", "Editor stage UI initialized successfully");
-//        setupEditorUI();
-//        Gdx.app.log("EditorStageUI", "Editor stage UI initialized successfully");
     }
 
     private void setupEditorUI() {
