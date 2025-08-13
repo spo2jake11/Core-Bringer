@@ -93,7 +93,7 @@ public class EditorStageUI {
             public void clicked(InputEvent event, float x, float y) {
                 String code = codeInputArea.getText();
                 String result = codeSimulator.simulate(code);
-                System.out.println(result);
+//                System.out.println(result);
                 System.out.println("Code Result: " + result);
             }
         });
