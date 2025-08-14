@@ -39,6 +39,14 @@ public class Enemy extends Entity {
         // Implement skill logic here
     }
 
+    // Simple attack method for basic turn-based combat
+    public void attack(Entity target) {
+        if (target != null && target.isAlive() && this.isAlive()) {
+            int damage = this.getAttack();
+            target.takeDamage(damage);
+        }
+    }
+
     @Override
     public void target(Player player) {
         // Enemy targets a player (e.g., attack or use skill)

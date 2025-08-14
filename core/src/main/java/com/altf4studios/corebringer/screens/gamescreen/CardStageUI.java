@@ -4,6 +4,7 @@ import com.altf4studios.corebringer.utils.CardParser;
 import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
 import com.altf4studios.corebringer.status.Poison;
+import com.altf4studios.corebringer.turns.TurnManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -25,13 +26,15 @@ public class CardStageUI {
     private Array<String> availableCardNames;
     private Player player;
     private Enemy enemy;
+    private TurnManager turnManager;
 
-    public CardStageUI(Stage cardStage, Skin skin, CardParser cardParser, Player player, Enemy enemy) {
+    public CardStageUI(Stage cardStage, Skin skin, CardParser cardParser, Player player, Enemy enemy, TurnManager turnManager) {
         this.cardStage = cardStage;
         this.skin = skin;
         this.player = player;
         this.enemy = enemy;
         this.cardParser = cardParser;
+        this.turnManager = turnManager;
         this.discardedCards = new boolean[5];
         this.cardsInHand = 5;
         setupCardUI();
@@ -320,7 +323,7 @@ public class CardStageUI {
                     }
                 }
 
-                Gdx.app.log("CardEffect", "Card '" + card.name + "' applies " + poisonPower + " poison for " + poisonDuration + " turns.");
+                Gdx.app.log("CardEffect", "Card '" + card.name + "' applies " + poisonPower + " poison for " + card.baseEffect + " turns.");
 
                 // Apply poison to enemy
                 if (enemy != null && enemy.isAlive()) {
@@ -328,6 +331,12 @@ public class CardStageUI {
                     enemy.addPoison(poison);
                     Gdx.app.log("CardEffect", "Enemy now has " + enemy.getPoisonEffects().size() + " poison effects");
                 }
+            }
+
+            // End player turn after playing a card
+            if (turnManager != null && turnManager.isPlayerTurn()) {
+                turnManager.endPlayerTurn();
+                Gdx.app.log("CardEffect", "Player turn ended, enemy turn starting...");
             }
 
         } else {
