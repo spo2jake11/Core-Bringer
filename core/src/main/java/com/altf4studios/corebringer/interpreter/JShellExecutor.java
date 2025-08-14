@@ -14,9 +14,15 @@ import java.util.concurrent.TimeoutException;
 public class JShellExecutor {
     private JShell shell;
     private static JShellExecutor instance;
+    private ByteArrayOutputStream capturedOutput;
+    private PrintStream customOut;
 
     public JShellExecutor() {
-        shell = JShell.create();
+        capturedOutput = new ByteArrayOutputStream();
+        customOut = new PrintStream(capturedOutput);
+        shell = JShell.builder()
+            .out(customOut)
+            .build();
         // Optionally preload game objects here
     }
 
@@ -44,12 +50,13 @@ public class JShellExecutor {
      * Captures System.out output during execution.
      */
     public String submitCode(String code) {
+        System.out.println("JShellExecutor.submitCode() called with: " + code);
+        
+        // Clear previous output
+        capturedOutput.reset();
+        
         StringBuilder output = new StringBuilder();
-        // Capture System.out
-        PrintStream originalOut = System.out;
-        ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        PrintStream ps = new PrintStream(baos);
-        System.setOut(ps);
+        
         try {
             List<SnippetEvent> events = shell.eval(code);
             for (SnippetEvent event : events) {
@@ -61,15 +68,19 @@ public class JShellExecutor {
                     output.append("Error: ").append(event.snippet().source()).append(" was rejected.\n");
                 }
             }
-        } finally {
-            System.out.flush();
-            System.setOut(originalOut);
+            
+            // Get captured output from JShell
+            String capturedOut = capturedOutput.toString();
+            System.out.println("Captured JShell output: '" + capturedOut + "'");
+            if (!capturedOut.isEmpty()) {
+                output.append(capturedOut);
+            }
+            
+        } catch (Exception e) {
+            output.append("Error: ").append(e.getMessage()).append("\n");
         }
-        // Append captured System.out output
-        String stdOut = baos.toString();
-        if (!stdOut.isEmpty()) {
-            output.append(stdOut);
-        }
+        
+        System.out.println("Final output: '" + output.toString() + "'");
         return output.toString();
     }
 
@@ -101,7 +112,10 @@ public class JShellExecutor {
      */
     public void resetSession() {
         shell.close();
-        shell = JShell.create();
+        capturedOutput.reset();
+        shell = JShell.builder()
+            .out(customOut)
+            .build();
         // Optionally reload game objects
     }
 }

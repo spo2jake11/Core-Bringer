@@ -29,6 +29,8 @@ public class EditorStageUI {
     private Table editorTable;
     private Table submenuTable;
     private TextArea codeInputArea;
+    private Window outputWindow;
+    private TextArea outputArea;
     private TextButton btnRunCode;
     private TextButton btnRunClass;
     private TextButton btnOptions;
@@ -70,6 +72,10 @@ public class EditorStageUI {
         codeInputArea = new TextArea("// Write your code here\n// Examples:\n// - Snippets: int x = 5; System.out.println(x);\n// - Classes: public class MyClass { ... }\n// - Methods: public static void main(String[] args) { ... }\n", skin);
         codeInputArea.setPrefRows(5);
         codeInputArea.setScale(0.8f);
+
+        // Create output window (initially hidden)
+        createOutputWindow();
+
         btnRunCode = new TextButton("Run Code", skin);
         btnRunClass = new TextButton("Run Class", skin);
 
@@ -90,8 +96,14 @@ public class EditorStageUI {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 String code = codeInputArea.getText();
+                System.out.println("Executing code: " + code);
                 String result = codeSimulator.simulate(code);
-//                System.out.println(result);
+                System.out.println("Raw result: '" + result + "'");
+
+                // Filter out debug messages and show only actual output
+                String cleanResult = filterOutput(result);
+                outputArea.setText(cleanResult.isEmpty() ? "// No output" : cleanResult);
+                showOutputWindow("Code Execution Result", cleanResult);
                 System.out.println("Code Result: " + result);
             }
         });
@@ -101,7 +113,14 @@ public class EditorStageUI {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 String code = codeInputArea.getText();
+                System.out.println("Executing class code: " + code);
                 String result = codeSimulator.compileAndExecute(code);
+                System.out.println("Raw class result: '" + result + "'");
+
+                // Filter out debug messages and show only actual output
+                String cleanResult = filterOutput(result);
+                outputArea.setText(cleanResult.isEmpty() ? "// No output" : cleanResult);
+                showOutputWindow("Class Execution Result", cleanResult);
                 System.out.println("Class Result: " + result);
             }
         });
@@ -130,7 +149,7 @@ public class EditorStageUI {
 
         // Add code input table and submenu to the editor table
         Table leftEditorTable = new Table();
-        leftEditorTable.add(codeInputTable).growX().row();
+        leftEditorTable.add(codeInputTable).growX();
 
         editorTable.add(leftEditorTable).grow();
         editorTable.add(submenuTable).growY().right();
@@ -200,5 +219,127 @@ public class EditorStageUI {
 
     public TextButton getBtnRunCode() {
         return btnRunCode;
+    }
+
+    public TextArea getOutputArea() {
+        return outputArea;
+    }
+
+    /**
+     * Creates the output window (initially hidden)
+     */
+    private void createOutputWindow() {
+        // Create output area
+        outputArea = new TextArea("// Output will appear here\n", skin);
+        outputArea.setPrefRows(4);
+        outputArea.setScale(0.8f);
+        outputArea.setDisabled(true); // Make it read-only
+
+        // Create output window
+        outputWindow = new Window("Output", skin);
+        outputWindow.setModal(false);
+        outputWindow.setMovable(true);
+        outputWindow.setResizable(true);
+        outputWindow.pad(20);
+        outputWindow.setSize(600, 400);
+        outputWindow.setPosition(
+            Gdx.graphics.getWidth() / 2 - 300,
+            Gdx.graphics.getHeight() / 2 - 200
+        );
+
+        // Add close button
+        TextButton btnClose = new TextButton("Close", skin);
+        btnClose.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                hideOutputWindow();
+            }
+        });
+
+        // Add clear button
+        TextButton btnClear = new TextButton("Clear", skin);
+        btnClear.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                outputArea.setText("// Output cleared\n");
+            }
+        });
+
+        // Layout the window
+        Table buttonTable = new Table();
+        buttonTable.add(btnClear).padRight(10);
+        buttonTable.add(btnClose);
+
+        outputWindow.add(outputArea).grow().padBottom(10).row();
+        outputWindow.add(buttonTable).right();
+
+        // Initially hide the window
+        outputWindow.setVisible(false);
+        editorStage.addActor(outputWindow);
+    }
+
+    /**
+     * Shows the output window with the given title
+     */
+    private void showOutputWindow(String title, String result) {
+        outputWindow.setVisible(true);
+        outputWindow.toFront(); // Bring to front
+        
+        // Update the output area with the result
+        if (result != null && !result.isEmpty()) {
+            outputArea.setText(result);
+        }
+    }
+
+    /**
+     * Hides the output window
+     */
+    private void hideOutputWindow() {
+        outputWindow.setVisible(false);
+    }
+
+    /**
+     * Filters out debug messages and returns only the actual output
+     */
+    private String filterOutput(String result) {
+        if (result == null || result.isEmpty()) {
+            return "";
+        }
+
+        // Remove debug messages that start with specific patterns
+        String[] lines = result.split("\n");
+        StringBuilder cleanOutput = new StringBuilder();
+
+        for (String line : lines) {
+            // Skip debug messages
+            if (line.startsWith("CodeSimulator.") ||
+                line.startsWith("JShellExecutor.") ||
+                line.startsWith("ClassManager.") ||
+                line.startsWith("Executing code:") ||
+                line.startsWith("Executing class code:") ||
+                line.startsWith("Raw result:") ||
+                line.startsWith("Raw class result:") ||
+                line.startsWith("Captured") ||
+                line.startsWith("Final") ||
+                line.startsWith("Code Result:") ||
+                line.startsWith("Class Result:") ||
+                line.startsWith("Executing:") ||
+                line.contains("called with") ||
+                line.contains("Captured System.out") ||
+                line.contains("Captured JShell output") ||
+                line.contains("Final output") ||
+                line.contains("Final executeMainMethod output")) {
+                continue;
+            }
+
+            // Skip empty lines and lines that are just debug info
+            if (line.trim().isEmpty() || line.trim().equals("'") || line.trim().equals("''")) {
+                continue;
+            }
+
+            cleanOutput.append(line).append("\n");
+        }
+
+        return cleanOutput.toString().trim();
     }
 }
