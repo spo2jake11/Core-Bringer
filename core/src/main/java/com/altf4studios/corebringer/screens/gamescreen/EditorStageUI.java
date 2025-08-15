@@ -20,6 +20,8 @@ import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class EditorStageUI {
+
+    private TextButton btnJournal;
     private Stage editorStage;
     private Skin skin;
     private Main corebringer;
@@ -140,12 +142,18 @@ public class EditorStageUI {
         btnLog = new TextButton("Logs", skin);
         btnCheckDeck = new TextButton("Deck", skin);
         btnCharacter = new TextButton("Character", skin);
+        btnJournal   = new TextButton("Journal",skin);
+
 
         submenuTable.defaults().padTop(30).padBottom(30).padRight(20).padLeft(20).fill().uniform();
+        submenuTable.add(btnJournal).growX().row();
         submenuTable.add(btnOptions);
         submenuTable.add(btnCheckDeck).row();
+
         submenuTable.add(btnLog);
         submenuTable.add(btnCharacter);
+
+
 
         // Add code input table and submenu to the editor table
         Table leftEditorTable = new Table();
@@ -160,10 +168,20 @@ public class EditorStageUI {
         setupButtonListeners();
     }
 
+
+
     private void setupButtonListeners() {
         btnOptions.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                optionsWindowUI();
+            }
+        });
+
+        btnJournal.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                super.clicked(event, x, y);
                 optionsWindowUI();
             }
         });
@@ -284,7 +302,7 @@ public class EditorStageUI {
     private void showOutputWindow(String title, String result) {
         outputWindow.setVisible(true);
         outputWindow.toFront(); // Bring to front
-        
+
         // Update the output area with the result
         if (result != null && !result.isEmpty()) {
             outputArea.setText(result);
