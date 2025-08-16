@@ -85,7 +85,7 @@ public class GameScreen implements Screen{
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
-        cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy);
+        cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager);
         editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer, codeSimulator, player, enemy);
 
         // Test output to verify new UI classes are working
@@ -134,31 +134,35 @@ public class GameScreen implements Screen{
         editorStage.act(delta);
         editorStage.draw();
 
-        // --- TurnManager Integration: process turn phases and execute cards ---
-        // Example: process one card per frame if in ACTION phase
-        turnManager.executeNextCard();
-        // Optionally, advance phase if queues are empty (simple example)
-        if (turnManager.getCurrentPhase() == TurnManager.TurnPhase.PLAYER_ACTION && isPlayerQueueEmpty()) {
-            turnManager.nextPhase();
-        } else if (turnManager.getCurrentPhase() == TurnManager.TurnPhase.ENEMY_ACTION && isEnemyQueueEmpty()) {
-            turnManager.nextPhase();
+        // --- TurnManager Integration: process turn phases and execute enemy turns ---
+        // Update turn manager (handles delays)
+        turnManager.update(delta);
+        
+        // Execute enemy turn if it's enemy's turn and not delaying
+        if (turnManager.isEnemyTurn() && !turnManager.isDelaying()) {
+            turnManager.executeEnemyTurn();
+        }
+        
+        // Check for game over (only log once)
+        if (turnManager.shouldLogGameOver()) {
+            String winner = turnManager.getWinner();
+            Gdx.app.log("GameScreen", "Game Over! Winner: " + winner);
+            // You can add game over UI here later
         }
         // --- End TurnManager Integration ---
 
         /// For wiring the HP values properly
         battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
+        
+        // Update turn indicator
+        if (turnManager.isPlayerTurn()) {
+            battleStageUI.updateTurnIndicator("Player's Turn");
+        } else {
+            battleStageUI.updateTurnIndicator("Enemy's Turn");
+        }
     }
 
-    // --- Helper methods for queue checks ---
-    private boolean isPlayerQueueEmpty() {
-        // Reflection or accessor in TurnManager would be better, but for now:
-        // This is a placeholder; you may want to add a public method in TurnManager for this
-        return true; // Replace with actual check if needed
-    }
-    private boolean isEnemyQueueEmpty() {
-        // This is a placeholder; you may want to add a public method in TurnManager for this
-        return true; // Replace with actual check if needed
-    }
+
 
     // --- Test methods for enemy changing ---
     public void testChangeEnemy() {
@@ -172,6 +176,21 @@ public class GameScreen implements Screen{
         if (battleStageUI != null) {
             battleStageUI.changeEnemy(enemyName);
             Gdx.app.log("GameScreen", "Changed enemy to: " + battleStageUI.getCurrentEnemyName());
+        }
+    }
+
+    public void testTurnSystem() {
+        if (turnManager != null) {
+            Gdx.app.log("GameScreen", "Testing turn system...");
+            Gdx.app.log("GameScreen", "Current phase: " + turnManager.getCurrentPhase());
+            Gdx.app.log("GameScreen", "Is player turn: " + turnManager.isPlayerTurn());
+            Gdx.app.log("GameScreen", "Is enemy turn: " + turnManager.isEnemyTurn());
+            
+            // Test ending player turn
+            if (turnManager.isPlayerTurn()) {
+                turnManager.endPlayerTurn();
+                Gdx.app.log("GameScreen", "Player turn ended, new phase: " + turnManager.getCurrentPhase());
+            }
         }
     }
 

@@ -21,6 +21,7 @@ public class BattleStageUI {
     private Stack enemyTemplateStack;
     private Label userHpLabel;
     private Label enemyHpLabel;
+    private Label turnIndicatorLabel;
 
     public BattleStageUI(Stage battleStage, Skin skin) {
         this.battleStage = battleStage;
@@ -93,6 +94,10 @@ public class BattleStageUI {
         enemyHpLabel = new Label("100", skin);
         Label userTemplate = new Label("", skin);
         Label enemyTemplate = new Label("", skin);
+        
+        // Turn indicator
+        turnIndicatorLabel = new Label("Player's Turn", skin);
+        turnIndicatorLabel.setAlignment(Align.center);
 
         // HP Stacks
         Stack userHpStack = new Stack();
@@ -125,8 +130,12 @@ public class BattleStageUI {
         actionTable.defaults().padTop(50);
         actionTable.add(userHpStack).height(25).width(200).padLeft(50);
         actionTable.add(enemyHpStack).height(25).width(200).padRight(50).row();
+        
+        // Add turn indicator
+        actionTable.add(turnIndicatorLabel).colspan(2).height(30).padTop(20).row();
+        
         actionTable.defaults().reset();
-        actionTable.defaults().padTop(65);
+        actionTable.defaults().padTop(35);
         actionTable.add(userTemplateStack).height(200).width(200).pad(100).center();
         actionTable.add(enemyTemplateStack).height(200).width(200).pad(100).center();
 
@@ -139,6 +148,12 @@ public class BattleStageUI {
         }
         if (enemyHpLabel != null) {
             enemyHpLabel.setText(String.valueOf(enemyHp));
+        }
+    }
+
+    public void updateTurnIndicator(String turnText) {
+        if (turnIndicatorLabel != null) {
+            turnIndicatorLabel.setText(turnText);
         }
     }
 
