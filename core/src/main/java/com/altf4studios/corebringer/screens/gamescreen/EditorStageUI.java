@@ -3,9 +3,11 @@ package com.altf4studios.corebringer.screens.gamescreen;
 import com.altf4studios.corebringer.Main;
 import com.altf4studios.corebringer.entities.Enemy;
 import com.altf4studios.corebringer.entities.Player;
-import com.altf4studios.corebringer.interpreter.CodeSimulator;
+import com.altf4studios.corebringer.compiler.JavaExternalRunner;
+import com.altf4studios.corebringer.compiler.CodePolicyValidator;
 import com.altf4studios.corebringer.utils.LoggingUtils;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -14,16 +16,12 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.*;
 
 public class EditorStageUI {
     private Stage editorStage;
     private Skin skin;
     private Main corebringer;
-    private CodeSimulator codeSimulator;
 
     // UI Components
     private Table editorTable;
@@ -32,11 +30,12 @@ public class EditorStageUI {
     private Window outputWindow;
     private TextArea outputArea;
     private TextButton btnRunCode;
-    private TextButton btnRunClass;
     private TextButton btnOptions;
     private TextButton btnLog;
     private TextButton btnCheckDeck;
     private TextButton btnCharacter;
+    private Label outputLabel;
+    private final JavaExternalRunner javaRunner = new JavaExternalRunner();
     private Player player;
     private Enemy enemy;
     private List<String> listofcards;
@@ -44,15 +43,10 @@ public class EditorStageUI {
     private Array<String> carddescription;
     private SampleCardHandler selectedcard;
 
-    public EditorStageUI(Stage editorStage, Skin skin, Main corebringer, CodeSimulator codeSimulator, Player player, Enemy enemy) {
+    public EditorStageUI(Stage editorStage, Skin skin, Main corebringer, Player player, Enemy enemy) {
         this.editorStage = editorStage;
         this.skin = skin;
         this.corebringer = corebringer;
-        this.codeSimulator = codeSimulator;
-        this.editorStage = editorStage;
-        this.skin = skin;
-        this.corebringer = corebringer;
-        this.codeSimulator = codeSimulator;
         this.player = player;
         this.enemy = enemy;
         setupEditorUI();
@@ -77,53 +71,111 @@ public class EditorStageUI {
         createOutputWindow();
 
         btnRunCode = new TextButton("Run Code", skin);
-        btnRunClass = new TextButton("Run Class", skin);
 
         // Table for code input and run button
         Table codeInputTable = new Table();
         codeInputTable.left().top();
         codeInputTable.add(codeInputArea).growX().padRight(10).padLeft(15);
 
-        // Button table
+        // Button table with output display
         Table buttonTable = new Table();
-        buttonTable.add(btnRunCode).width(100).height(40).padRight(5).row();
-        buttonTable.add(btnRunClass).width(100).height(40);
+        buttonTable.add(btnRunCode).width(100).height(40).center().row();
+
+        // Add output label below buttons (smaller, just for status)
+        outputLabel = new Label("Ready to run code", skin);
+        outputLabel.setColor(Color.WHITE);
+        outputLabel.setWrap(true);
+        outputLabel.setAlignment(Align.center);
+        outputLabel.setFontScale(0.6f);
+        buttonTable.add(outputLabel).width(100).height(30).center().row();
+
+        // Add small instruction label
+        Label instructionLabel = new Label("Click Run Code to compile & execute", skin);
+        instructionLabel.setColor(Color.LIGHT_GRAY);
+        instructionLabel.setFontScale(0.5f);
+        instructionLabel.setAlignment(Align.center);
+        buttonTable.add(instructionLabel).width(100).height(20).center().row();
+
+        // Add clear button for output
+        TextButton btnClearOutput = new TextButton("Clear", skin);
+        btnClearOutput.setScale(0.6f);
+        btnClearOutput.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                outputLabel.setText("Ready to run code");
+                outputLabel.setColor(Color.WHITE);
+
+                // Also clear output window if it's visible
+                if (outputWindow.isVisible()) {
+                    hideOutputWindow();
+                }
+            }
+        });
+        buttonTable.add(btnClearOutput).width(70).height(20);
 
         codeInputTable.add(buttonTable).top();
 
-        // When Run Code is clicked, execute code snippet and show result
+        // When Run Code is clicked, execute the code using CodeSimulator
         btnRunCode.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 String code = codeInputArea.getText();
-                System.out.println("Executing code: " + code);
-                String result = codeSimulator.simulate(code);
-                System.out.println("Raw result: '" + result + "'");
+                System.out.println("Executing code with external javac/java: " + code);
 
-                // Filter out debug messages and show only actual output
-                String cleanResult = filterOutput(result);
-                outputArea.setText(cleanResult.isEmpty() ? "// No output" : cleanResult);
-                showOutputWindow("Code Execution Result", cleanResult);
-                System.out.println("Code Result: " + result);
+                // Update output label to show compiling status
+                outputLabel.setText("Compiling...");
+                outputLabel.setColor(Color.YELLOW);
+
+                // Execute code in a separate thread to avoid blocking UI
+                new Thread(() -> {
+                    try {
+                        // Validate first
+                        CodePolicyValidator.ValidationResult vr = CodePolicyValidator.validate(code);
+                        if (!vr.valid) {
+                            String result = "❌ VALIDATION FAILED:\n" + vr.message + "\n\n" + CodePolicyValidator.policyTemplate();
+                            Gdx.app.postRunnable(() -> {
+                                outputArea.setText(result);
+                                showOutputWindow("Validation Error", result);
+                                outputLabel.setText("❌ Validation failed - See output window");
+                                outputLabel.setColor(Color.RED);
+                            });
+                            return;
+                        }
+
+                        String result = javaRunner.compileAndRun(code);
+
+                        // Update UI on main thread
+                        Gdx.app.postRunnable(() -> {
+                            // Show detailed result in output window
+                            outputArea.setText(result);
+                            showOutputWindow("Code Execution Result", result);
+
+                            // Update button area with brief status
+                            if (result.contains("✅")) {
+                                outputLabel.setText("✅ Success - See output window");
+                                outputLabel.setColor(Color.GREEN);
+                            } else {
+                                outputLabel.setText("❌ Failed - See output window");
+                                outputLabel.setColor(Color.RED);
+                            }
+                        });
+                    } catch (Exception e) {
+                        Gdx.app.postRunnable(() -> {
+                            String errorResult = "❌ Unexpected error: " + e.getMessage();
+
+                            // Show error in output window
+                            outputArea.setText(errorResult);
+                            showOutputWindow("Code Execution Error", errorResult);
+
+                            // Update button area
+                            outputLabel.setText("❌ Error occurred");
+                            outputLabel.setColor(Color.RED);
+                        });
+                    }
+                }).start();
             }
         });
 
-        // When Run Class is clicked, compile and execute class code
-        btnRunClass.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                String code = codeInputArea.getText();
-                System.out.println("Executing class code: " + code);
-                String result = codeSimulator.compileAndExecute(code);
-                System.out.println("Raw class result: '" + result + "'");
-
-                // Filter out debug messages and show only actual output
-                String cleanResult = filterOutput(result);
-                outputArea.setText(cleanResult.isEmpty() ? "// No output" : cleanResult);
-                showOutputWindow("Class Execution Result", cleanResult);
-                System.out.println("Class Result: " + result);
-            }
-        });
 
         editorTable.bottom();
         editorTable.setFillParent(false);
@@ -225,13 +277,26 @@ public class EditorStageUI {
         return outputArea;
     }
 
+    public Label getOutputLabel() {
+        return outputLabel;
+    }
+
+    public void setOutput(String output, Color color) {
+        if (outputLabel != null) {
+            outputLabel.setText(output);
+            if (color != null) {
+                outputLabel.setColor(color);
+            }
+        }
+    }
+
     /**
      * Creates the output window (initially hidden)
      */
     private void createOutputWindow() {
         // Create output area
         outputArea = new TextArea("// Output will appear here\n", skin);
-        outputArea.setPrefRows(4);
+        outputArea.setPrefRows(6);
         outputArea.setScale(0.8f);
         outputArea.setDisabled(true); // Make it read-only
 
@@ -239,12 +304,12 @@ public class EditorStageUI {
         outputWindow = new Window("Output", skin);
         outputWindow.setModal(false);
         outputWindow.setMovable(true);
-        outputWindow.setResizable(true);
+        outputWindow.setResizable(false);
         outputWindow.pad(20);
-        outputWindow.setSize(600, 400);
+        outputWindow.setSize(900, 600); // 30% bigger: 600*1.3=780, 400*1.3=520
         outputWindow.setPosition(
-            Gdx.graphics.getWidth() / 2 - 300,
-            Gdx.graphics.getHeight() / 2 - 200
+            Gdx.graphics.getWidth() / 2 - 390, // 780/2 = 390
+            Gdx.graphics.getHeight() / 2 - 260  // 520/2 = 260
         );
 
         // Add close button
@@ -282,13 +347,19 @@ public class EditorStageUI {
      * Shows the output window with the given title
      */
     private void showOutputWindow(String title, String result) {
-        outputWindow.setVisible(true);
-        outputWindow.toFront(); // Bring to front
-        
         // Update the output area with the result
         if (result != null && !result.isEmpty()) {
             outputArea.setText(result);
         }
+
+        // Show and bring to front
+        outputWindow.setVisible(true);
+        outputWindow.toFront();
+
+        // Position window in center of screen
+        float centerX = Gdx.graphics.getWidth() / 2 - outputWindow.getWidth() / 2;
+        float centerY = Gdx.graphics.getHeight() / 2 - outputWindow.getHeight() / 2;
+        outputWindow.setPosition(centerX, centerY);
     }
 
     /**
@@ -296,50 +367,5 @@ public class EditorStageUI {
      */
     private void hideOutputWindow() {
         outputWindow.setVisible(false);
-    }
-
-    /**
-     * Filters out debug messages and returns only the actual output
-     */
-    private String filterOutput(String result) {
-        if (result == null || result.isEmpty()) {
-            return "";
-        }
-
-        // Remove debug messages that start with specific patterns
-        String[] lines = result.split("\n");
-        StringBuilder cleanOutput = new StringBuilder();
-
-        for (String line : lines) {
-            // Skip debug messages
-            if (line.startsWith("CodeSimulator.") ||
-                line.startsWith("JShellExecutor.") ||
-                line.startsWith("ClassManager.") ||
-                line.startsWith("Executing code:") ||
-                line.startsWith("Executing class code:") ||
-                line.startsWith("Raw result:") ||
-                line.startsWith("Raw class result:") ||
-                line.startsWith("Captured") ||
-                line.startsWith("Final") ||
-                line.startsWith("Code Result:") ||
-                line.startsWith("Class Result:") ||
-                line.startsWith("Executing:") ||
-                line.contains("called with") ||
-                line.contains("Captured System.out") ||
-                line.contains("Captured JShell output") ||
-                line.contains("Final output") ||
-                line.contains("Final executeMainMethod output")) {
-                continue;
-            }
-
-            // Skip empty lines and lines that are just debug info
-            if (line.trim().isEmpty() || line.trim().equals("'") || line.trim().equals("''")) {
-                continue;
-            }
-
-            cleanOutput.append(line).append("\n");
-        }
-
-        return cleanOutput.toString().trim();
     }
 }

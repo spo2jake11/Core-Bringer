@@ -1,7 +1,7 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
-import com.altf4studios.corebringer.interpreter.JShellExecutor;
+// Removed interpreter integration
 import com.altf4studios.corebringer.utils.CardParser;
 import com.altf4studios.corebringer.turns.TurnManager;
 import com.altf4studios.corebringer.entities.Player;
@@ -44,8 +44,8 @@ public class GameScreen implements Screen{
     // CardParser instance for managing card data
     private CardParser cardParser;
 
-    // CodeSimulator for running user code
-    private com.altf4studios.corebringer.interpreter.CodeSimulator codeSimulator;
+    // CodeSimulator for running user code - REMOVED
+    // private com.altf4studios.corebringer.interpreter.CodeSimulator codeSimulator;
 
 
     // --- TurnManager Integration ---
@@ -67,8 +67,8 @@ public class GameScreen implements Screen{
         // Initialize CardParser
         cardParser = CardParser.getInstance();
 
-        // Initialize CodeSimulator
-        codeSimulator = new com.altf4studios.corebringer.interpreter.CodeSimulator();
+        // Initialize CodeSimulator - REMOVED
+        // codeSimulator = new com.altf4studios.corebringer.interpreter.CodeSimulator();
 
         ///This stages are separated to lessen complications
         battleStage = new Stage(new ScreenViewport());
@@ -86,7 +86,7 @@ public class GameScreen implements Screen{
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
         cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager);
-        editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer, codeSimulator, player, enemy);
+        editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer, player, enemy);
 
         // Test output to verify new UI classes are working
         Gdx.app.log("GameScreen", "Successfully initialized all UI components:");
@@ -107,7 +107,7 @@ public class GameScreen implements Screen{
 //        battleStage.setDebugAll(true);
 //        editorStage.setDebugAll(true);
 //        cardStage.setDebugAll(true);
-        JShellExecutor shell = new JShellExecutor();
+        // Interpreter removed
 
     }
 

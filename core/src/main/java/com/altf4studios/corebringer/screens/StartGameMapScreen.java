@@ -1,7 +1,7 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
-import com.altf4studios.corebringer.interpreter.JShellExecutor;
+// Removed interpreter integration
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.Screen;
@@ -50,7 +50,6 @@ public class StartGameMapScreen implements Screen{
 //        battleStage.setDebugAll(true);
         editorStage.setDebugAll(true);
         cardStage.setDebugAll(true);
-        JShellExecutor shell = new JShellExecutor();
 
     }
 

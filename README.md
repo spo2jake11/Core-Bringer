@@ -4,6 +4,39 @@ A [libGDX](https://libgdx.com/) project generated with [gdx-liftoff](https://git
 
 This project was generated with a template including simple application launchers and an `ApplicationAdapter` extension that draws libGDX logo.
 
+## Enhanced Java Code Compilation
+
+Core-Bringer includes an advanced Java code compilation system that provides IDE-like error reporting:
+
+### Error Classification
+- **SYNTAX ERROR**: Missing semicolons, brackets, parentheses, etc.
+- **TYPE ERROR**: Incompatible types, undefined symbols, etc.
+- **METHOD ERROR**: Method not found, incorrect parameters, etc.
+- **VARIABLE ERROR**: Undefined variables, duplicate declarations, etc.
+- **CLASS ERROR**: Class not found, import issues, etc.
+- **RUNTIME EXCEPTION**: NullPointerException, ArrayIndexOutOfBounds, etc.
+
+### Features
+- **Line Number Reporting**: Exact line numbers where errors occur
+- **Error Categories**: Color-coded error types with 🔴 indicators
+- **Stack Trace Parsing**: Runtime error analysis with method call chains
+- **External Compiler**: Uses `javac` and `java` for robust compilation
+- **JShell Fallback**: Handles code snippets and multi-class scenarios
+- **Clean Output**: OnlineGDB-style formatted results
+
+### Example Error Output
+```
+🔴 SYNTAX ERROR at line 15:
+   ';' expected
+   
+🔴 TYPE ERROR at line 22:
+   incompatible types: int cannot be converted to String
+   
+🔴 NULL POINTER EXCEPTION:
+   Exception in thread "main" java.lang.NullPointerException
+   → at line 15 in RuntimeErrorTest.java
+```
+
 ## Platforms
 
 - `core`: Main module with the application logic shared by all platforms.

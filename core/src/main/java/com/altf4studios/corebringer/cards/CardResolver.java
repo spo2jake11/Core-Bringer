@@ -3,7 +3,7 @@ package com.altf4studios.corebringer.cards;
 import com.altf4studios.corebringer.effects.CardEffectType;
 import com.altf4studios.corebringer.entities.Entity;
 import com.altf4studios.corebringer.entities.Player;
-import com.altf4studios.corebringer.interpreter.JShellExecutor;
+// Removed JShell-based custom effect executor
 import com.altf4studios.corebringer.utils.CombatLog;
 
 public class CardResolver {
@@ -46,10 +46,8 @@ public class CardResolver {
                     }
                     break;
                 case CUSTOM:
-                    if (card.codeEffect != null && !card.codeEffect.isEmpty()) {
-                        JShellExecutor.runScript(card.codeEffect, user, target);
-                        CombatLog.logInfo(user.getName() + " executes custom effect");
-                    }
+                    // Custom code effects disabled without interpreter
+                    CombatLog.logInfo("Custom effect execution is disabled");
                     break;
             }
         }

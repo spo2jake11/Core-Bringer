@@ -9,3 +9,12 @@ dependencies {
     implementation "io.github.berstanio:gdx-svmhelper-annotations:$graalHelperVersion"
   }
 }
+ 
+ // Exclude files that are intentionally invalid or for demonstration only
+ sourceSets {
+   main {
+     java {
+       exclude 'com/altf4studios/corebringer/interpreter/EnhancedErrorTest.java'
+     }
+   }
+ }
