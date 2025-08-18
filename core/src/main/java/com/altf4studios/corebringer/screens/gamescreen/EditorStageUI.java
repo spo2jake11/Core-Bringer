@@ -11,12 +11,15 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.*;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.utils.StringBuilder;
 
 public class EditorStageUI {
 
@@ -82,6 +85,28 @@ public class EditorStageUI {
         Table codeInputTable = new Table();
         codeInputTable.left().top();
         codeInputTable.add(codeInputArea).growX().padRight(10).padLeft(15);
+
+        // IDE-like behavior: Tab inserts 4 spaces; Enter auto-indents +4 spaces
+        codeInputArea.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.TAB) {
+                    insertAtCursor(codeInputArea, "    ");
+                    return true;
+                }
+                if (keycode == Input.Keys.ENTER || keycode == Input.Keys.NUMPAD_ENTER) {
+                    String text = codeInputArea.getText();
+                    int cursor = codeInputArea.getCursorPosition();
+                    int lineStart = text.lastIndexOf('\n', Math.max(0, cursor - 1));
+                    lineStart = (lineStart == -1) ? 0 : lineStart + 1;
+                    int leading = countLeadingSpaces(text, lineStart);
+                    String indent = buildSpaces(leading + 4);
+                    insertAtCursor(codeInputArea, "\n" + indent);
+                    return true;
+                }
+                return false;
+            }
+        });
 
         // Button table with output display
         Table buttonTable = new Table();
@@ -324,6 +349,31 @@ public class EditorStageUI {
         journalWindow.add(btnClose).padLeft(20).padBottom(20).expandY().left().bottom();
 
         editorStage.addActor(journalWindow);
+    }
+
+    // --- Helpers for editor behavior ---
+    private static void insertAtCursor(TextArea area, String toInsert) {
+        String text = area.getText();
+        int cursor = area.getCursorPosition();
+        String before = text.substring(0, cursor);
+        String after = text.substring(cursor);
+        area.setText(before + toInsert + after);
+        area.setCursorPosition(cursor + toInsert.length());
+    }
+
+    private static int countLeadingSpaces(String text, int fromIndex) {
+        int i = 0;
+        while (fromIndex + i < text.length() && text.charAt(fromIndex + i) == ' ') {
+            i++;
+        }
+        return i;
+    }
+
+    private static String buildSpaces(int n) {
+        if (n <= 0) return "";
+        StringBuilder sb = new StringBuilder(n);
+        for (int i = 0; i < n; i++) sb.append(' ');
+        return sb.toString();
     }
 
     public void resize(float screenWidth, float screenHeight, float bottomHeight) {

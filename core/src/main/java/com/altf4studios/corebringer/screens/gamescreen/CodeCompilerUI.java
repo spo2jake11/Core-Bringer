@@ -11,10 +11,12 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.utils.Disposable;
 
 /**
@@ -116,6 +118,28 @@ public class CodeCompilerUI implements Disposable {
 
         // Event listeners
         setupEventListeners();
+
+        // IDE-like behavior: Tab inserts 4 spaces; Enter auto-indents +4 spaces
+        codeInput.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.TAB) {
+                    CodeCompilerUIHelpers.insertAtCursor(codeInput, "    ");
+                    return true;
+                }
+                if (keycode == Input.Keys.ENTER || keycode == Input.Keys.NUMPAD_ENTER) {
+                    String text = codeInput.getText();
+                    int cursor = codeInput.getCursorPosition();
+                    int lineStart = text.lastIndexOf('\n', Math.max(0, cursor - 1));
+                    lineStart = (lineStart == -1) ? 0 : lineStart + 1;
+                    int leading = CodeCompilerUIHelpers.countLeadingSpaces(text, lineStart);
+                    String indent = CodeCompilerUIHelpers.buildSpaces(leading + 4);
+                    CodeCompilerUIHelpers.insertAtCursor(codeInput, "\n" + indent);
+                    return true;
+                }
+                return false;
+            }
+        });
     }
 
     private void setupEventListeners() {
@@ -277,5 +301,28 @@ public class CodeCompilerUI implements Disposable {
      */
     public void useColoredBackground() {
         useTextureBackground = false;
+    }
+}
+
+// --- Helpers for editor behavior ---
+class CodeCompilerUIHelpers {
+    static void insertAtCursor(TextArea area, String toInsert) {
+        String text = area.getText();
+        int cursor = area.getCursorPosition();
+        String before = text.substring(0, cursor);
+        String after = text.substring(cursor);
+        area.setText(before + toInsert + after);
+        area.setCursorPosition(cursor + toInsert.length());
+    }
+    static int countLeadingSpaces(String text, int fromIndex) {
+        int i = 0;
+        while (fromIndex + i < text.length() && text.charAt(fromIndex + i) == ' ') i++;
+        return i;
+    }
+    static String buildSpaces(int n) {
+        if (n <= 0) return "";
+        StringBuilder sb = new StringBuilder(n);
+        for (int i = 0; i < n; i++) sb.append(' ');
+        return sb.toString();
     }
 }
