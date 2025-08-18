@@ -14,12 +14,15 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
 public class EditorStageUI {
+
+    private TextButton btnJournal;
     private Stage editorStage;
     private Skin skin;
     private Main corebringer;
@@ -140,12 +143,18 @@ public class EditorStageUI {
         btnLog = new TextButton("Logs", skin);
         btnCheckDeck = new TextButton("Deck", skin);
         btnCharacter = new TextButton("Character", skin);
+        btnJournal   = new TextButton("Journal",skin);
+
 
         submenuTable.defaults().padTop(30).padBottom(30).padRight(20).padLeft(20).fill().uniform();
+        submenuTable.add(btnJournal).growX().row();
         submenuTable.add(btnOptions);
         submenuTable.add(btnCheckDeck).row();
+
         submenuTable.add(btnLog);
         submenuTable.add(btnCharacter);
+
+
 
         // Add code input table and submenu to the editor table
         Table leftEditorTable = new Table();
@@ -160,11 +169,20 @@ public class EditorStageUI {
         setupButtonListeners();
     }
 
+
+
     private void setupButtonListeners() {
         btnOptions.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 optionsWindowUI();
+            }
+        });
+
+        btnJournal.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                showBlankJournalWindow();
             }
         });
     }
@@ -206,6 +224,53 @@ public class EditorStageUI {
         optionsWindow.add(btnToMain).growX().padRight(20).padTop(20).space(15).bottom();
 
         editorStage.addActor(optionsWindow);
+    }
+
+    private void showBlankJournalWindow() {
+        Texture optionBG = new Texture(Gdx.files.internal("ui/optionsBG.png"));
+        Drawable optionBGDrawable = new TextureRegionDrawable(new TextureRegion(optionBG));
+        Window journalWindow = new Window("Journal", skin);
+        journalWindow.setModal(true);
+        journalWindow.setMovable(false);
+        journalWindow.pad(20);
+        journalWindow.setSize(1300, 800);
+        journalWindow.setPosition(
+            Gdx.graphics.getWidth() / 2 / 2,
+            Gdx.graphics.getHeight() / 2 / 2
+        );
+        journalWindow.background(optionBGDrawable);
+        journalWindow.setColor(1, 1, 1, 1);
+
+        TextButton btnClose = new TextButton("Close", skin);
+        btnClose.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                journalWindow.remove();
+            }
+        });
+
+        // Add Java tutorial text at the top left
+        Label tutorialTitle = new Label("Java Tutorials", skin);
+        tutorialTitle.setFontScale(1.5f);
+        tutorialTitle.setAlignment(Align.left);
+
+        Label mainMethodLabel = new Label("public static void main(String [] args) {   } // Main Syntax", skin);
+        mainMethodLabel.setFontScale(1.2f);
+        mainMethodLabel.setAlignment(Align.left);
+
+        Label ifLabel = new Label("if(condition){ //code blocks here}  // if condition syntax", skin);
+        ifLabel.setFontScale(1.2f);
+        ifLabel.setAlignment(Align.left);
+
+        // Add tutorial content to the top left area
+        journalWindow.add(tutorialTitle).top().left().padLeft(160).padTop(100).row();
+        journalWindow.add(mainMethodLabel).top().left().padLeft(20).padTop(80).row();
+        journalWindow.add(ifLabel).top().left().padLeft(20).padTop(20).row();
+
+        // Add only a close button - content is blank for now
+        journalWindow.add(btnClose).padLeft(20).padBottom(20).expandY().left().bottom();
+
+        editorStage.addActor(journalWindow);
     }
 
     public void resize(float screenWidth, float screenHeight, float bottomHeight) {
@@ -284,7 +349,7 @@ public class EditorStageUI {
     private void showOutputWindow(String title, String result) {
         outputWindow.setVisible(true);
         outputWindow.toFront(); // Bring to front
-        
+
         // Update the output area with the result
         if (result != null && !result.isEmpty()) {
             outputArea.setText(result);

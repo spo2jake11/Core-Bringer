@@ -81,7 +81,7 @@ public class BattleStageUI {
     }
 
     private void setupBattleUI() {
-        Texture bg = new Texture(Gdx.files.internal("backgrounds/Stage1_bg.png"));
+        Texture bg = new Texture(Gdx.files.internal("backgrounds/new_bg_design/stg1_background.png"));
         Drawable bgDraw = new TextureRegionDrawable(new TextureRegion(bg));
 
         Table actionTable = new Table();
@@ -94,7 +94,7 @@ public class BattleStageUI {
         enemyHpLabel = new Label("100", skin);
         Label userTemplate = new Label("", skin);
         Label enemyTemplate = new Label("", skin);
-        
+
         // Turn indicator
         turnIndicatorLabel = new Label("Player's Turn", skin);
         turnIndicatorLabel.setAlignment(Align.center);
@@ -114,7 +114,7 @@ public class BattleStageUI {
         // Character images
         Texture playerTexture = new Texture(Gdx.files.internal("basic-characters/hero.png"));
         Image userImageBG = new Image(playerTexture);
-        userImageBG.setSize(200, 200);
+        userImageBG.setSize(480, 1120);
 
         // Random enemy selection
         currentEnemyName = getRandomEnemyName();
@@ -130,10 +130,10 @@ public class BattleStageUI {
         actionTable.defaults().padTop(50);
         actionTable.add(userHpStack).height(25).width(200).padLeft(50);
         actionTable.add(enemyHpStack).height(25).width(200).padRight(50).row();
-        
+
         // Add turn indicator
         actionTable.add(turnIndicatorLabel).colspan(2).height(30).padTop(20).row();
-        
+
         actionTable.defaults().reset();
         actionTable.defaults().padTop(35);
         actionTable.add(userTemplateStack).height(200).width(200).pad(100).center();
