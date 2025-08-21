@@ -31,16 +31,13 @@ public class EditorStageUI {
 
     // UI Components
     private Table editorTable;
-    private Table submenuTable;
+    private Window optionsWindow;
     private TextArea codeInputArea;
     private Window outputWindow;
     private TextArea outputArea;
     private TextButton btnRunCode;
     private TextButton btnRunClass;
-    private TextButton btnOptions;
-    private TextButton btnLog;
-    private TextButton btnCheckDeck;
-    private TextButton btnCharacter;
+    private TextButton btnCodeOnly;
     private Label outputLabel;
     private final JavaExternalRunner javaRunner = new JavaExternalRunner();
     private Player player;
@@ -74,12 +71,14 @@ public class EditorStageUI {
         codeInputArea = new TextArea("// Write your code here\n// Examples:\n// - Snippets: int x = 5; System.out.println(x);\n// - Classes: public class MyClass { ... }\n// - Methods: public static void main(String[] args) { ... }\n", skin);
         codeInputArea.setPrefRows(5);
         codeInputArea.setScale(0.8f);
+        editorStage.setKeyboardFocus(codeInputArea);
 
         // Create output window (initially hidden)
         createOutputWindow();
 
         btnRunCode = new TextButton("Run Code", skin);
         btnRunClass = new TextButton("Run Class", skin);
+        btnCodeOnly = new TextButton("Code Editor Only", skin);
 
         // Table for code input and run button
         Table codeInputTable = new Table();
@@ -107,10 +106,21 @@ public class EditorStageUI {
                 return false;
             }
         });
+        codeInputArea.addListener(new InputListener() {
+            @Override
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.ESCAPE) {
+                    toggleOptionsWindow();
+                    return true;
+                }
+                return false;
+            }
+        });
 
         // Button table with output display
         Table buttonTable = new Table();
-        buttonTable.add(btnRunCode).width(100).height(40).center().row();
+        buttonTable.add(btnRunCode).width(120).height(40).center().row();
+        buttonTable.add(btnCodeOnly).width(120).height(40).center().row();
 
         // Add output label below buttons (smaller, just for status)
         outputLabel = new Label("Ready to run code", skin);
@@ -213,78 +223,59 @@ public class EditorStageUI {
         editorTable.setSize(worldWidth, worldHeight * 0.3f);
         editorTable.background(editorTableDrawable);
 
-        // Submenu buttons
-        submenuTable = new Table();
-        submenuTable.bottom();
-        submenuTable.setFillParent(false);
-        submenuTable.setSize(editorTable.getWidth() * 0.2f, editorTable.getHeight());
-
-        btnOptions = new TextButton("Options", skin);
-        btnLog = new TextButton("Logs", skin);
-        btnCheckDeck = new TextButton("Deck", skin);
-        btnCharacter = new TextButton("Character", skin);
-        btnJournal   = new TextButton("Journal",skin);
-
-
-        submenuTable.defaults().padTop(30).padBottom(30).padRight(20).padLeft(20).fill().uniform();
-        submenuTable.add(btnJournal).growX().row();
-        submenuTable.add(btnOptions);
-        submenuTable.add(btnCheckDeck).row();
-
-        submenuTable.add(btnLog);
-        submenuTable.add(btnCharacter);
-
-
-
-        // Add code input table and submenu to the editor table
+        // Add code input table to the editor table (submenu removed; moved to options window)
         Table leftEditorTable = new Table();
         leftEditorTable.add(codeInputTable).growX();
 
         editorTable.add(leftEditorTable).grow();
-        editorTable.add(submenuTable).growY().right();
 
         editorStage.addActor(editorTable);
 
-        // Add click listeners
-        setupButtonListeners();
-    }
+        // Create options window (hidden by default)
+        createOptionsWindow();
 
-    private void setupButtonListeners() {
-        btnOptions.addListener(new ClickListener() {
+        // Input: toggle options window with ESC
+        editorStage.addListener(new InputListener() {
             @Override
-            public void clicked(InputEvent event, float x, float y) {
-                optionsWindowUI();
+            public boolean keyDown(InputEvent event, int keycode) {
+                if (keycode == Input.Keys.ESCAPE) {
+                    toggleOptionsWindow();
+                    return true;
+                }
+                return false;
             }
         });
 
-        btnJournal.addListener(new ClickListener(){
+        // Button listeners
+        btnCodeOnly.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                showBlankJournalWindow();
+                corebringer.setScreen(corebringer.codeEditorScreen);
             }
         });
     }
 
-    private void optionsWindowUI() {
+    private void createOptionsWindow() {
         Texture optionBG = new Texture(Gdx.files.internal("ui/optionsBG.png"));
         Drawable optionBGDrawable = new TextureRegionDrawable(new TextureRegion(optionBG));
-        Window optionsWindow = new Window("", skin);
+        optionsWindow = new Window("Options", skin);
         optionsWindow.setModal(true);
         optionsWindow.setMovable(false);
         optionsWindow.pad(20);
         optionsWindow.setSize(640, 480);
         optionsWindow.setPosition(
-            Gdx.graphics.getWidth() / 2 / 2,
-            Gdx.graphics.getHeight() / 2 / 2
+            Gdx.graphics.getWidth() / 2f - 320f,
+            Gdx.graphics.getHeight() / 2f - 240f
         );
         optionsWindow.background(optionBGDrawable);
         optionsWindow.setColor(1, 1, 1, 1);
 
-        TextButton btnClose = new TextButton("Close", skin);
-        btnClose.addListener(new ClickListener() {
+        // Moved submenu actions here
+        TextButton btnJournalLocal = new TextButton("Journal", skin);
+        btnJournalLocal.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                optionsWindow.remove();
+                showBlankJournalWindow();
             }
         });
 
@@ -297,12 +288,49 @@ public class EditorStageUI {
             }
         });
 
-        optionsWindow.add(new Label("Options go here", skin)).top().colspan(2).row();
-        optionsWindow.add(btnClose).growX().padLeft(20).padTop(20).space(15).bottom();
-        optionsWindow.add(btnToMain).growX().padRight(20).padTop(20).space(15).bottom();
+        TextButton btnClose = new TextButton("Close", skin);
+        btnClose.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                optionsWindow.setVisible(false);
+                optionsWindow.remove();
+            }
+        });
 
+        TextButton btnDeck = new TextButton("Deck", skin);
+        TextButton btnLogs = new TextButton("Logs", skin);
+        TextButton btnCharacter = new TextButton("Character", skin);
+
+        Table content = new Table();
+        content.defaults().pad(10).growX();
+        content.add(new Label("Options", skin)).colspan(2).center().row();
+        content.add(btnJournalLocal).row();
+        content.add(btnDeck).row();
+        content.add(btnLogs).row();
+        content.add(btnCharacter).row();
+        content.add(btnToMain).row();
+
+        Table bottom = new Table();
+        bottom.add(btnClose).right();
+
+        optionsWindow.clear();
+        optionsWindow.add(content).grow().row();
+        optionsWindow.add(bottom).right();
+
+        optionsWindow.setVisible(false);
         editorStage.addActor(optionsWindow);
     }
+
+    private void toggleOptionsWindow() {
+        if (optionsWindow == null) {
+            createOptionsWindow();
+        }
+        boolean show = !optionsWindow.isVisible();
+        optionsWindow.setVisible(show);
+        if (show) optionsWindow.toFront();
+    }
+
+    // old optionsWindowUI removed (submenu migrated to optionsWindow)
 
     private void showBlankJournalWindow() {
         Texture optionBG = new Texture(Gdx.files.internal("ui/optionsBG.png"));
@@ -378,7 +406,6 @@ public class EditorStageUI {
 
     public void resize(float screenWidth, float screenHeight, float bottomHeight) {
         editorTable.setSize(screenWidth, bottomHeight);
-        submenuTable.setSize(screenWidth * 0.2f, bottomHeight);
     }
 
     public TextArea getCodeInputArea() {

@@ -1,0 +1,139 @@
+[
+  {
+    "id": 1,
+    "question": "Declare an int variable named x, assign it the value 42, and print its value.",
+    "possibleAnswers": ["42"],
+    "validations": {
+      "codePatterns": [
+        "int\\s+x\\s*=\\s*42\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*x\\s*\\)"
+      ],
+      "expectedOutputRegex": "^42$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 3, "assignment": 2, "print": 1, "correctOutput": 2 }
+  },
+  {
+    "id": 2,
+    "question": "Create a double variable named price set to 19.99 and print it.",
+    "possibleAnswers": ["19.99"],
+    "validations": {
+      "codePatterns": [
+        "double\\s+price\\s*=\\s*19\\.99\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*price\\s*\\)"
+      ],
+      "expectedOutputRegex": "^19\\.99$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 3, "assignment": 2, "print": 1, "correctOutput": 2 }
+  },
+  {
+    "id": 3,
+    "question": "Declare a String variable name with value \"Alice\" and print Hello, Alice! using concatenation.",
+    "possibleAnswers": ["Hello, Alice!"],
+    "validations": {
+      "codePatterns": [
+        "String\\s+name\\s*=\\s*\\\"Alice\\\"\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*\\\"Hello,\\s*\\\"\\s*\\+\\s*name\\s*\\+\\s*\\\"!\\\"\\s*\\)"
+      ],
+      "expectedOutputRegex": "^Hello, Alice!$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 2, "assignment": 2, "print": 2, "correctOutput": 2 }
+  },
+  {
+    "id": 4,
+    "question": "Declare two int variables a = 7 and b = 5, create an int sum with their total, and print sum.",
+    "possibleAnswers": ["12"],
+    "validations": {
+      "codePatterns": [
+        "int\\s+a\\s*=\\s*7\\s*;",
+        "int\\s+b\\s*=\\s*5\\s*;",
+        "int\\s+sum\\s*=\\s*a\\s*\\+\\s*b\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*sum\\s*\\)"
+      ],
+      "expectedOutputRegex": "^12$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 2, "assignment": 3, "print": 1, "correctOutput": 2 }
+  },
+  {
+    "id": 5,
+    "question": "Declare a boolean variable isActive set to true and print it.",
+    "possibleAnswers": ["true"],
+    "validations": {
+      "codePatterns": [
+        "boolean\\s+isActive\\s*=\\s*true\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*isActive\\s*\\)"
+      ],
+      "expectedOutputRegex": "^true$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 3, "assignment": 2, "print": 1, "correctOutput": 2 }
+  },
+  {
+    "id": 6,
+    "question": "Create a char variable initial with value 'Z' and print it.",
+    "possibleAnswers": ["Z"],
+    "validations": {
+      "codePatterns": [
+        "char\\s+initial\\s*=\\s*'Z'\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*initial\\s*\\)"
+      ],
+      "expectedOutputRegex": "^Z$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 3, "assignment": 2, "print": 1, "correctOutput": 2 }
+  },
+  {
+    "id": 7,
+    "question": "Declare a final int MAX_COUNT equal to 3 and print it.",
+    "possibleAnswers": ["3"],
+    "validations": {
+      "codePatterns": [
+        "final\\s+int\\s+MAX_COUNT\\s*=\\s*3\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*MAX_COUNT\\s*\\)"
+      ],
+      "expectedOutputRegex": "^3$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 3, "assignment": 2, "print": 1, "correctOutput": 2 }
+  },
+  {
+    "id": 8,
+    "question": "Create an int n = 10 and a double half = n / 2.0, then print half.",
+    "possibleAnswers": ["5.0", "5"],
+    "validations": {
+      "codePatterns": [
+        "int\\s+n\\s*=\\s*10\\s*;",
+        "double\\s+half\\s*=\\s*n\\s*/\\s*2\\.0\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*half\\s*\\)"
+      ],
+      "expectedOutputRegex": "^5(\\.0)?$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 2, "assignment": 3, "print": 1, "correctOutput": 2 }
+  },
+  {
+    "id": 9,
+    "question": "Declare String first = \"Core\" and String last = \"Bringer\" and print CoreBringer using concatenation.",
+    "possibleAnswers": ["CoreBringer"],
+    "validations": {
+      "codePatterns": [
+        "String\\s+first\\s*=\\s*\\\"Core\\\"\\s*;",
+        "String\\s+last\\s*=\\s*\\\"Bringer\\\"\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*first\\s*\\+\\s*last\\s*\\)"
+      ],
+      "expectedOutputRegex": "^CoreBringer$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 2, "assignment": 2, "print": 2, "correctOutput": 2 }
+  },
+  {
+    "id": 10,
+    "question": "Parse the integer from the String s = \"123\" into int value and print value.",
+    "possibleAnswers": ["123"],
+    "validations": {
+      "codePatterns": [
+        "String\\s+s\\s*=\\s*\\\"123\\\"\\s*;",
+        "int\\s+value\\s*=\\s*Integer\\.parseInt\\(s\\)\\s*;",
+        "System\\.out\\.println\\s*\\(\\s*value\\s*\\)"
+      ],
+      "expectedOutputRegex": "^123$"
+    },
+    "points": { "class": 1, "mainMethod": 1, "variableDeclaration": 2, "assignment": 3, "print": 1, "correctOutput": 2 }
+  }
+]
+
+

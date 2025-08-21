@@ -30,6 +30,7 @@ public class Main extends Game {
     public OptionsScreen optionsScreen;
     public GameScreen gameScreen;
     public StartGameMapScreen startGameMapScreen;
+    public CodeEditorScreen codeEditorScreen;
     public DebugScreen debugScreen;
     public CardTestScren cardTestScren;
     public SampleCardHandler selecteddebugcard;
@@ -73,6 +74,7 @@ public class Main extends Game {
         mainMenuScreen = new MainMenuScreen(this);
         optionsScreen = new OptionsScreen(this);
         startGameMapScreen = new StartGameMapScreen(this);
+        codeEditorScreen = new CodeEditorScreen(this);
         debugScreen = new DebugScreen(this);
         cardTestScren = new CardTestScren(this);
         gameScreen = new GameScreen(this);
