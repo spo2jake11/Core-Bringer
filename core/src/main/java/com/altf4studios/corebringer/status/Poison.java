@@ -20,19 +20,19 @@ public class Poison extends StatusEffect {
      * @param target The entity to apply poison damage to
      */
     public void applyPoisonDamage(Entity target) {
-        if (target != null && target.isAlive() && duration > 0) {
-            // Apply poison damage (power amount)
+        if (target != null && target.isAlive() && power > 0) {
+            // Apply poison damage equal to current stacks (power)
             target.takeDamage(power);
             
             // Log the poison damage
             Gdx.app.log("Poison", target.getName() + " took " + power + " poison damage. Remaining HP: " + target.getHp());
             
-            // Reduce duration
-            duration--;
+            // Reduce stacks by 1 per turn
+            power--;
             
-            // Log remaining duration
-            if (duration > 0) {
-                Gdx.app.log("Poison", "Poison duration remaining: " + duration + " turns");
+            // Log remaining stacks
+            if (power > 0) {
+                Gdx.app.log("Poison", "Poison stacks remaining: " + power);
             } else {
                 Gdx.app.log("Poison", "Poison effect has expired");
             }
@@ -44,7 +44,7 @@ public class Poison extends StatusEffect {
      * @return true if duration is 0 or less
      */
     public boolean isExpired() {
-        return duration <= 0;
+        return power <= 0;
     }
 
     /**

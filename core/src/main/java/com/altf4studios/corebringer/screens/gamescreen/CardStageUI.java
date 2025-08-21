@@ -259,6 +259,12 @@ public class CardStageUI {
         if (card != null) {
             Gdx.app.log("CardEffect", "Processing card: " + card.name + " (Type: " + card.type + ", Effect: " + card.baseEffect + ")");
 
+            // Handle cards that have both attack and defense effects (like Astral Mirage)
+            boolean hasAttackEffect = card.description != null && 
+                (card.description.toLowerCase().contains("deal") || card.description.toLowerCase().contains("damage"));
+            boolean hasShieldEffect = card.description != null && 
+                card.description.toLowerCase().contains("gain") && card.description.toLowerCase().contains("shield");
+
             if (card.type.equalsIgnoreCase("ATTACK")) {
                 int damage = card.baseEffect;
 
@@ -270,15 +276,40 @@ public class CardStageUI {
                     Gdx.app.log("CardEffect", "Enemy HP reduced to: " + enemy.getHp());
                 }
 
+                // If this attack card also has shield effect, apply it
+                if (hasShieldEffect) {
+                    int shieldFromDesc = parseShieldFromDescription(card.description);
+                    if (shieldFromDesc > 0) {
+                        Gdx.app.log("CardEffect", "Card '" + card.name + "' also grants " + shieldFromDesc + " shield!");
+                        if (player != null && player.isAlive()) {
+                            player.gainBlock(shieldFromDesc);
+                            Gdx.app.log("CardEffect", "Player shield (block) increased to: " + player.getBlock());
+                        }
+                    }
+                }
+
             } else if (card.type.equalsIgnoreCase("DEFENSE")) {
-                int block = card.baseEffect;
+                int shieldFromDesc = parseShieldFromDescription(card.description);
+                int block = shieldFromDesc > 0 ? shieldFromDesc : card.baseEffect;
 
-                Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Gains " + block + " block.");
+                Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Gains " + block + " shield.");
 
-                // Apply block to player
+                // Apply block (shield) to player
                 if (player != null && player.isAlive()) {
                     player.gainBlock(block);
-                    Gdx.app.log("CardEffect", "Player block increased to: " + player.getBlock());
+                    Gdx.app.log("CardEffect", "Player shield (block) increased to: " + player.getBlock());
+                }
+
+                // If this defense card also has attack effect, apply it
+                if (hasAttackEffect) {
+                    int damage = card.baseEffect;
+                    if (damage > 0) {
+                        Gdx.app.log("CardEffect", "Card '" + card.name + "' also deals " + damage + " damage to enemy!");
+                        if (enemy != null && enemy.isAlive()) {
+                            enemy.takeDamage(damage);
+                            Gdx.app.log("CardEffect", "Enemy HP reduced to: " + enemy.getHp());
+                        }
+                    }
                 }
 
             } else if (card.type.equalsIgnoreCase("BUFF")) {
@@ -302,34 +333,29 @@ public class CardStageUI {
                 Gdx.app.log("CardEffect", "Unknown card type: " + card.type);
             }
 
-            // Check for poison application in card description or tags
+            // Check for poison application in card description
             if (card.description != null && card.description.toLowerCase().contains("poison")) {
-                int poisonPower = 5; // Default poison power
-                int poisonDuration = 3; // Default duration
-
-                // Try to extract poison power from description
-                if (card.description.contains("apply") && card.description.contains("poison")) {
-                    // Look for numbers in the description
-                    String[] words = card.description.split("\\s+");
-                    for (int i = 0; i < words.length; i++) {
-                        if (words[i].toLowerCase().contains("poison") && i > 0) {
+                int poisonStacks = 0;
+                // Extract the number before the word 'poison'
+                String[] words = card.description.split("\\s+");
+                for (int i = 0; i < words.length; i++) {
+                    if (words[i].toLowerCase().startsWith("poison")) {
+                        if (i > 0) {
                             try {
-                                poisonPower = Integer.parseInt(words[i-1]);
-                                break;
-                            } catch (NumberFormatException e) {
-                                // Use default value
-                            }
+                                poisonStacks = Integer.parseInt(words[i - 1]);
+                            } catch (NumberFormatException ignored) {}
                         }
+                        break;
                     }
                 }
+                if (poisonStacks <= 0) {
+                    poisonStacks = 5; // sensible default
+                }
 
-                Gdx.app.log("CardEffect", "Card '" + card.name + "' applies " + poisonPower + " poison for " + card.baseEffect + " turns.");
-
-                // Apply poison to enemy
                 if (enemy != null && enemy.isAlive()) {
-                    Poison poison = new Poison("Poison", poisonPower, poisonDuration);
+                    Poison poison = new Poison("Poison", poisonStacks, 0);
                     enemy.addPoison(poison);
-                    Gdx.app.log("CardEffect", "Enemy now has " + enemy.getPoisonEffects().size() + " poison effects");
+                    Gdx.app.log("CardEffect", "Applied " + poisonStacks + " poison stacks to enemy.");
                 }
             }
 
@@ -342,5 +368,24 @@ public class CardStageUI {
         } else {
             Gdx.app.log("CardEffect", "No such card found: " + cardName);
         }
+    }
+
+    private int parseShieldFromDescription(String description) {
+        if (description == null) return 0;
+        String lower = description.toLowerCase();
+        int gainIdx = lower.indexOf("gain");
+        int shieldIdx = lower.indexOf("shield");
+        if (gainIdx == -1 || shieldIdx == -1 || shieldIdx <= gainIdx) return 0;
+        String between = lower.substring(gainIdx, shieldIdx);
+        String[] parts = between.split("[^0-9]+");
+        int value = 0;
+        for (String p : parts) {
+            if (p != null && p.length() > 0) {
+                try {
+                    value = Integer.parseInt(p);
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        return Math.max(0, value);
     }
 }

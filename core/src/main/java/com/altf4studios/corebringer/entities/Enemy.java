@@ -39,6 +39,13 @@ public class Enemy extends Entity {
         // Implement skill logic here
     }
 
+    // Defensive action: enemy gains shield (block) and skips attack
+    public void defend() {
+        if (!this.isAlive()) return;
+        int blockAmount = Math.max(3, (int)Math.round(this.getDefense() * 1.5));
+        this.gainBlock(blockAmount);
+    }
+
     // Simple attack method for basic turn-based combat
     public void attack(Entity target) {
         if (target != null && target.isAlive() && this.isAlive()) {
