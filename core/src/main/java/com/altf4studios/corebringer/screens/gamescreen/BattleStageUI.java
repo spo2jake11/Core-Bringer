@@ -1,6 +1,7 @@
 package com.altf4studios.corebringer.screens.gamescreen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -21,6 +22,8 @@ public class BattleStageUI {
     private Stack enemyTemplateStack;
     private Label userHpLabel;
     private Label enemyHpLabel;
+    private Label userShieldLabel;
+    private Label enemyShieldLabel;
     private Label turnIndicatorLabel;
 
     public BattleStageUI(Stage battleStage, Skin skin) {
@@ -92,6 +95,11 @@ public class BattleStageUI {
         // HP Labels
         userHpLabel = new Label("100", skin);
         enemyHpLabel = new Label("100", skin);
+        // Shield Labels (blue)
+        userShieldLabel = new Label("0", skin);
+        userShieldLabel.setColor(Color.CYAN);
+        enemyShieldLabel = new Label("0", skin);
+        enemyShieldLabel.setColor(Color.CYAN);
         Label userTemplate = new Label("", skin);
         Label enemyTemplate = new Label("", skin);
 
@@ -102,11 +110,19 @@ public class BattleStageUI {
         // HP Stacks
         Stack userHpStack = new Stack();
         userHpLabel.setAlignment(Align.center);
-        userHpStack.add(userHpLabel);
+        userShieldLabel.setAlignment(Align.center);
+        Table userHpTable = new Table();
+        userHpTable.add(userHpLabel).row();
+        userHpTable.add(userShieldLabel);
+        userHpStack.add(userHpTable);
 
         Stack enemyHpStack = new Stack();
         enemyHpLabel.setAlignment(Align.center);
-        enemyHpStack.add(enemyHpLabel);
+        enemyShieldLabel.setAlignment(Align.center);
+        Table enemyHpTable = new Table();
+        enemyHpTable.add(enemyHpLabel).row();
+        enemyHpTable.add(enemyShieldLabel);
+        enemyHpStack.add(enemyHpTable);
 
         userTemplate.setAlignment(Align.center);
         enemyTemplate.setAlignment(Align.center);
@@ -128,8 +144,8 @@ public class BattleStageUI {
         enemyTemplateStack.add(enemyTemplate);
 
         actionTable.defaults().padTop(50);
-        actionTable.add(userHpStack).height(25).width(200).padLeft(50);
-        actionTable.add(enemyHpStack).height(25).width(200).padRight(50).row();
+        actionTable.add(userHpStack).height(50).width(200).padLeft(50);
+        actionTable.add(enemyHpStack).height(50).width(200).padRight(50).row();
 
         // Add turn indicator
         actionTable.add(turnIndicatorLabel).colspan(2).height(30).padTop(20).row();
@@ -151,9 +167,36 @@ public class BattleStageUI {
         }
     }
 
+    public void updateShieldBars(int playerShield, int enemyShield) {
+        if (userShieldLabel != null) {
+            userShieldLabel.setText(String.valueOf(playerShield));
+        }
+        if (enemyShieldLabel != null) {
+            enemyShieldLabel.setText(String.valueOf(enemyShield));
+        }
+    }
+
     public void updateTurnIndicator(String turnText) {
         if (turnIndicatorLabel != null) {
             turnIndicatorLabel.setText(turnText);
+        }
+    }
+
+    public void updateHpColors(boolean isPlayerPoisoned, boolean isEnemyPoisoned) {
+        if (userHpLabel != null) {
+            userHpLabel.setColor(isPlayerPoisoned ? Color.PURPLE : Color.WHITE);
+        }
+        if (enemyHpLabel != null) {
+            enemyHpLabel.setColor(isEnemyPoisoned ? Color.PURPLE : Color.WHITE);
+        }
+    }
+
+    public void updateShieldColors(boolean isPlayerShielded, boolean isEnemyShielded) {
+        if (userShieldLabel != null) {
+            userShieldLabel.setColor(isPlayerShielded ? Color.CYAN : Color.GRAY);
+        }
+        if (enemyShieldLabel != null) {
+            enemyShieldLabel.setColor(isEnemyShielded ? Color.CYAN : Color.GRAY);
         }
     }
 

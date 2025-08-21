@@ -27,7 +27,7 @@
     {
       "id": "atk_card3",
       "name": "Volatile Token",
-      "description": "Deal 10 damage to all enemies and apply 10 bug overtime",
+      "description": "Deal 10 damage to all enemies and apply 10 burn stacks",
       "type": "ATTACK",
       "targetType": "ALL_ENEMIES",
       "cost": 4,
@@ -54,7 +54,7 @@
       "type": "DEFENSE",
       "targetType": "SELF",
       "cost": 2,
-      "baseEffect": 4,
+      "baseEffect": 5,
       "codeEffect": "",
       "suggestion": "",
       "tags": ["DEFENSE", "APPLY_STATUS"]

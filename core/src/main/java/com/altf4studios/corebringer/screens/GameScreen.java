@@ -175,8 +175,11 @@ public class GameScreen implements Screen{
         }
         // --- End TurnManager Integration ---
 
-        /// For wiring the HP values properly
+        /// For wiring the HP/Shield values properly
         battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
+        battleStageUI.updateShieldBars(player.getBlock(), enemy.getBlock());
+        battleStageUI.updateHpColors(player.hasPoison(), enemy.hasPoison());
+        battleStageUI.updateShieldColors(player.getBlock() > 0, enemy.getBlock() > 0);
 
         // Update turn indicator
         if (turnManager.isPlayerTurn()) {

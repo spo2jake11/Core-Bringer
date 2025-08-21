@@ -82,8 +82,15 @@ public abstract class Entity implements BattleEntity {
     // Poison management
     public void addPoison(Poison poison) {
         if (poison != null) {
-            poisonEffects.add(poison);
-            poison.onApply();
+            // Merge into a single poison stack so total stacks decrease by 1 per turn
+            if (poisonEffects.isEmpty()) {
+                poisonEffects.add(poison);
+                poison.onApply();
+            } else {
+                Poison existing = poisonEffects.get(0);
+                existing.increasePower(poison.getPower());
+                existing.onApply();
+            }
         }
     }
 
