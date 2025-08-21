@@ -87,7 +87,7 @@ public class GameScreen implements Screen{
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
         cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager);
-        editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer, player, enemy);
+        editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer);
 
         // Test output to verify new UI classes are working
         Gdx.app.log("GameScreen", "Successfully initialized all UI components:");
@@ -272,7 +272,7 @@ public class GameScreen implements Screen{
         float screenHeight = editorStage.getViewport().getWorldHeight();
         float screenWidth = editorStage.getViewport().getWorldWidth();
         float bottomHeight = screenHeight * 0.4f;
-        editorStageUI.resize(screenWidth, screenHeight, bottomHeight);
+        editorStageUI.resize(screenWidth, bottomHeight);
 
     }
     @Override public void pause() {

@@ -322,7 +322,6 @@ public class CodeEditorScreen implements Screen {
     public void show() {
         Gdx.input.setInputProcessor(stage);
         pickRandomQuestion();
-        stage.setDebugAll(true);
     }
 
     @Override

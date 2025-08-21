@@ -1,11 +1,8 @@
 package com.altf4studios.corebringer.screens.gamescreen;
 
 import com.altf4studios.corebringer.Main;
-import com.altf4studios.corebringer.entities.Enemy;
-import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.compiler.JavaExternalRunner;
 import com.altf4studios.corebringer.compiler.CodePolicyValidator;
-import com.altf4studios.corebringer.utils.LoggingUtils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
@@ -23,7 +20,6 @@ import com.badlogic.gdx.utils.StringBuilder;
 
 public class EditorStageUI {
 
-    private TextButton btnJournal;
     private Stage editorStage;
     private Skin skin;
     private Main corebringer;
@@ -36,24 +32,15 @@ public class EditorStageUI {
     private Window outputWindow;
     private TextArea outputArea;
     private TextButton btnRunCode;
-    private TextButton btnRunClass;
     private TextButton btnCodeOnly;
     private Label outputLabel;
     private final JavaExternalRunner javaRunner = new JavaExternalRunner();
-    private Player player;
-    private Enemy enemy;
-    private List<String> listofcards;
-    private ScrollPane scrolllistofcards;
-    private Array<String> carddescription;
-    private SampleCardHandler selectedcard;
     private JournalWindow journalWindow;
 
-    public EditorStageUI(Stage editorStage, Skin skin, Main corebringer, Player player, Enemy enemy) {
+    public EditorStageUI(Stage editorStage, Skin skin, Main corebringer) {
         this.editorStage = editorStage;
         this.skin = skin;
         this.corebringer = corebringer;
-        this.player = player;
-        this.enemy = enemy;
         // Initialize journalWindow here
         this.journalWindow = new JournalWindow(editorStage, skin);
         setupEditorUI();
@@ -79,7 +66,6 @@ public class EditorStageUI {
         createOutputWindow();
 
         btnRunCode = new TextButton("Run Code", skin);
-        btnRunClass = new TextButton("Run Class", skin);
         btnCodeOnly = new TextButton("Code Editor Only", skin);
 
         // Table for code input and run button
@@ -168,7 +154,7 @@ public class EditorStageUI {
                             String result = "❌ VALIDATION FAILED:\n" + vr.message + "\n\n" + CodePolicyValidator.policyTemplate();
                             Gdx.app.postRunnable(() -> {
                                 outputArea.setText(result);
-                                showOutputWindow("Validation Error", result);
+                                showOutputWindow(result);
                                 outputLabel.setText("❌ Validation failed - See output window");
                                 outputLabel.setColor(Color.RED);
                             });
@@ -181,7 +167,7 @@ public class EditorStageUI {
                         Gdx.app.postRunnable(() -> {
                             // Show detailed result in output window
                             outputArea.setText(result);
-                            showOutputWindow("Code Execution Result", result);
+                            showOutputWindow(result);
 
                             // Update button area with brief status
                             if (result.contains("✅")) {
@@ -198,7 +184,7 @@ public class EditorStageUI {
 
                             // Show error in output window
                             outputArea.setText(errorResult);
-                            showOutputWindow("Code Execution Error", errorResult);
+                            showOutputWindow(errorResult);
 
                             // Update button area
                             outputLabel.setText("❌ Error occurred");
@@ -295,33 +281,8 @@ public class EditorStageUI {
         return sb.toString();
     }
 
-    public void resize(float screenWidth, float screenHeight, float bottomHeight) {
+    public void resize(float screenWidth, float bottomHeight) {
         editorTable.setSize(screenWidth, bottomHeight);
-    }
-
-    public TextArea getCodeInputArea() {
-        return codeInputArea;
-    }
-
-    public TextButton getBtnRunCode() {
-        return btnRunCode;
-    }
-
-    public TextArea getOutputArea() {
-        return outputArea;
-    }
-
-    public Label getOutputLabel() {
-        return outputLabel;
-    }
-
-    public void setOutput(String output, Color color) {
-        if (outputLabel != null) {
-            outputLabel.setText(output);
-            if (color != null) {
-                outputLabel.setColor(color);
-            }
-        }
     }
 
     /**
@@ -342,8 +303,8 @@ public class EditorStageUI {
         outputWindow.pad(20);
         outputWindow.setSize(900, 600); // 30% bigger: 600*1.3=780, 400*1.3=520
         outputWindow.setPosition(
-            Gdx.graphics.getWidth() / 2 - 390, // 780/2 = 390
-            Gdx.graphics.getHeight() / 2 - 260  // 520/2 = 260
+            (float)Gdx.graphics.getWidth() / 2f - 390f, // 780/2 = 390
+            (float)Gdx.graphics.getHeight() / 2f - 260f  // 520/2 = 260
         );
 
         // Add close button
@@ -378,9 +339,9 @@ public class EditorStageUI {
     }
 
     /**
-     * Shows the output window with the given title
+     * Shows the output window
      */
-    private void showOutputWindow(String title, String result) {
+    private void showOutputWindow(String result) {
         outputWindow.setVisible(true);
         outputWindow.toFront(); // Bring to front
 
@@ -394,8 +355,8 @@ public class EditorStageUI {
         outputWindow.toFront();
 
         // Position window in center of screen
-        float centerX = Gdx.graphics.getWidth() / 2 - outputWindow.getWidth() / 2;
-        float centerY = Gdx.graphics.getHeight() / 2 - outputWindow.getHeight() / 2;
+        float centerX = (float)Gdx.graphics.getWidth() / 2f - outputWindow.getWidth() / 2f;
+        float centerY = (float)Gdx.graphics.getHeight() / 2f - outputWindow.getHeight() / 2f;
         outputWindow.setPosition(centerX, centerY);
     }
 
