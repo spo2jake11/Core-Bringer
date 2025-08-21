@@ -8,6 +8,7 @@ import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
 import com.altf4studios.corebringer.screens.gamescreen.*;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
@@ -115,6 +116,29 @@ public class GameScreen implements Screen{
     public void show() {
         /// This gives the button functions to become clickable
         InputMultiplexer multiplexer = new InputMultiplexer();
+        // Add global ESC key listener first
+        multiplexer.addProcessor(new InputProcessor() {
+            @Override public boolean keyDown(int keycode) {
+                if (keycode == Input.Keys.ESCAPE) {
+                    if (editorStageUI != null) editorStageUI.toggleOptionsWindow();
+                    return true;
+                }
+                return false;
+            }
+            @Override public boolean keyUp(int keycode) { return false; }
+            @Override public boolean keyTyped(char character) { return false; }
+            @Override public boolean touchDown(int screenX, int screenY, int pointer, int button) { return false; }
+            @Override public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }
+
+            @Override
+            public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
+                return false;
+            }
+
+            @Override public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
+            @Override public boolean mouseMoved(int screenX, int screenY) { return false; }
+            @Override public boolean scrolled(float amountX, float amountY) { return false; }
+        });
         multiplexer.addProcessor(editorStage);
         multiplexer.addProcessor(cardStage);
         Gdx.input.setInputProcessor(multiplexer);
@@ -137,12 +161,12 @@ public class GameScreen implements Screen{
         // --- TurnManager Integration: process turn phases and execute enemy turns ---
         // Update turn manager (handles delays)
         turnManager.update(delta);
-        
+
         // Execute enemy turn if it's enemy's turn and not delaying
         if (turnManager.isEnemyTurn() && !turnManager.isDelaying()) {
             turnManager.executeEnemyTurn();
         }
-        
+
         // Check for game over (only log once)
         if (turnManager.shouldLogGameOver()) {
             String winner = turnManager.getWinner();
@@ -153,7 +177,7 @@ public class GameScreen implements Screen{
 
         /// For wiring the HP values properly
         battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
-        
+
         // Update turn indicator
         if (turnManager.isPlayerTurn()) {
             battleStageUI.updateTurnIndicator("Player's Turn");
@@ -185,7 +209,7 @@ public class GameScreen implements Screen{
             Gdx.app.log("GameScreen", "Current phase: " + turnManager.getCurrentPhase());
             Gdx.app.log("GameScreen", "Is player turn: " + turnManager.isPlayerTurn());
             Gdx.app.log("GameScreen", "Is enemy turn: " + turnManager.isEnemyTurn());
-            
+
             // Test ending player turn
             if (turnManager.isPlayerTurn()) {
                 turnManager.endPlayerTurn();
