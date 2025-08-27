@@ -24,6 +24,12 @@ public class TurnManager {
     // Game over logging control
     private boolean gameOverLogged = false;
 
+    // Poison resolution staging to make damage visible between turns
+    private enum PendingPoisonTarget { NONE, PLAYER, ENEMY }
+    private PendingPoisonTarget pendingPoisonTarget = PendingPoisonTarget.NONE;
+    private boolean isResolvingPoison = false;
+    private float poisonResolutionDelay = 0.8f; // brief delay to show poison damage
+
     public TurnManager(Player player, Enemy enemy) {
         this.player = player;
         this.enemy = enemy;
@@ -49,10 +55,9 @@ public class TurnManager {
             isDelaying = true;
             delayTimer = turnDelay;
             Gdx.app.log("TurnManager", "Player turn ended, switching to enemy turn");
-            // Apply poison effects at the start of enemy turn
-            if (enemy.hasPoison()) {
-                enemy.applyPoisonEffects();
-            }
+            // Schedule poison to resolve for enemy after the initial delay
+            pendingPoisonTarget = PendingPoisonTarget.ENEMY;
+            isResolvingPoison = false;
         }
     }
 
@@ -63,21 +68,28 @@ public class TurnManager {
             isDelaying = true;
             delayTimer = turnDelay;
             Gdx.app.log("TurnManager", "Enemy turn ended, switching to player turn");
-            // Apply poison effects at the start of player turn
-            if (player.hasPoison()) {
-                player.applyPoisonEffects();
-            }
+            // Schedule poison to resolve for player after the initial delay
+            pendingPoisonTarget = PendingPoisonTarget.PLAYER;
+            isResolvingPoison = false;
         }
     }
 
     public void executeEnemyTurn() {
         if (currentPhase == TurnPhase.ENEMY_TURN && enemy.isAlive() && player.isAlive() && !isDelaying) {
-            Gdx.app.log("TurnManager", "Executing enemy turn - enemy attacks player");
-            // Simple enemy attack using the enemy's attack method
-            enemy.attack(player);
-            
-            // End enemy turn after attacking
-            endEnemyTurn();
+            // Randomly decide to defend instead of attacking
+            double defendChance = 0.35; // 35% chance to defend
+            if (Math.random() < defendChance) {
+                Gdx.app.log("TurnManager", "Enemy chooses to defend this turn");
+                enemy.defend();
+                // End enemy turn after defending
+                endEnemyTurn();
+            } else {
+                Gdx.app.log("TurnManager", "Executing enemy turn - enemy attacks player");
+                // Simple enemy attack using the enemy's attack method
+                enemy.attack(player);
+                // End enemy turn after attacking
+                endEnemyTurn();
+            }
         }
     }
 
@@ -141,6 +153,26 @@ public class TurnManager {
                 delayTimer = 0.0f;
                 turnEnded = false;
             }
+        }
+
+        // After initial delay, resolve scheduled poison and add a short delay so it's visible
+        if (!isDelaying && pendingPoisonTarget != PendingPoisonTarget.NONE) {
+            if (pendingPoisonTarget == PendingPoisonTarget.ENEMY && enemy.hasPoison()) {
+                Gdx.app.log("TurnManager", "Resolving enemy poison before enemy acts");
+                enemy.applyPoisonEffects();
+            } else if (pendingPoisonTarget == PendingPoisonTarget.PLAYER && player.hasPoison()) {
+                Gdx.app.log("TurnManager", "Resolving player poison before player acts");
+                player.applyPoisonEffects();
+            }
+            pendingPoisonTarget = PendingPoisonTarget.NONE;
+            isResolvingPoison = true;
+            isDelaying = true;
+            delayTimer = poisonResolutionDelay;
+        }
+
+        // Clear resolving flag after poison delay completes
+        if (!isDelaying && isResolvingPoison) {
+            isResolvingPoison = false;
         }
     }
 
