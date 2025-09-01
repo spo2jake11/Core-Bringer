@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.altf4studios.corebringer.screens.GameScreen;
 
 public class CardStageUI {
     private Stage cardStage;
@@ -27,18 +28,19 @@ public class CardStageUI {
     private Player player;
     private Enemy enemy;
     private TurnManager turnManager;
+    private GameScreen gameScreen;
 
-    public CardStageUI(Stage cardStage, Skin skin, CardParser cardParser, Player player, Enemy enemy, TurnManager turnManager) {
+    public CardStageUI(Stage cardStage, Skin skin, CardParser cardParser, Player player, Enemy enemy, TurnManager turnManager, GameScreen gameScreen) {
         this.cardStage = cardStage;
         this.skin = skin;
         this.player = player;
         this.enemy = enemy;
         this.cardParser = cardParser;
         this.turnManager = turnManager;
+        this.gameScreen = gameScreen;
         this.discardedCards = new boolean[5];
         this.cardsInHand = 5;
         setupCardUI();
-        Gdx.app.log("CardStageUI", "Card stage UI initialized successfully");
         worldHeight = cardStage.getViewport().getWorldHeight();
     }
 
@@ -79,19 +81,12 @@ public class CardStageUI {
 
     private void initializeAvailableCards() {
         availableCardNames = new Array<>();
-        Gdx.app.log("CardStageUI", "Initializing available cards...");
-        Gdx.app.log("CardStageUI", "CardParser isCardsLoaded: " + cardParser.isCardsLoaded());
-        Gdx.app.log("CardStageUI", "CardParser card count: " + cardParser.getCardCount());
-
         if (cardParser.isCardsLoaded()) {
             Array<SampleCardHandler> allCards = cardParser.getAllCards();
-            Gdx.app.log("CardStageUI", "Loading " + allCards.size + " cards from CardParser");
             for (SampleCardHandler card : allCards) {
                 availableCardNames.add(card.name);
-                Gdx.app.log("CardStageUI", "Added card: " + card.name + " (Type: " + card.type + ")");
             }
         } else {
-            Gdx.app.log("CardStageUI", "Cards not loaded, using fallback names");
             // Fallback card names if cards aren't loaded
             availableCardNames.add("Card 1");
             availableCardNames.add("Card 2");
@@ -104,8 +99,6 @@ public class CardStageUI {
             availableCardNames.add("Card 9");
             availableCardNames.add("Card 10");
         }
-
-        Gdx.app.log("CardStageUI", "Total available card names: " + availableCardNames.size);
     }
 
     private String[] getCardNames() {
@@ -115,7 +108,6 @@ public class CardStageUI {
             if (availableCardNames.size > 0) {
                 int randomIndex = (int) (Math.random() * availableCardNames.size);
                 cardNames[i] = availableCardNames.get(randomIndex);
-                Gdx.app.log("Card Loaded", availableCardNames.get(randomIndex));
                 availableCardNames.removeIndex(randomIndex);
             } else {
                 cardNames[i] = "Corrupted Card";
@@ -134,26 +126,35 @@ public class CardStageUI {
             cardLabel.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    if (!discardedCards[cardIndex] && !cardLabel.getText().toString().equals("Corrupted Card") || discardedCards[cardIndex] && cardLabel.getText().toString().equals("Corrupted Card")) {
-
-                        /// Call the effect resolver before discarding
-                        resolveCardEffect(cardLabel.getText().toString());
-
-                        /// Discard the card (the logic now somehow works when discarding "corrupted" cards)
+                    String cardName = cardLabel.getText().toString();
+                    SampleCardHandler card = cardParser.findCardByName(cardName);
+                    int cost = (card != null) ? card.cost : 0;
+                    if (gameScreen.getEnergy() < cost) {
+                        Dialog dialog = new Dialog("No Energy", skin) {
+                            @Override
+                            protected void result(Object object) {
+                                this.hide();
+                            }
+                        };
+                        dialog.text("No energy! Please recharge!");
+                        dialog.button("OK");
+                        dialog.show(cardStage);
+                        return;
+                    }
+                    if (!discardedCards[cardIndex] && !cardName.equals("Corrupted Card") || discardedCards[cardIndex] && cardName.equals("Corrupted Card")) {
+                        // Deduct energy
+                        gameScreen.addEnergy(-cost);
+                        // Call the effect resolver before discarding
+                        resolveCardEffect(cardName);
+                        // Discard the card
                         discardedCards[cardIndex] = true;
                         cardLabel.setText("Discarded");
                         cardLabel.setColor(0.5f, 0.5f, 0.5f, 0.5f); // Gray out the card
                         cardsInHand--;
-
-                        Gdx.app.log("CardStageUI", "Card discarded: " + cardLabel.getText() + " at index " + cardIndex);
-                        Gdx.app.log("CardStageUI", "Cards remaining: " + cardsInHand);
-
                         // Check if all cards are used
                         if (cardsInHand == 0) {
-                            Gdx.app.log("CardStageUI", "All cards used, refreshing hand...");
                             refreshCardHand();
                         }
-
                         // Show draw button if there are cards available to draw
                         if (availableCardNames.size > 0) {
                             showDrawButton();
@@ -203,9 +204,6 @@ public class CardStageUI {
 
                     availableCardNames.removeIndex(randomIndex);
 
-                    Gdx.app.log("CardStageUI", "Drew card: " + newCardName + " at index " + i);
-                    Gdx.app.log("CardStageUI", "Cards in hand: " + cardsInHand);
-
                     // Hide draw button if no more cards available or hand is full
                     if (availableCardNames.size == 0 || cardsInHand == 5) {
                         hideDrawButton();
@@ -222,8 +220,6 @@ public class CardStageUI {
     }
 
     public void refreshCardHand() {
-        Gdx.app.log("CardStageUI", "Refreshing card hand with new random cards...");
-
         // Reset discarded cards array
         for (int i = 0; i < discardedCards.length; i++) {
             discardedCards[i] = false;
@@ -244,21 +240,16 @@ public class CardStageUI {
         for (int i = 0; i < cardHandTable.cardLabels.length && i < newCardNames.length; i++) {
             cardHandTable.cardLabels[i].setText(newCardNames[i]);
             cardHandTable.cardLabels[i].setColor(1f, 1f, 1f, 1f); // Reset color
-            Gdx.app.log("CardStageUI", "Card " + (i + 1) + " updated to: " + newCardNames[i]);
         }
 
         // Hide draw button after refresh
         hideDrawButton();
-
-        Gdx.app.log("CardStageUI", "Card hand refreshed successfully");
     }
 
     private void resolveCardEffect(String cardName) {
         SampleCardHandler card = cardParser.findCardByName(cardName);
 
         if (card != null) {
-            Gdx.app.log("CardEffect", "Processing card: " + card.name + " (Type: " + card.type + ", Effect: " + card.baseEffect + ")");
-
             // Handle cards that have both attack and defense effects (like Astral Mirage)
             boolean hasAttackEffect = card.description != null &&
                 (card.description.toLowerCase().contains("deal") || card.description.toLowerCase().contains("damage"));
@@ -268,22 +259,17 @@ public class CardStageUI {
             if (card.type.equalsIgnoreCase("ATTACK")) {
                 int damage = card.baseEffect;
 
-                Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Deals " + damage + " damage to enemy.");
-
                 // Apply damage to enemy
                 if (enemy != null && enemy.isAlive()) {
                     enemy.takeDamage(damage);
-                    Gdx.app.log("CardEffect", "Enemy HP reduced to: " + enemy.getHp());
                 }
 
                 // If this attack card also has shield effect, apply it
                 if (hasShieldEffect) {
                     int shieldFromDesc = parseShieldFromDescription(card.description);
                     if (shieldFromDesc > 0) {
-                        Gdx.app.log("CardEffect", "Card '" + card.name + "' also grants " + shieldFromDesc + " shield!");
                         if (player != null && player.isAlive()) {
                             player.gainBlock(shieldFromDesc);
-                            Gdx.app.log("CardEffect", "Player shield (block) increased to: " + player.getBlock());
                         }
                     }
                 }
@@ -292,22 +278,17 @@ public class CardStageUI {
                 int shieldFromDesc = parseShieldFromDescription(card.description);
                 int block = shieldFromDesc > 0 ? shieldFromDesc : card.baseEffect;
 
-                Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Gains " + block + " shield.");
-
                 // Apply block (shield) to player
                 if (player != null && player.isAlive()) {
                     player.gainBlock(block);
-                    Gdx.app.log("CardEffect", "Player shield (block) increased to: " + player.getBlock());
                 }
 
                 // If this defense card also has attack effect, apply it
                 if (hasAttackEffect) {
                     int damage = card.baseEffect;
                     if (damage > 0) {
-                        Gdx.app.log("CardEffect", "Card '" + card.name + "' also deals " + damage + " damage to enemy!");
                         if (enemy != null && enemy.isAlive()) {
                             enemy.takeDamage(damage);
-                            Gdx.app.log("CardEffect", "Enemy HP reduced to: " + enemy.getHp());
                         }
                     }
                 }
@@ -315,10 +296,8 @@ public class CardStageUI {
             } else if (card.type.equalsIgnoreCase("BUFF")) {
                 // Handle buff effects based on tags
                 if (card.tags != null && card.tags.contains("INCREASE_ATTACK", false)) {
-                    Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Increases attack by " + card.baseEffect);
                     // For now, just log the buff - you can implement attack buffing later
                 } else if (card.tags != null && card.tags.contains("APPLY_STATS", false)) {
-                    Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Applies stat buff: " + card.baseEffect);
                     // For now, just log the buff - you can implement stat buffing later
                 } else {
                     Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Generic buff effect: " + card.baseEffect);
@@ -355,14 +334,12 @@ public class CardStageUI {
                 if (enemy != null && enemy.isAlive()) {
                     Poison poison = new Poison("Poison", poisonStacks, 0);
                     enemy.addPoison(poison);
-                    Gdx.app.log("CardEffect", "Applied " + poisonStacks + " poison stacks to enemy.");
                 }
             }
 
             // End player turn after playing a card
             if (turnManager != null && turnManager.isPlayerTurn()) {
                 turnManager.endPlayerTurn();
-                Gdx.app.log("CardEffect", "Player turn ended, enemy turn starting...");
             }
 
         } else {

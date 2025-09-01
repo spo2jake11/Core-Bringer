@@ -93,7 +93,7 @@ public class BattleStageUI {
         actionTable.setFillParent(true);
 
         // HP Labels
-        userHpLabel = new Label("100", skin);
+        userHpLabel = new Label("20", skin);
         enemyHpLabel = new Label("100", skin);
         // Shield Labels (blue)
         userShieldLabel = new Label("0", skin);

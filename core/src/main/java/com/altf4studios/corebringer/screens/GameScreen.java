@@ -21,6 +21,10 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 
 public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
@@ -54,6 +58,11 @@ public class GameScreen implements Screen{
     private Window optionsWindow;
     // --- End Energy System ---
 
+    // --- Death Screen ---
+    private Window deathScreenWindow = null;
+    private boolean deathScreenShown = false;
+    // --- End Death Screen ---
+
 
     public GameScreen(Main corebringer) {
         this.corebringer = corebringer; /// The Master Key that holds all screens together
@@ -70,7 +79,7 @@ public class GameScreen implements Screen{
 
         // --- TurnManager Integration ---
         // Initialize player and enemy (example values, adjust as needed)
-        player = new Player("Player", 100, 10, 5, 3);
+        player = new Player("Player", 20, 10, 5, 3);
         enemy = new Enemy("enemy1", "Enemy", 100, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
         turnManager = new TurnManager(player, enemy);
         // --- End TurnManager Integration ---
@@ -78,7 +87,7 @@ public class GameScreen implements Screen{
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
-        cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager);
+        cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager, this);
 
         // Add energy label to battleStage
         energyLabel = new Label("Energy: 0/10", corebringer.testskin);
@@ -174,14 +183,10 @@ public class GameScreen implements Screen{
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-
-        /// Since there are multiple stages, they are needed to be drawn separately
         battleStage.act(delta);
         battleStage.draw();
-
         cardStage.act(delta);
         cardStage.draw();
-
         // Removed: editorStage.act(delta); editorStage.draw();
 
         // --- TurnManager Integration: process turn phases and execute enemy turns ---
@@ -213,6 +218,12 @@ public class GameScreen implements Screen{
         } else {
             battleStageUI.updateTurnIndicator("Enemy's Turn");
         }
+
+        // --- Death Screen Trigger ---
+        if (!deathScreenShown && player.getHp() <= 0) {
+            showDeathScreen();
+        }
+        // --- End Death Screen Trigger ---
     }
 
 
@@ -382,5 +393,45 @@ public class GameScreen implements Screen{
         if (energyLabel != null) {
             energyLabel.setText("Energy: " + energy + "/" + MAX_ENERGY);
         }
+    }
+
+    private void showDeathScreen() {
+        if (deathScreenWindow != null) return; // Already shown
+        deathScreenShown = true;
+        // Load the death screen texture
+        Texture deathTexture = new Texture(Gdx.files.internal("assets/nameplates/death_scrn.png"));
+        Image deathImage = new Image(deathTexture);
+        deathImage.getColor().a = 0f;
+        deathImage.addAction(Actions.fadeIn(1.5f)); // 1.5 seconds fade in
+        // Create window to overlay everything
+        deathScreenWindow = new Window("", corebringer.testskin);
+        deathScreenWindow.setModal(true);
+        deathScreenWindow.setMovable(false);
+        deathScreenWindow.setResizable(false);
+        deathScreenWindow.setFillParent(true);
+        deathScreenWindow.setTouchable(Touchable.enabled);
+        deathScreenWindow.setColor(1,1,1,0f);
+        deathScreenWindow.addAction(Actions.fadeIn(1.5f));
+        // Centered button
+        TextButton btnReturn = new TextButton("Return to Title", corebringer.testskin);
+        btnReturn.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) {
+                corebringer.setScreen(corebringer.mainMenuScreen);
+                // Optionally reset death screen state
+                if (deathScreenWindow != null) {
+                    deathScreenWindow.remove();
+                    deathScreenWindow = null;
+                    deathScreenShown = false;
+                }
+            }
+        });
+        Table overlay = new Table();
+        overlay.setFillParent(true);
+        overlay.add(deathImage).expand().fill().row();
+        overlay.add(btnReturn).center().padTop(-300f); // Adjust as needed for button position
+        deathScreenWindow.add(overlay).expand().fill();
+        battleStage.addActor(deathScreenWindow);
+        // Block all input except the button
+        Gdx.input.setInputProcessor(battleStage);
     }
 }
