@@ -10,6 +10,8 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
+import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import jdk.jshell.JShell;
 import jdk.jshell.Snippet;
 import jdk.jshell.SnippetEvent;
@@ -37,6 +39,7 @@ public class Main extends Game {
     private AssetManager assetManager;
     public JShell jshell;
     private final ByteArrayOutputStream jshellOutputStream = new ByteArrayOutputStream();
+    private InputMultiplexer globalMultiplexer = new InputMultiplexer();
 
     @Override
     public void create() {
@@ -79,6 +82,8 @@ public class Main extends Game {
         cardTestScren = new CardTestScren(this);
         gameScreen = new GameScreen(this);
         setScreen(mainMenuScreen);
+        // Ensure the input multiplexer is always set as the input processor
+        Gdx.input.setInputProcessor(globalMultiplexer);
     }
 
     ///The method that initializes JShell as well as things it will import
@@ -186,5 +191,30 @@ public class Main extends Game {
     }
     @Override public void resize(int width, int height) {
         super.resize(width, height);
+    }
+
+    // Add methods to manage input processors globally
+    public void addInputProcessor(InputProcessor processor) {
+        if (!globalMultiplexer.getProcessors().contains(processor, true)) {
+            globalMultiplexer.addProcessor(processor);
+        }
+        Gdx.input.setInputProcessor(globalMultiplexer);
+    }
+    public void removeInputProcessor(InputProcessor processor) {
+        globalMultiplexer.removeProcessor(processor);
+        Gdx.input.setInputProcessor(globalMultiplexer);
+    }
+    public void clearInputProcessors() {
+        globalMultiplexer.clear();
+        Gdx.input.setInputProcessor(globalMultiplexer);
+    }
+    public void addInputProcessorAt(int index, InputProcessor processor) {
+        if (!globalMultiplexer.getProcessors().contains(processor, true)) {
+            globalMultiplexer.addProcessor(index, processor);
+        }
+        Gdx.input.setInputProcessor(globalMultiplexer);
+    }
+    public InputMultiplexer getGlobalMultiplexer() {
+        return globalMultiplexer;
     }
 }

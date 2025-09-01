@@ -72,7 +72,7 @@ public class CardStageUI {
         Table parentTable = new Table();
         parentTable.setFillParent(true);
         parentTable.bottom();
-        parentTable.add(cardHandTable.cardTable).expandX().padBottom(worldHeight * 0.55f);
+        parentTable.add(cardHandTable.cardTable).expandX().padBottom(worldHeight * 0.55f - 100f); // Move up by 100 units
 
         cardStage.addActor(parentTable);
     }
@@ -260,9 +260,9 @@ public class CardStageUI {
             Gdx.app.log("CardEffect", "Processing card: " + card.name + " (Type: " + card.type + ", Effect: " + card.baseEffect + ")");
 
             // Handle cards that have both attack and defense effects (like Astral Mirage)
-            boolean hasAttackEffect = card.description != null && 
+            boolean hasAttackEffect = card.description != null &&
                 (card.description.toLowerCase().contains("deal") || card.description.toLowerCase().contains("damage"));
-            boolean hasShieldEffect = card.description != null && 
+            boolean hasShieldEffect = card.description != null &&
                 card.description.toLowerCase().contains("gain") && card.description.toLowerCase().contains("shield");
 
             if (card.type.equalsIgnoreCase("ATTACK")) {

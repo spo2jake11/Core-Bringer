@@ -12,27 +12,15 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
-import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
-import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.viewport.ExtendViewport;
-import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-import com.badlogic.gdx.graphics.Pixmap;
-import com.badlogic.gdx.graphics.g2d.Batch;
-import com.badlogic.gdx.scenes.scene2d.ui.Image;
-import com.badlogic.gdx.scenes.scene2d.utils.DragAndDrop;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 
 public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
@@ -40,7 +28,6 @@ public class GameScreen implements Screen{
 
     private Stage battleStage;
     private Stage cardStage;
-    private Stage editorStage;
 
     // CardParser instance for managing card data
     private CardParser cardParser;
@@ -58,8 +45,14 @@ public class GameScreen implements Screen{
     // --- UI Components ---
     private BattleStageUI battleStageUI;
     private CardStageUI cardStageUI;
-    private EditorStageUI editorStageUI;
     // --- End UI Components ---
+
+    // --- Energy System ---
+    private int energy = 0;
+    private final int MAX_ENERGY = 10;
+    private Label energyLabel;
+    private Window optionsWindow;
+    // --- End Energy System ---
 
 
     public GameScreen(Main corebringer) {
@@ -73,7 +66,6 @@ public class GameScreen implements Screen{
 
         ///This stages are separated to lessen complications
         battleStage = new Stage(new ScreenViewport());
-        editorStage = new Stage(new ScreenViewport());
         cardStage = new Stage(new ScreenViewport());
 
         // --- TurnManager Integration ---
@@ -87,13 +79,17 @@ public class GameScreen implements Screen{
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
         cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager);
-        editorStageUI = new EditorStageUI(editorStage, corebringer.testskin, corebringer);
+
+        // Add energy label to battleStage
+        energyLabel = new Label("Energy: 0/10", corebringer.testskin);
+        energyLabel.setAlignment(Align.topLeft);
+        energyLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
+        battleStage.addActor(energyLabel);
 
         // Test output to verify new UI classes are working
         Gdx.app.log("GameScreen", "Successfully initialized all UI components:");
         Gdx.app.log("GameScreen", "- BattleStageUI: " + (battleStageUI != null ? "OK" : "FAILED"));
         Gdx.app.log("GameScreen", "- CardStageUI: " + (cardStageUI != null ? "OK" : "FAILED"));
-        Gdx.app.log("GameScreen", "- EditorStageUI: " + (editorStageUI != null ? "OK" : "FAILED"));
 
         // Test enemy atlas loading
         if (battleStageUI != null) {
@@ -114,13 +110,29 @@ public class GameScreen implements Screen{
 
     @Override
     public void show() {
-        /// This gives the button functions to become clickable
-        InputMultiplexer multiplexer = new InputMultiplexer();
-        // Add global ESC key listener first
-        multiplexer.addProcessor(new InputProcessor() {
+        // --- Energy gain from CodeEditorScreen points ---
+        if (corebringer.codeEditorScreen != null) {
+            int gained = corebringer.codeEditorScreen.consumeSessionPoints();
+            if (gained > 0) {
+                addEnergy(gained);
+                Gdx.app.log("GameScreen", "Gained energy from CodeEditorScreen: " + gained);
+            }
+        }
+        // --- End energy gain logic ---
+        // Register all input processors and stages with Main's global multiplexer
+        corebringer.clearInputProcessors();
+        corebringer.addInputProcessor(battleStage);
+        corebringer.addInputProcessor(cardStage);
+        corebringer.addInputProcessor(new InputProcessor() {
             @Override public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.ESCAPE) {
-                    if (editorStageUI != null) editorStageUI.toggleOptionsWindow();
+                    if (optionsWindow == null || !optionsWindow.isVisible()) {
+                        showOptionsWindow();
+                    } else {
+                        optionsWindow.setVisible(false);
+                        optionsWindow.remove();
+                        // No need to reset multiplexer, it's always managed by Main
+                    }
                     return true;
                 }
                 return false;
@@ -129,19 +141,34 @@ public class GameScreen implements Screen{
             @Override public boolean keyTyped(char character) { return false; }
             @Override public boolean touchDown(int screenX, int screenY, int pointer, int button) { return false; }
             @Override public boolean touchUp(int screenX, int screenY, int pointer, int button) { return false; }
-
-            @Override
-            public boolean touchCancelled(int screenX, int screenY, int pointer, int button) {
-                return false;
-            }
-
+            @Override public boolean touchCancelled(int screenX, int screenY, int pointer, int button) { return false; }
             @Override public boolean touchDragged(int screenX, int screenY, int pointer) { return false; }
             @Override public boolean mouseMoved(int screenX, int screenY) { return false; }
             @Override public boolean scrolled(float amountX, float amountY) { return false; }
         });
-        multiplexer.addProcessor(editorStage);
-        multiplexer.addProcessor(cardStage);
-        Gdx.input.setInputProcessor(multiplexer);
+        // Add Recharge button at the bottom of the screen, below cardStageUI
+        addRechargeButtonToBottom();
+    }
+
+    private void addRechargeButtonToBottom() {
+        // Remove previous Recharge button if any
+        for (Actor actor : battleStage.getActors()) {
+            if (actor.getName() != null && actor.getName().equals("RechargeButton")) {
+                actor.remove();
+                break;
+            }
+        }
+        TextButton btnRecharge = new TextButton("Recharge", corebringer.testskin);
+        btnRecharge.setName("RechargeButton");
+        btnRecharge.setWidth(200);
+        btnRecharge.setHeight(50);
+        btnRecharge.setPosition((Gdx.graphics.getWidth() - btnRecharge.getWidth()) / 2f, 100);
+        btnRecharge.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) {
+                corebringer.setScreen(corebringer.codeEditorScreen);
+            }
+        });
+        battleStage.addActor(btnRecharge);
     }
 
     @Override
@@ -155,8 +182,7 @@ public class GameScreen implements Screen{
         cardStage.act(delta);
         cardStage.draw();
 
-        editorStage.act(delta);
-        editorStage.draw();
+        // Removed: editorStage.act(delta); editorStage.draw();
 
         // --- TurnManager Integration: process turn phases and execute enemy turns ---
         // Update turn manager (handles delays)
@@ -249,8 +275,8 @@ public class GameScreen implements Screen{
             Gdx.graphics.getHeight() / 2f + 100f
         );
 
-        // Add to editor stage for display
-        editorStage.addActor(randomMessage);
+        // Add to battleStage for display (was editorStage)
+        battleStage.addActor(randomMessage);
 
         // Remove after 2 seconds
         randomMessage.addAction(Actions.sequence(
@@ -269,14 +295,8 @@ public class GameScreen implements Screen{
     @Override public void resize(int width, int height) {
         battleStage.getViewport().update(width, height, true);
         cardStage.getViewport().update(width, height, true);
-        editorStage.getViewport().update(width, height, true);
-
-        //This here is the resize for editorUI
-        float screenHeight = editorStage.getViewport().getWorldHeight();
-        float screenWidth = editorStage.getViewport().getWorldWidth();
-        float bottomHeight = screenHeight * 0.4f;
-        editorStageUI.resize(screenWidth, bottomHeight);
-
+        // Removed: editorStage.getViewport().update(width, height, true);
+        // Removed: editorStageUI.resize(...)
     }
     @Override public void pause() {
 
@@ -293,7 +313,74 @@ public class GameScreen implements Screen{
             battleStageUI.dispose();
         }
         battleStage.dispose();
-        editorStage.dispose();
+        // Removed: editorStage.dispose();
         cardStage.dispose();
+    }
+
+    private void showOptionsWindow() {
+        if (optionsWindow != null && optionsWindow.isVisible()) return;
+        optionsWindow = new Window("Options", corebringer.testskin);
+        optionsWindow.setModal(true);
+        optionsWindow.setMovable(true);
+        optionsWindow.pad(20);
+        optionsWindow.setSize(600, 480);
+        optionsWindow.setPosition(Gdx.graphics.getWidth() / 2f - 200f, Gdx.graphics.getHeight() / 2f - 200f);
+        // Add buttons
+        TextButton btnJournal = new TextButton("Journal", corebringer.testskin);
+        TextButton btnTitle = new TextButton("Title", corebringer.testskin);
+        TextButton btnClose = new TextButton("Close", corebringer.testskin);
+        btnJournal.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) {
+                float worldWidth = Gdx.graphics.getWidth();
+                float worldHeight = Gdx.graphics.getHeight();
+                JournalWindow journalWindow = new JournalWindow(corebringer.testskin, worldWidth, worldHeight);
+                battleStage.addActor(journalWindow);
+                journalWindow.setVisible(true);
+                optionsWindow.setVisible(false);
+                optionsWindow.remove();
+            }
+        });
+        btnTitle.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) {
+                corebringer.setScreen(corebringer.mainMenuScreen);
+                optionsWindow.setVisible(false);
+                optionsWindow.remove();
+                // Re-register input processors for the new screen
+                if (corebringer.getScreen() != null) corebringer.getScreen().show();
+            }
+        });
+        btnClose.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) {
+                optionsWindow.setVisible(false);
+                optionsWindow.remove();
+                // Re-register input processors for this screen
+                show();
+            }
+        });
+        Table table = new Table();
+        table.add(btnJournal).row();
+        table.add(btnTitle).row();
+        table.add(btnClose).row();
+        optionsWindow.add(table).expand().fill();
+        battleStage.addActor(optionsWindow);
+        // No need to reset multiplexer, it's always managed by Main
+    }
+    public void setEnergy(int value) {
+        this.energy = Math.min(value, MAX_ENERGY);
+        updateEnergyLabel();
+    }
+    public int getEnergy() {
+        return energy;
+    }
+    public int getMaxEnergy() {
+        return MAX_ENERGY;
+    }
+    public void addEnergy(int amount) {
+        setEnergy(this.energy + amount);
+    }
+    private void updateEnergyLabel() {
+        if (energyLabel != null) {
+            energyLabel.setText("Energy: " + energy + "/" + MAX_ENERGY);
+        }
     }
 }

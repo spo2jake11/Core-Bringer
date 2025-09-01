@@ -12,14 +12,14 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 
 public class JournalWindow extends Window {
-    public JournalWindow(final Stage stage, final Skin skin) {
+    public JournalWindow(final Skin skin, final float width, final float height) {
         super("Java Tutorial Journal", skin);
         this.getTitleLabel().setAlignment(Align.center);
         this.getTitleTable().padLeft(20).padRight(20);
         this.setModal(true);
-        this.setMovable(false);
+        this.setMovable(true);
         this.pad(-40);
-        this.setSize(1200, 900);
+        this.setSize(width * 0.8f, height * 0.8f);
         this.setPosition(
             Gdx.graphics.getWidth() / 2 - 800,
             Gdx.graphics.getHeight() / 2 - 800

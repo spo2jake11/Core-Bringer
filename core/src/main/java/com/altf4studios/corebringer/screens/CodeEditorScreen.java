@@ -38,10 +38,25 @@ public class CodeEditorScreen implements Screen {
     private QuizQuestion current;
     private final Random random = new Random();
 
+    private int energy;
+    private final int MAX_ENERGY = 10;
+    private Label energyLabel;
+    private Dialog maxEnergyDialog;
+
+    // --- Session Points for Energy Transfer ---
+    private int sessionPoints = 0;
+    // --- End Session Points ---
+
     public CodeEditorScreen(Main corebringer) {
         this.corebringer = corebringer;
         this.skin = corebringer.testskin;
         this.stage = new Stage(new ScreenViewport());
+        // Initialize energy from GameScreen if available
+        if (corebringer.gameScreen != null) {
+            this.energy = corebringer.gameScreen.getEnergy();
+        } else {
+            this.energy = 0;
+        }
         loadQuestions();
         buildUI();
     }
@@ -145,20 +160,34 @@ public class CodeEditorScreen implements Screen {
             }
         });
 
-        // Layout root
-        Table root = new Table();
-        root.setFillParent(true);
+        // Add energy label at top left
+        energyLabel = new Label("Energy: " + energy + "/" + MAX_ENERGY, skin);
+        energyLabel.setAlignment(Align.topLeft);
+        energyLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
+        stage.addActor(energyLabel);
 
-        // Left column is question (half width), right column is code editor
-        root.add(questionTable).width(Gdx.graphics.getWidth() * 0.5f).growY().pad(10);
-
+        // Add a button to gain energy for demonstration
+        TextButton btnGainEnergy = new TextButton("Gain Energy", skin);
+        btnGainEnergy.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                addEnergy(1);
+            }
+        });
         Table right = new Table();
         right.add(new ScrollPane(codeInputArea, skin)).grow().colspan(2).row();
         right.add(btnRun).padTop(10).left();
         right.add(btnNextQ).padTop(10).left().row();
         right.add(btnBack).padTop(10).left();
         right.add(outputLabel).padTop(10).left();
+        right.add(btnGainEnergy).padTop(10).left().row();
 
+        // Layout root
+        Table root = new Table();
+        root.setFillParent(true);
+
+        // Left column is question (half width), right column is code editor
+        root.add(questionTable).width(Gdx.graphics.getWidth() * 0.5f).growY().pad(10);
         root.add(right).grow().pad(10);
 
         stage.addActor(root);
@@ -201,6 +230,9 @@ public class CodeEditorScreen implements Screen {
                 boolean correct = evaluateCorrectness(code, result);
                 String judgement = correct ? "\n\n=== Judgement: ✅ Correct ===" : "\n\n=== Judgement: ❌ Incorrect ===";
                 int score = computeScore(code, result);
+                // --- Add to session points if correct ---
+                if (score > 0) sessionPoints += score;
+                // --- End session points logic ---
                 String scoreLine = "\nPoints: " + score + "/" + (current != null ? current.totalPoints() : 0);
                 final String finalText = result + judgement + scoreLine;
 
@@ -318,6 +350,41 @@ public class CodeEditorScreen implements Screen {
         area.setCursorPosition(cursor + toInsert.length());
     }
 
+    public void addEnergy(int amount) {
+        if (energy >= MAX_ENERGY) {
+            showMaxEnergyDialog();
+            return;
+        }
+        energy = Math.min(energy + amount, MAX_ENERGY);
+        updateEnergyLabel();
+    }
+    private void updateEnergyLabel() {
+        if (energyLabel != null) {
+            energyLabel.setText("Energy: " + energy + "/" + MAX_ENERGY);
+        }
+    }
+    private void showMaxEnergyDialog() {
+        if (maxEnergyDialog == null) {
+            maxEnergyDialog = new Dialog("Max Energy", skin) {
+                @Override
+                protected void result(Object object) {
+                    this.hide();
+                }
+            };
+            maxEnergyDialog.text("You have reached the maximum energy (10) and cannot obtain more.");
+            maxEnergyDialog.button("OK");
+        }
+        maxEnergyDialog.show(stage);
+    }
+
+    // --- Session Points Getter/Resetter ---
+    public int consumeSessionPoints() {
+        int pts = sessionPoints;
+        sessionPoints = 0;
+        return pts;
+    }
+    // --- End Session Points Getter/Resetter ---
+
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
@@ -334,7 +401,12 @@ public class CodeEditorScreen implements Screen {
     @Override public void resize(int width, int height) { stage.getViewport().update(width, height, true); }
     @Override public void pause() {}
     @Override public void resume() {}
-    @Override public void hide() {}
+    @Override public void hide() {
+        // Sync energy back to GameScreen
+        if (corebringer.gameScreen != null) {
+            corebringer.gameScreen.setEnergy(energy);
+        }
+    }
     @Override public void dispose() { stage.dispose(); }
 
     private static class QuizQuestion {
@@ -353,5 +425,4 @@ public class CodeEditorScreen implements Screen {
         }
     }
 }
-
 
