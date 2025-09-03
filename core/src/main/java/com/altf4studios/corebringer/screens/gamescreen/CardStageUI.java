@@ -23,7 +23,7 @@ public class CardStageUI {
     private float worldHeight;
     private boolean[] discardedCards;
     private int cardsInHand;
-    private Button drawButton;
+    private TextButton drawButton;
     private Array<String> availableCardNames;
     private Player player;
     private Enemy enemy;
@@ -63,20 +63,24 @@ public class CardStageUI {
         // Add click listeners to cards for discard functionality
         setupCardClickListeners();
 
-        // Create draw button
+        // Create draw button (TextButton)
         createDrawButton();
 
-        // Add draw button to the card table in a new row
-        cardHandTable.cardTable.row();
-        cardHandTable.cardTable.add(drawButton).colspan(5).padTop(10);
+        // Layout: cards in a row, draw button at the right
+        Table rowTable = new Table();
+        for (Label cardLabel : cardHandTable.cardLabels) {
+            rowTable.add(cardLabel).padRight(10f).width(cardWidth).height(cardHeight);
+        }
+        rowTable.add(drawButton).padLeft(20f).width(120f).height(cardHeight).right();
 
-        // Create parent table
+        // Parent table for positioning
         Table parentTable = new Table();
         parentTable.setFillParent(true);
         parentTable.bottom();
-        parentTable.add(cardHandTable.cardTable).expandX().padBottom(worldHeight * 0.55f - 100f); // Move up by 100 units
+        parentTable.add(rowTable).expandX().padBottom(worldHeight * 0.55f - 100f);
 
         cardStage.addActor(parentTable);
+        hideDrawButton(); // Hide by default
     }
 
     private void initializeAvailableCards() {
@@ -153,11 +157,9 @@ public class CardStageUI {
                         cardsInHand--;
                         // Check if all cards are used
                         if (cardsInHand == 0) {
-                            refreshCardHand();
-                        }
-                        // Show draw button if there are cards available to draw
-                        if (availableCardNames.size > 0) {
                             showDrawButton();
+                        } else {
+                            hideDrawButton();
                         }
                     }
                 }
@@ -166,22 +168,21 @@ public class CardStageUI {
     }
 
     private void createDrawButton() {
-        drawButton = new Button(skin, "default");
+        drawButton = new TextButton("Draw", skin);
         drawButton.setVisible(false);
         drawButton.setColor(Color.GOLD);
-
         drawButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 drawCard();
+                refreshCardHand();
             }
         });
     }
 
     private void showDrawButton() {
-        if (availableCardNames.size > 0) {
-            drawButton.setVisible(true);
-        }
+        drawButton.setVisible(true);
+
     }
 
     private void hideDrawButton() {
@@ -189,30 +190,21 @@ public class CardStageUI {
     }
 
     private void drawCard() {
-        if (availableCardNames.size > 0 && cardsInHand < 5) {
-            // Find an empty slot
-            for (int i = 0; i < cardHandTable.cardLabels.length; i++) {
-                if (discardedCards[i] || cardHandTable.cardLabels[i].getText().toString().equals("Corrupted Card")) {
-                    // Draw a new card
-                    int randomIndex = (int) (Math.random() * availableCardNames.size);
-                    String newCardName = availableCardNames.get(randomIndex);
-
-                    cardHandTable.cardLabels[i].setText(newCardName);
-                    cardHandTable.cardLabels[i].setColor(1f, 1f, 1f, 1f); // Reset color
-                    discardedCards[i] = false;
-                    cardsInHand++;
-
-                    availableCardNames.removeIndex(randomIndex);
-
-                    // Hide draw button if no more cards available or hand is full
-                    if (availableCardNames.size == 0 || cardsInHand == 5) {
-                        hideDrawButton();
-                    }
-
-                    break;
-                }
+        int drawn = 0;
+        for (int i = 0; i < cardHandTable.cardLabels.length && cardsInHand < 5 && availableCardNames.size > 0; i++) {
+            if (discardedCards[i] || cardHandTable.cardLabels[i].getText().toString().equals("Corrupted Card")) {
+                int randomIndex = (int) (Math.random() * availableCardNames.size);
+                String newCardName = availableCardNames.get(randomIndex);
+                cardHandTable.cardLabels[i].setText(newCardName);
+                cardHandTable.cardLabels[i].setColor(1f, 1f, 1f, 1f); // Reset color
+                discardedCards[i] = false;
+                cardsInHand++;
+                availableCardNames.removeIndex(randomIndex);
+                drawn++;
             }
         }
+        // Hide draw button after drawing
+        hideDrawButton();
     }
 
     public CardHandTable getCardHandTable() {

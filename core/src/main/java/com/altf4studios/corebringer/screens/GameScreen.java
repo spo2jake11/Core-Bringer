@@ -9,7 +9,6 @@ import com.altf4studios.corebringer.entities.Enemy;
 import com.altf4studios.corebringer.screens.gamescreen.*;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
-import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -22,8 +21,6 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 
 public class GameScreen implements Screen{
@@ -35,10 +32,6 @@ public class GameScreen implements Screen{
 
     // CardParser instance for managing card data
     private CardParser cardParser;
-
-    // CodeSimulator for running user code - REMOVED
-    // private com.altf4studios.corebringer.interpreter.CodeSimulator codeSimulator;
-
 
     // --- TurnManager Integration ---
     private TurnManager turnManager;
@@ -70,9 +63,6 @@ public class GameScreen implements Screen{
         // Initialize CardParser
         cardParser = CardParser.getInstance();
 
-        // Initialize CodeSimulator - REMOVED
-        // codeSimulator = new com.altf4studios.corebringer.interpreter.CodeSimulator();
-
         ///This stages are separated to lessen complications
         battleStage = new Stage(new ScreenViewport());
         cardStage = new Stage(new ScreenViewport());
@@ -80,7 +70,7 @@ public class GameScreen implements Screen{
         // --- TurnManager Integration ---
         // Initialize player and enemy (example values, adjust as needed)
         player = new Player("Player", 20, 10, 5, 3);
-        enemy = new Enemy("enemy1", "Enemy", 100, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
+        enemy = new Enemy("enemy1", "Enemy", 20, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
         turnManager = new TurnManager(player, enemy);
         // --- End TurnManager Integration ---
 
@@ -110,9 +100,8 @@ public class GameScreen implements Screen{
         /// Here's all the things that will initialize once the Start Button is clicked.
 
         /// This provides lines to be able to monitor the objects' boundaries
-//        battleStage.setDebugAll(true);
-//        editorStage.setDebugAll(true);
-//        cardStage.setDebugAll(true);
+        battleStage.setDebugAll(true);
+        cardStage.setDebugAll(true);
         // Interpreter removed
 
     }
@@ -157,6 +146,10 @@ public class GameScreen implements Screen{
         });
         // Add Recharge button at the bottom of the screen, below cardStageUI
         addRechargeButtonToBottom();
+
+        // --- Ensure viewport is updated to current window size ---
+        battleStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        cardStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
     private void addRechargeButtonToBottom() {
@@ -306,8 +299,6 @@ public class GameScreen implements Screen{
     @Override public void resize(int width, int height) {
         battleStage.getViewport().update(width, height, true);
         cardStage.getViewport().update(width, height, true);
-        // Removed: editorStage.getViewport().update(width, height, true);
-        // Removed: editorStageUI.resize(...)
     }
     @Override public void pause() {
 
@@ -326,6 +317,7 @@ public class GameScreen implements Screen{
         battleStage.dispose();
         // Removed: editorStage.dispose();
         cardStage.dispose();
+        this.dispose();
     }
 
     private void showOptionsWindow() {

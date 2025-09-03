@@ -103,13 +103,10 @@ public class MainMenuScreen implements Screen {
                 corebringer.corebringermapstartbgm.play();
 
                 // Show random selection message
-                showRandomSelectionMessage();
+//                showRandomSelectionMessage();
 
-                // Trigger random enemy and card selection
-                if (corebringer.gameScreen != null) {
-                    corebringer.gameScreen.triggerRandomSelection();
-                }
-
+                // Always create a new GameScreen for a fresh session
+                corebringer.gameScreen = new com.altf4studios.corebringer.screens.GameScreen(corebringer);
                 corebringer.setScreen(corebringer.gameScreen);
             }
         });
