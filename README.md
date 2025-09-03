@@ -64,3 +64,21 @@ Useful Gradle tasks and flags:
 
 Note that most tasks that are not specific to a single project can be run with `name:` prefix, where the `name` should be replaced with the ID of a specific project.
 For example, `core:clean` removes `build` folder only from the `core` project.
+
+## Main Menu changes (Title background + Atlas buttons)
+
+The main menu now renders a Title Card background and uses the `assets/ui/buttons_atlas.atlas` regions for the Start/Options/Exit buttons.
+
+### Title background
+- Add an Image using `backgrounds/TitleCard_bg.png` and add it to the `Stage` before other UI. Call `setFillParent(true)` so it stretches to the viewport.
+
+### Atlas-based buttons
+- `assets/ui/buttons_atlas.atlas` defines: `start_btn`, `settings_btn`, `exit_btn`.
+- Create `ImageButton`s from the atlas using `new TextureRegionDrawable(atlas.findRegion("..."))`.
+- Replace `TextButton` usages with these `ImageButton`s and keep the click listeners.
+
+### Code location
+- `core/src/main/java/com/altf4studios/corebringer/screens/MainMenuScreen.java` contains background and button setup.
+
+### Exporting to PDF
+- Open this section in a Markdown preview and use "Export as PDF" or your OS "Print to PDF".

@@ -8,6 +8,10 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.Batch;
+import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.InputMultiplexer;
@@ -44,8 +48,8 @@ public class Main extends Game {
     @Override
     public void create() {
         //AssetManager is located here
-        assetManager =new AssetManager();
-        assetManager.finishLoading();
+        assetManager = new AssetManager();
+        assetManager.load("TitleCard_bg.png", Texture.class);
 
         ///This is where music plays when the game starts
         corebringerbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
@@ -128,13 +132,13 @@ public class Main extends Game {
     @Override
     public void render() {
         super.render();
-
         Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
 
         ///This is to give function to the F11 key
         /*if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {
             toggleFullscreen();
         }*/
+
     }
 
     ///This method makes the F11 key to work properly for the game to achieve true fullscreen
@@ -188,6 +192,7 @@ public class Main extends Game {
 //        if (corebringermapstartbgm != null) {
 //            corebringermapstartbgm.dispose();
 //        }
+
     }
     @Override public void resize(int width, int height) {
         super.resize(width, height);
