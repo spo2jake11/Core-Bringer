@@ -1,0 +1,13 @@
+relics_atlas.png
+size:2048,512
+repeat:none
+bug_blade
+bounds:646,2,320,320
+stand_arrow
+bounds:1290,2,320,320
+suspicious_squid
+bounds:968,2,320,320
+torn_card
+bounds:2,2,320,320
+us_bug
+bounds:324,2,320,320

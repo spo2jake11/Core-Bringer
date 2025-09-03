@@ -1,16 +1,21 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.Utils;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 ///Now using Screens instead of ApplicationAdapter to implement button functionality and navigation
@@ -22,20 +27,27 @@ public class MainMenuScreen implements Screen {
     private Table gametitleandicontable;
     private Table gamestartandnavigationtable;
     private Image corebringericon;
-    private TextButton startbutton;
-    private TextButton optionsbutton;
-    private TextButton exitbutton;
+    private Image corebringerbg;
+    private ImageButton startbutton;
+    private ImageButton optionsbutton;
+    private ImageButton exitbutton;
     private int debugclickingcount;
     private Label magicword;
     private boolean isDebugMessageInvisible = false;
+    private TextureAtlas atlas;
 
     public MainMenuScreen(Main corebringer) {
         ///Here's all the things that will initiate upon start-up
         this.corebringer = corebringer; /// The Master Key that holds all screens together
         mainmenustage = new Stage(new FitViewport(1280, 720)); ////Used Stage as a skeletal framework for the UI
         mainmenutable = new Table(); ////Used Table as a flesh framework for the UI
+        atlas = new TextureAtlas(Utils.getInternalPath("assets/ui/buttons_atlas.atlas")); //UI buttons for main menu
 
         ////Core Table parameters
+        corebringerbg = new Image(new Texture("backgrounds/TitleCard_bg.png"));
+        corebringerbg.setFillParent(true);
+        mainmenustage.addActor(corebringerbg);
+
         mainmenutable.setFillParent(true);
         mainmenutable.top();
         mainmenustage.addActor(mainmenutable);
@@ -61,10 +73,13 @@ public class MainMenuScreen implements Screen {
         ///Game Start and Options Table initialization
         gamestartandnavigationtable = new Table();
 
-        ///Game Start and Options Table parameters and values
-        startbutton = new TextButton("Start", corebringer.testskin);
-        optionsbutton = new TextButton("Options", corebringer.testskin);
-        exitbutton = new TextButton("Exit", corebringer.testskin);
+        ///Game Start and Options Table parameters and values (use atlas-based image buttons)
+        startbutton = createAtlasButton("start_btn");
+        optionsbutton = createAtlasButton("settings_btn");
+        exitbutton = createAtlasButton("exit_btn");
+        startbutton.getImage().setScaling(Scaling.stretch);
+        optionsbutton.getImage().setScaling(Scaling.stretch);
+        exitbutton.getImage().setScaling(Scaling.stretch);
 
         ///Game Start and Options Table calling
         gamestartandnavigationtable.add(startbutton).width(250f).height(50f).pad(10f).row();
@@ -131,6 +146,15 @@ public class MainMenuScreen implements Screen {
         mainmenutable.add(gametitleandicontable).center().padTop(20f);
         mainmenutable.row();
         mainmenutable.add(gamestartandnavigationtable).center().padTop(50f).padBottom(20f);
+    }
+    private ImageButton createAtlasButton(String regionName) {
+        TextureRegionDrawable base = new TextureRegionDrawable(atlas.findRegion(regionName));
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.up = base;
+        style.over = base.tint(new Color(1f, 1f, 1f, 0.9f));
+        style.down = base.tint(new Color(0.85f, 0.85f, 0.85f, 1f));
+        style.checked = base.tint(new Color(0.9f, 0.9f, 0.9f, 1f));
+        return new ImageButton(style);
     }
     private void showthemagicword(String message, float duration) {
         if (isDebugMessageInvisible) return; ///This makes it so that the message won't be overlapping
