@@ -100,8 +100,8 @@ public class GameScreen implements Screen{
         /// Here's all the things that will initialize once the Start Button is clicked.
 
         /// This provides lines to be able to monitor the objects' boundaries
-        battleStage.setDebugAll(true);
-        cardStage.setDebugAll(true);
+//        battleStage.setDebugAll(true);
+//        cardStage.setDebugAll(true);
         // Interpreter removed
 
     }
@@ -262,7 +262,7 @@ public class GameScreen implements Screen{
 
         // Random card selection (refresh card hand)
         if (cardStageUI != null) {
-            refreshCardHand();
+//            refreshCardHand();
             Gdx.app.log("GameScreen", "Random cards selected");
         }
 
@@ -289,11 +289,11 @@ public class GameScreen implements Screen{
         ));
     }
 
-    private void refreshCardHand() {
-        if (cardStageUI != null) {
-            cardStageUI.refreshCardHand();
-        }
-    }
+//    private void refreshCardHand() {
+//        if (cardStageUI != null) {
+//            cardStageUI.refreshCardHand();
+//        }
+//    }
     // --- End test methods ---
 
     @Override public void resize(int width, int height) {

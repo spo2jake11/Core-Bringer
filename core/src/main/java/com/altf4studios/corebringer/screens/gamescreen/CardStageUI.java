@@ -7,7 +7,9 @@ import com.altf4studios.corebringer.status.Poison;
 import com.altf4studios.corebringer.turns.TurnManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
@@ -44,6 +46,15 @@ public class CardStageUI {
         worldHeight = cardStage.getViewport().getWorldHeight();
     }
 
+    private int[] getCardCosts(String[] cardNames) {
+        int[] costs = new int[cardNames.length];
+        for (int i = 0; i < cardNames.length; i++) {
+            SampleCardHandler card = cardParser.findCardByName(cardNames[i]);
+            costs[i] = (card != null) ? card.cost : 0;
+        }
+        return costs;
+    }
+
     private void setupCardUI() {
         // Calculate responsive dimensions
         float worldWidth = Gdx.graphics.getWidth();
@@ -54,22 +65,23 @@ public class CardStageUI {
         // Initialize available card names
         initializeAvailableCards();
 
-        // Get card names
+        // Get card names and costs
         String[] cardNames = getCardNames();
+        int[] cardCosts = getCardCosts(cardNames);
 
         // Create card hand table
-        cardHandTable = new CardHandTable(skin, cardWidth, cardHeight, cardNames);
+        cardHandTable = new CardHandTable(skin, cardWidth, cardHeight, cardNames, cardCosts);
 
-        // Add click listeners to cards for discard functionality
-        setupCardClickListeners();
+        // Add click and hover listeners to cards
+        setupCardListeners(cardNames, cardCosts);
 
         // Create draw button (TextButton)
         createDrawButton();
 
         // Layout: cards in a row, draw button at the right
         Table rowTable = new Table();
-        for (Label cardLabel : cardHandTable.cardLabels) {
-            rowTable.add(cardLabel).padRight(10f).width(cardWidth).height(cardHeight);
+        for (Table cardTable : cardHandTable.cardTables) {
+            rowTable.add(cardTable).padRight(10f).width(cardWidth).height(cardHeight);
         }
         rowTable.add(drawButton).padLeft(20f).width(120f).height(cardHeight).right();
 
@@ -122,15 +134,16 @@ public class CardStageUI {
         return cardNames;
     }
 
-    private void setupCardClickListeners() {
-        for (int i = 0; i < cardHandTable.cardLabels.length; i++) {
+    private void setupCardListeners(String[] cardNames, int[] cardCosts) {
+        for (int i = 0; i < cardHandTable.cardNameButtons.length; i++) {
             final int cardIndex = i;
-            final Label cardLabel = cardHandTable.cardLabels[i];
-
-            cardLabel.addListener(new ClickListener() {
+            final TextButton cardButton = cardHandTable.cardNameButtons[i];
+            final String cardName = cardNames[i];
+            final int cardCost = cardCosts[i];
+            cardButton.clearListeners();
+            cardButton.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    String cardName = cardLabel.getText().toString();
                     SampleCardHandler card = cardParser.findCardByName(cardName);
                     int cost = (card != null) ? card.cost : 0;
                     if (gameScreen.getEnergy() < cost) {
@@ -145,23 +158,35 @@ public class CardStageUI {
                         dialog.show(cardStage);
                         return;
                     }
-                    if (!discardedCards[cardIndex] && !cardName.equals("Corrupted Card") || discardedCards[cardIndex] && cardName.equals("Corrupted Card")) {
-                        // Deduct energy
-                        gameScreen.addEnergy(-cost);
-                        // Call the effect resolver before discarding
-                        resolveCardEffect(cardName);
-                        // Discard the card
-                        discardedCards[cardIndex] = true;
-                        cardLabel.setText("Discarded");
-                        cardLabel.setColor(0.5f, 0.5f, 0.5f, 0.5f); // Gray out the card
-                        cardsInHand--;
-                        // Check if all cards are used
-                        if (cardsInHand == 0) {
-                            showDrawButton();
-                        } else {
-                            hideDrawButton();
-                        }
+                    // Deduct energy
+                    gameScreen.addEnergy(-cost);
+                    // Call the effect resolver before discarding
+                    resolveCardEffect(cardName);
+                    // Discard the card
+                    discardedCards[cardIndex] = true;
+                    cardButton.setText("Discarded");
+                    cardButton.setColor(0.5f, 0.5f, 0.5f, 0.5f); // Gray out the card
+                    cardsInHand--;
+                    // Check if all cards are used
+                    if (cardsInHand == 0) {
+                        showDrawButton();
+                    } else {
+                        hideDrawButton();
                     }
+                }
+            });
+            cardButton.addListener(new InputListener() {
+                @Override
+                public boolean mouseMoved(InputEvent event, float x, float y) {
+                    SampleCardHandler card = cardParser.findCardByName(cardName);
+                    if (card != null) {
+                        cardButton.setText(card.description != null ? card.description : "No description");
+                    }
+                    return true;
+                }
+                @Override
+                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                    cardButton.setText(cardName);
                 }
             });
         }
@@ -190,17 +215,18 @@ public class CardStageUI {
     }
 
     private void drawCard() {
-        int drawn = 0;
-        for (int i = 0; i < cardHandTable.cardLabels.length && cardsInHand < 5 && availableCardNames.size > 0; i++) {
-            if (discardedCards[i] || cardHandTable.cardLabels[i].getText().toString().equals("Corrupted Card")) {
+        for (int i = 0; i < cardHandTable.cardNameButtons.length && cardsInHand < 5 && availableCardNames.size > 0; i++) {
+            if (discardedCards[i] || cardHandTable.cardNameButtons[i].getText().toString().equals("Corrupted Card")) {
                 int randomIndex = (int) (Math.random() * availableCardNames.size);
                 String newCardName = availableCardNames.get(randomIndex);
-                cardHandTable.cardLabels[i].setText(newCardName);
-                cardHandTable.cardLabels[i].setColor(1f, 1f, 1f, 1f); // Reset color
+                SampleCardHandler card = cardParser.findCardByName(newCardName);
+                int newCost = (card != null) ? card.cost : 0;
+                cardHandTable.cardNameButtons[i].setText(newCardName);
+                cardHandTable.cardNameButtons[i].setColor(1f, 1f, 1f, 1f); // Reset color
+                cardHandTable.cardCostButtons[i].setText("Cost: " + newCost);
                 discardedCards[i] = false;
                 cardsInHand++;
                 availableCardNames.removeIndex(randomIndex);
-                drawn++;
             }
         }
         // Hide draw button after drawing
@@ -212,29 +238,21 @@ public class CardStageUI {
     }
 
     public void refreshCardHand() {
-        // Reset discarded cards array
         for (int i = 0; i < discardedCards.length; i++) {
             discardedCards[i] = false;
         }
-
-        // Reset cards in hand count
         cardsInHand = 5;
-
-        // Reinitialize available cards if needed
         if (availableCardNames.size == 0) {
             initializeAvailableCards();
         }
-
-        // Get new random card names
         String[] newCardNames = getCardNames();
-
-        // Update card labels with new names and reset colors
-        for (int i = 0; i < cardHandTable.cardLabels.length && i < newCardNames.length; i++) {
-            cardHandTable.cardLabels[i].setText(newCardNames[i]);
-            cardHandTable.cardLabels[i].setColor(1f, 1f, 1f, 1f); // Reset color
+        int[] newCardCosts = getCardCosts(newCardNames);
+        for (int i = 0; i < cardHandTable.cardNameButtons.length && i < newCardNames.length; i++) {
+            cardHandTable.cardNameButtons[i].setText(newCardNames[i]);
+            cardHandTable.cardNameButtons[i].setColor(1f, 1f, 1f, 1f); // Reset color
+            cardHandTable.cardCostButtons[i].setText("Cost: " + newCardCosts[i]);
         }
-
-        // Hide draw button after refresh
+        setupCardListeners(newCardNames, newCardCosts);
         hideDrawButton();
     }
 
