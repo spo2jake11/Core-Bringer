@@ -1,0 +1,10 @@
+[
+  { "name": "Experiment", "hp": 22 },
+  { "name": "Probe", "hp": 25 },
+  { "name": "Shock_slime", "hp": 28 },
+  { "name": "duckling_gun", "hp": 21 },
+  { "name": "liquid_metal", "hp": 30 },
+  { "name": "nanite", "hp": 24 },
+  { "name": "standard_slime", "hp": 27 }
+]
+

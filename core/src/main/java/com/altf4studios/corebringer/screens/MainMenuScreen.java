@@ -2,6 +2,7 @@ package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
 import com.altf4studios.corebringer.Utils;
+import com.altf4studios.corebringer.utils.SaveManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
@@ -117,12 +118,31 @@ public class MainMenuScreen implements Screen {
                 corebringer.corebringermapstartbgm.setVolume(1f);
                 corebringer.corebringermapstartbgm.play();
 
-                // Show random selection message
-//                showRandomSelectionMessage();
-
+                // Save file logic
+                boolean saveExists = SaveManager.saveExists();
+                if (!saveExists) {
+                    // Create new save with default stats
+                    SaveManager.saveStats(20, 0, new String[]{}, 0); // hp=20, energy=0, empty cards, battleWon=0
+                } else {
+                    // Load stats and check battleWon
+                    com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                    if (stats != null && stats.battleWon == 1) {
+                        // Reroll enemy and reset battleWon
+                        SaveManager.saveStats(
+                            stats.hp,
+                            stats.energy,
+                            stats.cards,
+                            0 // reset battleWon
+                        );
+                    }
+                }
                 // Always create a new GameScreen for a fresh session
-                corebringer.gameScreen = new com.altf4studios.corebringer.screens.GameScreen(corebringer);
+//                corebringer.gameScreen = new com.altf4studios.corebringer.screens.GameScreen(corebringer);
                 corebringer.setScreen(corebringer.gameScreen);
+                // Always reroll enemy and cards when starting
+                if (corebringer.gameScreen != null) {
+                    corebringer.gameScreen.rerollEnemyAndCards();
+                }
             }
         });
 

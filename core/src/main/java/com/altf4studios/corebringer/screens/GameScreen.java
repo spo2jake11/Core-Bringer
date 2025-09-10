@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
+import com.altf4studios.corebringer.utils.SaveManager;
 
 public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
@@ -67,9 +68,23 @@ public class GameScreen implements Screen{
         battleStage = new Stage(new ScreenViewport());
         cardStage = new Stage(new ScreenViewport());
 
+        // --- Load stats from save file if exists ---
+        int hp = 20;
+        int energyVal = 0;
+        String[] cards = new String[]{};
+        int battleWon = 0;
+        if (SaveManager.saveExists()) {
+            com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+            if (stats != null) {
+                hp = stats.hp;
+                energyVal = stats.energy;
+                cards = stats.cards;
+            }
+        }
+
         // --- TurnManager Integration ---
         // Initialize player and enemy (example values, adjust as needed)
-        player = new Player("Player", 20, 10, 5, 3);
+        player = new Player("Player", hp, 10, 5, 3); // hp loaded from save
         enemy = new Enemy("enemy1", "Enemy", 20, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
         turnManager = new TurnManager(player, enemy);
         // --- End TurnManager Integration ---
@@ -79,8 +94,17 @@ public class GameScreen implements Screen{
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
         cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager, this);
 
+        // If battleWon == 1, reroll enemy and reset battleWon
+        if (battleWon == 1) {
+            battleStageUI.changeEnemy();
+            battleWon = 0;
+            SaveManager.saveStats(player.getHp(), energyVal, cards, battleWon);
+        }
+
+        // Set energy from save
+        setEnergy(energyVal);
         // Add energy label to battleStage
-        energyLabel = new Label("Energy: 0/10", corebringer.testskin);
+        energyLabel = new Label("Energy: " + energy + "/10", corebringer.testskin);
         energyLabel.setAlignment(Align.topLeft);
         energyLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
         battleStage.addActor(energyLabel);
@@ -104,6 +128,11 @@ public class GameScreen implements Screen{
 //        cardStage.setDebugAll(true);
         // Interpreter removed
 
+    }
+
+    // Call this after any stat change (hp, energy, cards, battleWon)
+    public void saveProgress(int battleWonValue) {
+        SaveManager.saveStats(player.getHp(), energy, new String[]{}, battleWonValue); // TODO: pass actual cards
     }
 
     @Override
@@ -408,6 +437,8 @@ public class GameScreen implements Screen{
         TextButton btnReturn = new TextButton("Return to Title", corebringer.testskin);
         btnReturn.addListener(new ClickListener() {
             @Override public void clicked(InputEvent event, float x, float y) {
+                // Delete save file on death
+                com.altf4studios.corebringer.utils.SaveManager.deleteSave();
                 corebringer.setScreen(corebringer.mainMenuScreen);
                 // Optionally reset death screen state
                 if (deathScreenWindow != null) {
@@ -425,5 +456,17 @@ public class GameScreen implements Screen{
         battleStage.addActor(deathScreenWindow);
         // Block all input except the button
         Gdx.input.setInputProcessor(battleStage);
+    }
+
+    /**
+     * Rerolls the enemy and cards for a new game session.
+     */
+    public void rerollEnemyAndCards() {
+        if (battleStageUI != null) {
+            battleStageUI.changeEnemy();
+            cardStageUI.refreshCardHand();
+        }
+        // TODO: Implement card reroll logic if needed
+        // Example: cardStageUI.rerollCards();
     }
 }
