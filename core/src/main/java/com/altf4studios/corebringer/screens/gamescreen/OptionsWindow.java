@@ -1,5 +1,6 @@
 package com.altf4studios.corebringer.screens.gamescreen;
 
+import com.altf4studios.corebringer.Main;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -22,6 +23,7 @@ public class OptionsWindow extends Window {
         void onGoToTitle();
     }
 
+    private Main corebringer;
     private final Stage stage;
     private final Skin skin;
     private final JournalCallback journalCallback;
@@ -63,8 +65,13 @@ public class OptionsWindow extends Window {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 if (titleCallback != null) titleCallback.onGoToTitle();
+                ///Remove this if necessary or has any other ideas for placement
+                corebringer.corebringergamescreenbgm.stop();
+                corebringer.corebringerstartmenubgm.setVolume(1.0f);
+                corebringer.corebringerstartmenubgm.play();
                 OptionsWindow.this.setVisible(false);
                 OptionsWindow.this.remove();
+
             }
         });
 

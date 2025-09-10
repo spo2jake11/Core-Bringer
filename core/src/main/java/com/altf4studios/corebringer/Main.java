@@ -29,11 +29,13 @@ public class Main extends Game {
     public Music corebringerbgm;
     public Music corebringerstartmenubgm;
     public Music corebringermapstartbgm;
+    public Music corebringergamescreenbgm;
     public boolean isMusicMuted;
     public Skin testskin;
     public Label.LabelStyle responsivelabelstyle;
     public MainMenuScreen mainMenuScreen;
     public OptionsScreen optionsScreen;
+    public GameMapScreen gameMapScreen;
     public GameScreen gameScreen;
     public StartGameMapScreen startGameMapScreen;
     public CodeEditorScreen codeEditorScreen;
@@ -52,19 +54,22 @@ public class Main extends Game {
         assetManager.load("TitleCard_bg.png", Texture.class);
 
         ///This is where music plays when the game starts
-        corebringerbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
+        corebringerbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Mortal-Gaming-144000-(GameIntro1).mp3"));
         corebringerbgm.setLooping(true);
         corebringerbgm.setVolume(1.0f);
-        corebringerstartmenubgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
+        corebringerstartmenubgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Mortal-Gaming-144000-(GameIntro1).mp3"));
         corebringerstartmenubgm.setLooping(true);
         corebringerstartmenubgm.setVolume(1.0f);
-        corebringermapstartbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Drake - Hotline Bling (Lyrics).mp3"));
+        corebringermapstartbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Intro-Video-Game-365760-(GameIntro2).mp3"));
         corebringermapstartbgm.setLooping(true);
         corebringermapstartbgm.setVolume(1.0f);
+        corebringergamescreenbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/0-Top-Battle-Game-BGM-264625-(NormalBattleMusic2).mp3"));
+        corebringergamescreenbgm.setLooping(true);
+        corebringergamescreenbgm.setVolume(1.0f);
 
         isMusicMuted = false;
-//        corebringerbgm.play();
-        //corebringerstartmenubgm.play();
+        //corebringerbgm.play();
+        corebringerstartmenubgm.play();
 
         ///This is for the Skin to be declared and initialized so Screens can just call it
         //test skin used Utils.getInternalPath
@@ -85,6 +90,7 @@ public class Main extends Game {
         debugScreen = new DebugScreen(this);
         cardTestScren = new CardTestScren(this);
         gameScreen = new GameScreen(this);
+        gameMapScreen = new GameMapScreen(this);
         setScreen(mainMenuScreen);
         // Ensure the input multiplexer is always set as the input processor
         Gdx.input.setInputProcessor(globalMultiplexer);
