@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Scaling;
 
 public class BattleStageUI {
     private Stage battleStage;
@@ -79,7 +80,8 @@ public class BattleStageUI {
             Gdx.app.log("BattleStageUI", "Using fallback enemy texture for: " + enemyName);
         }
 
-        enemyImage.setSize(200, 200);
+        enemyImage.setScaling(Scaling.fit);
+        enemyImage.setAlign(Align.center);
         return enemyImage;
     }
 
@@ -130,7 +132,8 @@ public class BattleStageUI {
         // Character images
         Texture playerTexture = new Texture(Gdx.files.internal("basic-characters/hero.png"));
         Image userImageBG = new Image(playerTexture);
-        userImageBG.setSize(480, 1120);
+        userImageBG.setScaling(Scaling.fit);
+        userImageBG.setAlign(Align.center);
 
         // Random enemy selection
         currentEnemyName = getRandomEnemyName();
@@ -152,7 +155,7 @@ public class BattleStageUI {
 
         actionTable.defaults().reset();
         actionTable.defaults().padTop(35);
-        actionTable.add(userTemplateStack).height(200).width(200).pad(100).center();
+        actionTable.add(userTemplateStack).height(400).width(400).pad(100).center();
         actionTable.add(enemyTemplateStack).height(200).width(200).pad(100).center();
 
         battleStage.addActor(actionTable);
