@@ -1,0 +1,11 @@
+debuffs.png
+size:2048,512
+repeat:none
+bleed_icon
+bounds:2,2,320,320
+paralysis_icon
+bounds:646,2,320,320
+poison_icon
+bounds:324,2,320,320
+stun_icon
+bounds:968,2,320,320

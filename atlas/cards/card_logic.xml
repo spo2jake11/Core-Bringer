@@ -1,0 +1,110 @@
+<card_logic>
+    <!--Attack card-->
+    <atk_card1>
+        <id>strike_card</id>
+        <name>Phase Slash</name>
+        <description>Deal 8 melee damage and apply 2 Burn.</description>
+        <type>ATTACK</type>
+        <cost>1</cost>
+        <rarity>COMMON</rarity>
+        <targetType>ENEMY</targetType>
+        <codeEffect>enemy.hp -= 8; enemy.applyBurn(2);</codeEffect>
+    </atk_card1>
+
+    <atk_card2>
+        <id>gun_card</id>
+        <name>Psionic Gun</name>
+        <description>Deal 5 ranged damage</description>
+        <type>ATTACK</type>
+        <cost>2</cost>
+        <rarity>COMMON</rarity>
+        <targetType>ENEMY</targetType>
+        <codeEffect>enemy.hp -= 5; enemy.dmgtake(5);</codeEffect>
+    </atk_card2>
+
+    <!--Defense card-->
+    <def_card1>
+        <id>defend_card</id>
+        <name>Holo Barrier</name>
+        <description>Gain 5 shield.</description>
+        <type>DEFENSE</type>
+        <cost>1</cost>
+        <rarity>COMMON</rarity>
+        <targetType>PLAYER</targetType>
+        <codeEffect>player.shield += 4; player.applyDefense(4);</codeEffect>
+    </def_card1>
+
+    <def_card2>
+        <id>defend_card</id>
+        <name>Bugged Syncronization</name>
+        <description>Deal 3 damage and gain 8 shield.</description>
+        <type>DEFENSE</type>
+        <cost>3</cost>
+        <rarity>RARE</rarity>
+        <targetType>PLAYER</targetType>
+        <codeEffect></codeEffect>
+    </def_card2>
+
+    <!--Status Cards-->
+     <stat_card1>
+         <id></id>
+         <name></name>
+         <description></description>
+         <type></type>
+         <rarity>UNCOMMON</rarity>
+         <targetType></targetType>
+         <codeEffect></codeEffect>
+     </stat_card1>
+
+    <stat_card2>
+        <id></id>
+        <name></name>
+        <description></description>
+        <type></type>
+        <rarity>UNCOMMON</rarity>
+        <targetType></targetType>
+        <codeEffect></codeEffect>
+    </stat_card2>
+
+    <stat_card3>
+        <id></id>
+        <name></name>
+        <description></description>
+        <type></type>
+        <rarity>UNCOMMON</rarity>
+        <targetType></targetType>
+        <codeEffect></codeEffect>
+    </stat_card3>
+
+    <!--Util cards -->
+    <util_card1>
+        <id></id>
+        <name></name>
+        <description></description>
+        <type></type>
+        <rarity>UNCOMMON</rarity>
+        <targetType></targetType>
+        <codeEffect></codeEffect>
+    </util_card1>
+
+    <util_card2>
+        <id></id>
+        <name></name>
+        <description></description>
+        <type></type>
+        <rarity>UNCOMMON</rarity>
+        <targetType></targetType>
+        <codeEffect></codeEffect>
+    </util_card2>
+
+    <util_card3>
+        <id></id>
+        <name></name>
+        <description></description>
+        <type></type>
+        <rarity>UNCOMMON</rarity>
+        <targetType></targetType>
+        <codeEffect></codeEffect>
+    </util_card3>
+
+</card_logic>
