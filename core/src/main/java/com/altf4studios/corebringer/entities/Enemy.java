@@ -18,6 +18,13 @@ public class Enemy extends Entity {
         this.skills = skills;
     }
 
+    /**
+     * Expose a setter for max health on Enemy to allow runtime updates when rerolling enemies.
+     */
+    public void setMaxHealth(int maxHealth) {
+        super.setMaxHealth(maxHealth);
+    }
+
     public String getEntityID() {
         return entityID;
     }

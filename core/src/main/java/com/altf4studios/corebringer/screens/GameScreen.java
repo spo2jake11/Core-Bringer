@@ -73,6 +73,22 @@ public class GameScreen implements Screen{
         int energyVal = 0;
         String[] cards = new String[]{};
         int battleWon = 0;
+        String enemyName = "Enemy";
+        int enemyHp = 20;
+        try {
+            com.badlogic.gdx.files.FileHandle file = Gdx.files.internal("assets/enemies.json");
+            String json = file.readString();
+            com.badlogic.gdx.utils.JsonReader jsonReader = new com.badlogic.gdx.utils.JsonReader();
+            com.badlogic.gdx.utils.JsonValue enemies = jsonReader.parse(json);
+            if (enemies != null && enemies.size > 0) {
+                int idx = com.badlogic.gdx.math.MathUtils.random(enemies.size - 1);
+                com.badlogic.gdx.utils.JsonValue enemyData = enemies.get(idx);
+                enemyName = enemyData.getString("name");
+                enemyHp = enemyData.getInt("hp");
+            }
+        } catch (Exception e) {
+            Gdx.app.error("GameScreen", "Failed to load enemy from JSON: " + e.getMessage());
+        }
         if (SaveManager.saveExists()) {
             com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
             if (stats != null) {
@@ -85,7 +101,7 @@ public class GameScreen implements Screen{
         // --- TurnManager Integration ---
         // Initialize player and enemy (example values, adjust as needed)
         player = new Player("Player", hp, 10, 5, 3); // hp loaded from save
-        enemy = new Enemy("enemy1", "Enemy", 20, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
+        enemy = new Enemy("enemy1", enemyName, enemyHp, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
         turnManager = new TurnManager(player, enemy);
         // --- End TurnManager Integration ---
 
@@ -480,22 +496,25 @@ public class GameScreen implements Screen{
             // Load enemies.json
             com.badlogic.gdx.files.FileHandle file = Gdx.files.internal("assets/enemies.json");
             String json = file.readString();
-            com.badlogic.gdx.utils.Json libgdxJson = new com.badlogic.gdx.utils.Json();
-            java.util.List<java.util.Map> enemies = libgdxJson.fromJson(java.util.List.class, json);
-            if (enemies != null && !enemies.isEmpty()) {
-                // Pick a random enemy
-                int idx = (int)(Math.random() * enemies.size());
-                java.util.Map enemyData = enemies.get(idx);
-                String name = (String)enemyData.get("name");
-                int hp = ((Number)enemyData.get("hp")).intValue();
+            com.badlogic.gdx.utils.JsonReader jsonReader = new com.badlogic.gdx.utils.JsonReader();
+            com.badlogic.gdx.utils.JsonValue enemies = jsonReader.parse(json);
+            if (enemies != null && enemies.size > 0) {
+                int idx = com.badlogic.gdx.math.MathUtils.random(enemies.size - 1);
+                com.badlogic.gdx.utils.JsonValue enemyData = enemies.get(idx);
+                String name = enemyData.getString("name");
+                int hp = enemyData.getInt("hp");
                 // Update Enemy object
                 if (enemy != null) {
                     enemy.setName(name);
+                    // Ensure enemy max health is updated so setHp isn't clamped to an old max
+                    enemy.setMaxHealth(hp);
                     enemy.setHp(hp);
                 }
                 // Update UI
                 if (battleStageUI != null) {
                     battleStageUI.changeEnemy(name);
+                    // Update UI HP bars using current player/enemy values
+                    battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
                     battleStageUI.setEnemyHp(hp);
                 }
             }
@@ -505,6 +524,11 @@ public class GameScreen implements Screen{
         // Reroll cards
         if (cardStageUI != null) {
             cardStageUI.refreshCardHand();
+        }
+        // Reset turn manager phase to player's turn and clear any pending turn state
+        if (turnManager != null) {
+            turnManager.reset();
+            Gdx.app.log("GameScreen", "TurnManager reset after reroll. Player HP: " + player.getHp() + ", Enemy HP: " + enemy.getHp());
         }
     }
 }

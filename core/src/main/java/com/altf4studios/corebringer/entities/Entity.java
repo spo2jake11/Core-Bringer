@@ -54,6 +54,15 @@ public abstract class Entity implements BattleEntity {
         return maxHealth;
     }
 
+    /**
+     * Set the maximum health for this entity and clamp current health to the new max.
+     * Useful when replacing or rerolling enemies so their max HP can be updated at runtime.
+     */
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = Math.max(1, maxHealth);
+        if (this.health > this.maxHealth) this.health = this.maxHealth;
+    }
+
     public int getAttack() {
         return attack;
     }
