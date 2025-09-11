@@ -34,6 +34,10 @@ public class Enemy extends Entity {
         return skills;
     }
 
+    public void setName(String name) {
+        super.setName(name);
+    }
+
     // Enemy-specific action
     public void useSkill(int index, Entity target) {
         // Implement skill logic here

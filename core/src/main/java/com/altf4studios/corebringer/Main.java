@@ -22,6 +22,7 @@ import jdk.jshell.SnippetEvent;
 import java.util.List;
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
+import com.badlogic.gdx.utils.Timer;
 
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
@@ -158,30 +159,73 @@ public class Main extends Game {
         }
     }
 
+    // Fade out the given music over duration (seconds)
+    public void fadeOutMusic(final Music music, final float duration, final Runnable afterFade) {
+        if (music == null || !music.isPlaying()) {
+            if (afterFade != null) afterFade.run();
+            return;
+        }
+        final float initialVolume = music.getVolume();
+        final int steps = 20;
+        final float stepTime = duration / steps;
+        Timer.schedule(new Timer.Task() {
+            int currentStep = 0;
+            @Override
+            public void run() {
+                currentStep++;
+                float newVolume = initialVolume * (1f - (float)currentStep / steps);
+                music.setVolume(Math.max(newVolume, 0f));
+                if (currentStep >= steps) {
+                    music.stop();
+                    music.setVolume(initialVolume); // Reset for next play
+                    if (afterFade != null) afterFade.run();
+                    this.cancel();
+                }
+            }
+        }, 0, stepTime, steps);
+    }
+
+    // Fade in the given music over duration (seconds)
+    public void fadeInMusic(final Music music, final float duration) {
+        if (music == null) return;
+        final float targetVolume = 1.0f;
+        music.setVolume(0f);
+        music.play();
+        final int steps = 20;
+        final float stepTime = duration / steps;
+        Timer.schedule(new Timer.Task() {
+            int currentStep = 0;
+            @Override
+            public void run() {
+                currentStep++;
+                float newVolume = targetVolume * ((float)currentStep / steps);
+                music.setVolume(Math.min(newVolume, targetVolume));
+                if (currentStep >= steps) {
+                    music.setVolume(targetVolume);
+                    this.cancel();
+                }
+            }
+        }, 0, stepTime, steps);
+    }
+
     @Override public void pause() {
         super.pause();
-//        if (!isMusicMuted && corebringerbgm.isPlaying()) {
-//            corebringerbgm.stop();
-//        }
         if (!isMusicMuted && corebringerstartmenubgm.isPlaying()) {
-            corebringerstartmenubgm.pause();
+            fadeOutMusic(corebringerstartmenubgm, 1f, null);
         }
         if (!isMusicMuted && corebringermapstartbgm.isPlaying()) {
-            corebringermapstartbgm.pause();
+            fadeOutMusic(corebringermapstartbgm, 1f, null);
         }
     }
     @Override public void resume() {
         super.resume();
-//        if (!isMusicMuted && !corebringerbgm.isPlaying()) {
-//            corebringerbgm.play();
-//        }
         if (!isMusicMuted) {
             if (getScreen().equals(mainMenuScreen) && !corebringerstartmenubgm.isPlaying()) {
-                corebringerstartmenubgm.play();
+                fadeInMusic(corebringerstartmenubgm, 1f);
                 isMusicMuted = false;
             }
             if (getScreen().equals(startGameMapScreen) && !corebringermapstartbgm.isPlaying()) {
-                corebringermapstartbgm.play();
+                fadeInMusic(corebringermapstartbgm, 1f);
                 isMusicMuted = false;
             }
         }

@@ -29,6 +29,10 @@ public abstract class Entity implements BattleEntity {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public int getHealth() {
         return health;
     }
@@ -122,14 +126,14 @@ public abstract class Entity implements BattleEntity {
      */
     public void applyPoisonEffects() {
         List<Poison> expiredPoisons = new ArrayList<>();
-        
+
         for (Poison poison : poisonEffects) {
             poison.applyPoisonDamage(this);
             if (poison.isExpired()) {
                 expiredPoisons.add(poison);
             }
         }
-        
+
         // Remove expired poison effects
         for (Poison expiredPoison : expiredPoisons) {
             poisonEffects.remove(expiredPoison);

@@ -347,6 +347,7 @@ public class GameScreen implements Screen{
         // Removed: editorStage.dispose();
         cardStage.dispose();
         this.dispose();
+
     }
 
     private void showOptionsWindow() {
@@ -374,6 +375,18 @@ public class GameScreen implements Screen{
         });
         btnTitle.addListener(new ClickListener() {
             @Override public void clicked(InputEvent event, float x, float y) {
+                // Fade out current game music, fade in main menu music
+                if (corebringer.corebringergamescreenbgm.isPlaying()) {
+                    corebringer.fadeOutMusic(corebringer.corebringergamescreenbgm, 1f, () -> {
+                        corebringer.fadeInMusic(corebringer.corebringerstartmenubgm, 1f);
+                    });
+                } else if (corebringer.corebringermapstartbgm.isPlaying()) {
+                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
+                        corebringer.fadeInMusic(corebringer.corebringerstartmenubgm, 1f);
+                    });
+                } else {
+                    corebringer.fadeInMusic(corebringer.corebringerstartmenubgm, 1f);
+                }
                 corebringer.setScreen(corebringer.mainMenuScreen);
                 optionsWindow.setVisible(false);
                 optionsWindow.remove();
@@ -460,13 +473,38 @@ public class GameScreen implements Screen{
 
     /**
      * Rerolls the enemy and cards for a new game session.
+     * Loads enemy name and hp from enemies.json and updates Enemy and UI.
      */
     public void rerollEnemyAndCards() {
-        if (battleStageUI != null) {
-            battleStageUI.changeEnemy();
+        try {
+            // Load enemies.json
+            com.badlogic.gdx.files.FileHandle file = Gdx.files.internal("assets/enemies.json");
+            String json = file.readString();
+            com.badlogic.gdx.utils.Json libgdxJson = new com.badlogic.gdx.utils.Json();
+            java.util.List<java.util.Map> enemies = libgdxJson.fromJson(java.util.List.class, json);
+            if (enemies != null && !enemies.isEmpty()) {
+                // Pick a random enemy
+                int idx = (int)(Math.random() * enemies.size());
+                java.util.Map enemyData = enemies.get(idx);
+                String name = (String)enemyData.get("name");
+                int hp = ((Number)enemyData.get("hp")).intValue();
+                // Update Enemy object
+                if (enemy != null) {
+                    enemy.setName(name);
+                    enemy.setHp(hp);
+                }
+                // Update UI
+                if (battleStageUI != null) {
+                    battleStageUI.changeEnemy(name);
+                    battleStageUI.setEnemyHp(hp);
+                }
+            }
+        } catch (Exception e) {
+            Gdx.app.error("GameScreen", "Failed to reroll enemy from JSON: " + e.getMessage());
+        }
+        // Reroll cards
+        if (cardStageUI != null) {
             cardStageUI.refreshCardHand();
         }
-        // TODO: Implement card reroll logic if needed
-        // Example: cardStageUI.rerollCards();
     }
 }

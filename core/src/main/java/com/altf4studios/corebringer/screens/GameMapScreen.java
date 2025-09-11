@@ -128,56 +128,53 @@ public class GameMapScreen implements Screen{
         nodeA.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(corebringer.gameScreen);
-                // Always reroll enemy and cards when starting
-                if (corebringer.gameScreen != null) {
-                    corebringer.corebringermapstartbgm.stop();
-                    corebringer.corebringermapstartbgm.setVolume(1.0f);
-                    corebringer.corebringergamescreenbgm.play();
-                    corebringer.gameScreen.rerollEnemyAndCards();
-                }
+                // Fade out map music, fade in game music
+                corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
+                    corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                    corebringer.setScreen(corebringer.gameScreen);
+                    if (corebringer.gameScreen != null) {
+                        corebringer.gameScreen.rerollEnemyAndCards();
+                    }
+                });
             }
         });
 
         nodeB.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(corebringer.gameScreen);
-                // Always reroll enemy and cards when starting
-                if (corebringer.gameScreen != null) {
-                    corebringer.corebringermapstartbgm.stop();
-                    corebringer.corebringermapstartbgm.setVolume(1.0f);
-                    corebringer.corebringergamescreenbgm.play();
-                    corebringer.gameScreen.rerollEnemyAndCards();
-                }
+                corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
+                    corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                    corebringer.setScreen(corebringer.gameScreen);
+                    if (corebringer.gameScreen != null) {
+                        corebringer.gameScreen.rerollEnemyAndCards();
+                    }
+                });
             }
         });
 
         nodeC.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(corebringer.gameScreen);
-                // Always reroll enemy and cards when starting
-                if (corebringer.gameScreen != null) {
-                    corebringer.corebringermapstartbgm.stop();
-                    corebringer.corebringermapstartbgm.setVolume(1.0f);
-                    corebringer.corebringergamescreenbgm.play();
-                    corebringer.gameScreen.rerollEnemyAndCards();
-                }
+                corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
+                    corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                    corebringer.setScreen(corebringer.gameScreen);
+                    if (corebringer.gameScreen != null) {
+                        corebringer.gameScreen.rerollEnemyAndCards();
+                    }
+                });
             }
         });
 
         nodeD.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(corebringer.gameScreen);
-                // Always reroll enemy and cards when starting
-                if (corebringer.gameScreen != null) {
-                    corebringer.corebringermapstartbgm.stop();
-                    corebringer.corebringermapstartbgm.setVolume(1.0f);
-                    corebringer.corebringergamescreenbgm.play();
-                    corebringer.gameScreen.rerollEnemyAndCards();
-                }
+                corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
+                    corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                    corebringer.setScreen(corebringer.gameScreen);
+                    if (corebringer.gameScreen != null) {
+                        corebringer.gameScreen.rerollEnemyAndCards();
+                    }
+                });
             }
         });
 
