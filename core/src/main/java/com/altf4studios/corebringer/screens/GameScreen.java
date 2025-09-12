@@ -73,6 +73,22 @@ public class GameScreen implements Screen{
         int energyVal = 0;
         String[] cards = new String[]{};
         int battleWon = 0;
+        String enemyName = "Enemy";
+        int enemyHp = 20;
+        try {
+            com.badlogic.gdx.files.FileHandle file = Gdx.files.internal("assets/enemies.json");
+            String json = file.readString();
+            com.badlogic.gdx.utils.JsonReader jsonReader = new com.badlogic.gdx.utils.JsonReader();
+            com.badlogic.gdx.utils.JsonValue enemies = jsonReader.parse(json);
+            if (enemies != null && enemies.size > 0) {
+                int idx = com.badlogic.gdx.math.MathUtils.random(enemies.size - 1);
+                com.badlogic.gdx.utils.JsonValue enemyData = enemies.get(idx);
+                enemyName = enemyData.getString("name");
+                enemyHp = enemyData.getInt("hp");
+            }
+        } catch (Exception e) {
+            Gdx.app.error("GameScreen", "Failed to load enemy from JSON: " + e.getMessage());
+        }
         if (SaveManager.saveExists()) {
             com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
             if (stats != null) {
@@ -85,7 +101,7 @@ public class GameScreen implements Screen{
         // --- TurnManager Integration ---
         // Initialize player and enemy (example values, adjust as needed)
         player = new Player("Player", hp, 10, 5, 3); // hp loaded from save
-        enemy = new Enemy("enemy1", "Enemy", 20, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
+        enemy = new Enemy("enemy1", enemyName, enemyHp, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
         turnManager = new TurnManager(player, enemy);
         // --- End TurnManager Integration ---
 
@@ -347,6 +363,7 @@ public class GameScreen implements Screen{
         // Removed: editorStage.dispose();
         cardStage.dispose();
         this.dispose();
+
     }
 
     private void showOptionsWindow() {
@@ -374,6 +391,18 @@ public class GameScreen implements Screen{
         });
         btnTitle.addListener(new ClickListener() {
             @Override public void clicked(InputEvent event, float x, float y) {
+                // Fade out current game music, fade in main menu music
+                if (corebringer.corebringergamescreenbgm.isPlaying()) {
+                    corebringer.fadeOutMusic(corebringer.corebringergamescreenbgm, 1f, () -> {
+                        corebringer.fadeInMusic(corebringer.corebringerstartmenubgm, 1f);
+                    });
+                } else if (corebringer.corebringermapstartbgm.isPlaying()) {
+                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
+                        corebringer.fadeInMusic(corebringer.corebringerstartmenubgm, 1f);
+                    });
+                } else {
+                    corebringer.fadeInMusic(corebringer.corebringerstartmenubgm, 1f);
+                }
                 corebringer.setScreen(corebringer.mainMenuScreen);
                 optionsWindow.setVisible(false);
                 optionsWindow.remove();
@@ -460,13 +489,46 @@ public class GameScreen implements Screen{
 
     /**
      * Rerolls the enemy and cards for a new game session.
+     * Loads enemy name and hp from enemies.json and updates Enemy and UI.
      */
     public void rerollEnemyAndCards() {
-        if (battleStageUI != null) {
-            battleStageUI.changeEnemy();
+        try {
+            // Load enemies.json
+            com.badlogic.gdx.files.FileHandle file = Gdx.files.internal("assets/enemies.json");
+            String json = file.readString();
+            com.badlogic.gdx.utils.JsonReader jsonReader = new com.badlogic.gdx.utils.JsonReader();
+            com.badlogic.gdx.utils.JsonValue enemies = jsonReader.parse(json);
+            if (enemies != null && enemies.size > 0) {
+                int idx = com.badlogic.gdx.math.MathUtils.random(enemies.size - 1);
+                com.badlogic.gdx.utils.JsonValue enemyData = enemies.get(idx);
+                String name = enemyData.getString("name");
+                int hp = enemyData.getInt("hp");
+                // Update Enemy object
+                if (enemy != null) {
+                    enemy.setName(name);
+                    // Ensure enemy max health is updated so setHp isn't clamped to an old max
+                    enemy.setMaxHealth(hp);
+                    enemy.setHp(hp);
+                }
+                // Update UI
+                if (battleStageUI != null) {
+                    battleStageUI.changeEnemy(name);
+                    // Update UI HP bars using current player/enemy values
+                    battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
+                    battleStageUI.setEnemyHp(hp);
+                }
+            }
+        } catch (Exception e) {
+            Gdx.app.error("GameScreen", "Failed to reroll enemy from JSON: " + e.getMessage());
+        }
+        // Reroll cards
+        if (cardStageUI != null) {
             cardStageUI.refreshCardHand();
         }
-        // TODO: Implement card reroll logic if needed
-        // Example: cardStageUI.rerollCards();
+        // Reset turn manager phase to player's turn and clear any pending turn state
+        if (turnManager != null) {
+            turnManager.reset();
+            Gdx.app.log("GameScreen", "TurnManager reset after reroll. Player HP: " + player.getHp() + ", Enemy HP: " + enemy.getHp());
+        }
     }
 }

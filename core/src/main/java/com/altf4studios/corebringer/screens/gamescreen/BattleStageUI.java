@@ -251,4 +251,10 @@ public class BattleStageUI {
             enemyAtlas.dispose();
         }
     }
+
+    public void setEnemyHp(int hp) {
+        if (enemyHpLabel != null) {
+            enemyHpLabel.setText(String.valueOf(hp));
+        }
+    }
 }

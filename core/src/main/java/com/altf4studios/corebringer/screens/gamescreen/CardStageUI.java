@@ -375,4 +375,29 @@ public class CardStageUI {
         }
         return Math.max(0, value);
     }
+
+    /**
+     * Clean up internal references and UI actors. Do NOT dispose the stage here because the
+     * GameScreen owns and will dispose the Stage. This prevents double-dispose issues.
+     */
+    public void dispose() {
+        try {
+            if (cardStage != null) {
+                cardStage.clear();
+            }
+        } catch (Exception e) {
+            Gdx.app.error("CardStageUI", "Error while clearing cardStage: " + e.getMessage());
+        }
+
+        // Null out references to help GC
+        skin = null;
+        cardParser = null;
+        cardHandTable = null;
+        availableCardNames = null;
+        player = null;
+        enemy = null;
+        turnManager = null;
+        gameScreen = null;
+        drawButton = null;
+    }
 }

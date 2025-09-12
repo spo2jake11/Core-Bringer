@@ -114,35 +114,26 @@ public class MainMenuScreen implements Screen {
         startbutton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.corebringerstartmenubgm.stop();
-                corebringer.corebringermapstartbgm.setVolume(1f);
-                corebringer.corebringermapstartbgm.play();
-
-                // Save file logic
-                boolean saveExists = SaveManager.saveExists();
-                if (!saveExists) {
-                    // Create new save with default stats
-                    SaveManager.saveStats(20, 0, new String[]{}, 0); // hp=20, energy=0, empty cards, battleWon=0
-                } else {
-                    // Load stats and check battleWon
-                    com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
-                    if (stats != null && stats.battleWon == 1) {
-                        // Reroll enemy and reset battleWon
-                        SaveManager.saveStats(
-                            stats.hp,
-                            stats.energy,
-                            stats.cards,
-                            0 // reset battleWon
-                        );
+                // Fade out main menu music, fade in map music
+                corebringer.fadeOutMusic(corebringer.corebringerstartmenubgm, 1f, () -> {
+                    corebringer.fadeInMusic(corebringer.corebringermapstartbgm, 1f);
+                    // Save file logic
+                    boolean saveExists = SaveManager.saveExists();
+                    if (!saveExists) {
+                        SaveManager.saveStats(20, 0, new String[]{}, 0);
+                    } else {
+                        com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                        if (stats != null && stats.battleWon == 1) {
+                            SaveManager.saveStats(
+                                stats.hp,
+                                stats.energy,
+                                stats.cards,
+                                0
+                            );
+                        }
                     }
-                }
-                // Always create a new GameScreen for a fresh session
-//                corebringer.gameScreen = new com.altf4studios.corebringer.screens.GameScreen(corebringer);
-                corebringer.setScreen(corebringer.gameMapScreen);
-                /* Always reroll enemy and cards when starting
-                if (corebringer.gameScreen != null) {
-                    corebringer.gameScreen.rerollEnemyAndCards();
-                } */
+                    corebringer.setScreen(corebringer.gameMapScreen);
+                });
             }
         });
 

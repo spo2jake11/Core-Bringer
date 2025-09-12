@@ -29,6 +29,10 @@ public abstract class Entity implements BattleEntity {
         return name;
     }
 
+    public void setName(String name) {
+        this.name = name;
+    }
+
     public int getHealth() {
         return health;
     }
@@ -48,6 +52,15 @@ public abstract class Entity implements BattleEntity {
 
     public int getMaxHealth() {
         return maxHealth;
+    }
+
+    /**
+     * Set the maximum health for this entity and clamp current health to the new max.
+     * Useful when replacing or rerolling enemies so their max HP can be updated at runtime.
+     */
+    public void setMaxHealth(int maxHealth) {
+        this.maxHealth = Math.max(1, maxHealth);
+        if (this.health > this.maxHealth) this.health = this.maxHealth;
     }
 
     public int getAttack() {
@@ -122,14 +135,14 @@ public abstract class Entity implements BattleEntity {
      */
     public void applyPoisonEffects() {
         List<Poison> expiredPoisons = new ArrayList<>();
-        
+
         for (Poison poison : poisonEffects) {
             poison.applyPoisonDamage(this);
             if (poison.isExpired()) {
                 expiredPoisons.add(poison);
             }
         }
-        
+
         // Remove expired poison effects
         for (Poison expiredPoison : expiredPoisons) {
             poisonEffects.remove(expiredPoison);
