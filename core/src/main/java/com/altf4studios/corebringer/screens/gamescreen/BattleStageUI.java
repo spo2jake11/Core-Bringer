@@ -130,7 +130,7 @@ public class BattleStageUI {
         enemyTemplate.setAlignment(Align.center);
 
         // Character images
-        Texture playerTexture = new Texture(Gdx.files.internal("basic-characters/hero.png"));
+        Texture playerTexture = new Texture(Gdx.files.internal("assets/basic-characters/hero.png"));
         Image userImageBG = new Image(playerTexture);
         userImageBG.setScaling(Scaling.fit);
         userImageBG.setAlign(Align.center);
@@ -155,7 +155,7 @@ public class BattleStageUI {
 
         actionTable.defaults().reset();
         actionTable.defaults().padTop(35);
-        actionTable.add(userTemplateStack).height(400).width(400).pad(100).center();
+        actionTable.add(userTemplateStack).height(500).width(500).pad(100).center();
         actionTable.add(enemyTemplateStack).height(200).width(200).pad(100).center();
 
         battleStage.addActor(actionTable);
