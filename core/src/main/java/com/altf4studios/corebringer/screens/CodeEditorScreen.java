@@ -1,11 +1,13 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.Utils;
 import com.altf4studios.corebringer.compiler.CodePolicyValidator;
 import com.altf4studios.corebringer.compiler.JavaExternalRunner;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -27,6 +29,10 @@ public class CodeEditorScreen implements Screen {
     private final Skin skin;
 
     private final JavaExternalRunner javaRunner = new JavaExternalRunner();
+
+    // Background
+    private Texture backgroundTexture;
+    private Image backgroundImage;
 
     private Window outputWindow;
     private TextArea outputArea;
@@ -51,6 +57,16 @@ public class CodeEditorScreen implements Screen {
         this.corebringer = corebringer;
         this.skin = corebringer.testskin;
         this.stage = new Stage(new ScreenViewport());
+
+        // Background setup (add first so it renders behind other actors)
+        try {
+            backgroundTexture = new Texture(Utils.getInternalPath("assets/backgrounds/code_window_bg.png"));
+            backgroundImage = new Image(backgroundTexture);
+            backgroundImage.setFillParent(true);
+            stage.addActor(backgroundImage);
+        } catch (Exception e) {
+            Gdx.app.error("CodeEditorScreen", "Failed to load background image: " + e.getMessage());
+        }
         // Initialize energy from GameScreen if available
         if (corebringer.gameScreen != null) {
             this.energy = corebringer.gameScreen.getEnergy();
@@ -407,7 +423,12 @@ public class CodeEditorScreen implements Screen {
             corebringer.gameScreen.setEnergy(energy);
         }
     }
-    @Override public void dispose() { stage.dispose(); }
+    @Override public void dispose() {
+        stage.dispose();
+        if (backgroundTexture != null) {
+            backgroundTexture.dispose();
+        }
+    }
 
     private static class QuizQuestion {
         int id;

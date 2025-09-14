@@ -11,7 +11,7 @@ import java.util.regex.Pattern;
  * - Enforces size limits
  * - Provides a user-facing policy summary/template
  */
-public final class CodePolicyValidator {
+public final class  CodePolicyValidator {
     private static final int MAX_SOURCE_CHARS = 12000;
     private static final int MAX_SOURCE_LINES = 400;
 

@@ -45,7 +45,7 @@ public class MainMenuScreen implements Screen {
         atlas = new TextureAtlas(Utils.getInternalPath("assets/ui/buttons_atlas.atlas")); //UI buttons for main menu
 
         ////Core Table parameters
-        corebringerbg = new Image(new Texture("backgrounds/TitleCard_bg.png"));
+        corebringerbg = new Image(new Texture("backgrounds/startup_bg.png"));
         corebringerbg.setFillParent(true);
         mainmenustage.addActor(corebringerbg);
 

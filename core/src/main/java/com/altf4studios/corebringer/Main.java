@@ -52,7 +52,7 @@ public class Main extends Game {
     public void create() {
         //AssetManager is located here
         assetManager = new AssetManager();
-        assetManager.load("TitleCard_bg.png", Texture.class);
+        assetManager.load("startup_bg.png", Texture.class);
 
         ///This is where music plays when the game starts
         corebringerbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Mortal-Gaming-144000-(GameIntro1).mp3"));
