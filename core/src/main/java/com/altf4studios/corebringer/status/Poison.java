@@ -15,69 +15,53 @@ public class Poison extends StatusEffect {
         Gdx.app.log("Poison", "Poison applied with power: " + power + " for " + duration + " turns");
     }
 
-    /**
-     * Apply poison damage to the target entity
-     * @param target The entity to apply poison damage to
-     */
-    public void applyPoisonDamage(Entity target) {
+    @Override
+    public void onTurnStart(Entity target) {
+        // Apply poison damage at the start of each turn
         if (target != null && target.isAlive() && power > 0) {
-            // Apply poison damage equal to current stacks (power)
+            // Apply poison damage equal to current power
             target.takeDamage(power);
-            
+
             // Log the poison damage
             Gdx.app.log("Poison", target.getName() + " took " + power + " poison damage. Remaining HP: " + target.getHp());
-            
-            // Reduce stacks by 1 per turn
-            power--;
-            
-            // Log remaining stacks
+
+            // Reduce power by 1 per turn (poison stacks decrease over time)
+            decreasePower(1);
+
+            // Log remaining power
             if (power > 0) {
-                Gdx.app.log("Poison", "Poison stacks remaining: " + power);
+                Gdx.app.log("Poison", "Poison power remaining: " + power);
             } else {
                 Gdx.app.log("Poison", "Poison effect has expired");
             }
         }
+        
+        // Reduce duration
+        tick();
     }
 
-    /**
-     * Check if the poison effect has expired
-     * @return true if duration is 0 or less
-     */
-    public boolean isExpired() {
-        return power <= 0;
+    @Override
+    public void onExpire(Entity target) {
+        Gdx.app.log("Poison", "Poison effect expired for: " + name);
     }
 
-    /**
-     * Get the current power of the poison
-     * @return the poison damage amount
-     */
-    public int getPower() {
-        return power;
-    }
-
-    /**
-     * Get the remaining duration
-     * @return the number of turns remaining
-     */
-    public int getDuration() {
-        return duration;
-    }
-
-    /**
-     * Increase poison power (for stacking effects)
-     * @param additionalPower additional poison damage to add
-     */
-    public void increasePower(int additionalPower) {
-        this.power += additionalPower;
+    @Override
+    public void increasePower(int amount) {
+        super.increasePower(amount);
         Gdx.app.log("Poison", "Poison power increased to: " + power);
     }
 
-    /**
-     * Extend poison duration
-     * @param additionalDuration additional turns to add
-     */
-    public void extendDuration(int additionalDuration) {
-        this.duration += additionalDuration;
+    @Override
+    public void extendDuration(int amount) {
+        super.extendDuration(amount);
         Gdx.app.log("Poison", "Poison duration extended to: " + duration + " turns");
+    }
+
+    /**
+     * Apply poison damage to the target entity (legacy method for backward compatibility)
+     * @param target The entity to apply poison damage to
+     */
+    public void applyPoisonDamage(Entity target) {
+        onTurnStart(target);
     }
 }
