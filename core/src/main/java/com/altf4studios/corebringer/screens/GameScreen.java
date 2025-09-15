@@ -249,12 +249,19 @@ public class GameScreen implements Screen{
         battleStageUI.updateShieldBars(player.getBlock(), enemy.getBlock());
         battleStageUI.updateHpColors(player.hasPoison(), enemy.hasPoison());
         battleStageUI.updateShieldColors(player.getBlock() > 0, enemy.getBlock() > 0);
+        // New: enemy HP color for bleed/stun (priority handled in UI)
+        battleStageUI.updateEnemyHpStatusColor(enemy.hasPoison(), enemy.hasStatus("Bleed"), enemy.hasStatus("Stun"));
 
         // Update turn indicator
         if (turnManager.isPlayerTurn()) {
             battleStageUI.updateTurnIndicator("Player's Turn");
         } else {
-            battleStageUI.updateTurnIndicator("Enemy's Turn");
+            // If enemy is stunned, reflect it in the indicator
+            if (enemy.hasStatus("Stun")) {
+                battleStageUI.updateTurnIndicator("Enemy's Turn (Stunned)");
+            } else {
+                battleStageUI.updateTurnIndicator("Enemy's Turn");
+            }
         }
 
         // --- Death Screen Trigger ---

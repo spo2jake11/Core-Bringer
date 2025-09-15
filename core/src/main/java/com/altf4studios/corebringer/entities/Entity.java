@@ -205,5 +205,21 @@ public abstract class Entity implements BattleEntity {
         // Default: do nothing. Override in subclasses for status effects.
     }
 
+    // Generic status helpers for named statuses (e.g., "Stun")
+    public int getStatusValue(String status) {
+        Integer v = statusEffects.get(status);
+        return v != null ? v : 0;
+    }
+
+    public void decrementStatus(String status, int amount) {
+        int current = getStatusValue(status);
+        int next = Math.max(0, current - Math.max(1, amount));
+        if (next == 0) {
+            statusEffects.remove(status);
+        } else {
+            statusEffects.put(status, next);
+        }
+    }
+
     // Targeting methods to be implemented in subclasses
 }

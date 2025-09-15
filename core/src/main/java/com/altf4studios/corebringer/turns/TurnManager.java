@@ -2,7 +2,6 @@ package com.altf4studios.corebringer.turns;
 
 import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
-import com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler;
 import com.badlogic.gdx.Gdx;
 
 public class TurnManager {
@@ -76,6 +75,14 @@ public class TurnManager {
 
     public void executeEnemyTurn() {
         if (currentPhase == TurnPhase.ENEMY_TURN && enemy.isAlive() && player.isAlive() && !isDelaying) {
+            // Stun check: if stunned, decrement and skip action
+            int stunTurns = enemy.getStatusValue("Stun");
+            if (stunTurns > 0) {
+                Gdx.app.log("TurnManager", "Enemy is stunned and skips the turn (" + stunTurns + " turns remaining)");
+                enemy.decrementStatus("Stun", 1);
+                endEnemyTurn();
+                return;
+            }
             // Randomly decide to defend instead of attacking
             double defendChance = 0.35; // 35% chance to defend
             if (Math.random() < defendChance) {

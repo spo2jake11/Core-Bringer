@@ -3,12 +3,10 @@ package com.altf4studios.corebringer.utils;
 import com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.Json;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 
-import java.util.ArrayList;
-import java.util.List;
+// removed unused imports
 
 /**
  * Utility class for parsing and managing card data from JSON files.
@@ -16,7 +14,7 @@ import java.util.List;
  */
 public class CardParser {
     
-    private static final String CARDS_FILE_PATH = "cards.json";
+    private static final String CARDS_FILE_PATH = "assets/cards.json";
     private static CardParser instance;
     private Array<SampleCardHandler> allCards;
     
@@ -45,22 +43,109 @@ public class CardParser {
      */
     public Array<SampleCardHandler> loadAllCards() {
         try {
-            Json json = new Json();
             JsonValue root = new JsonReader().parse(Gdx.files.internal(CARDS_FILE_PATH));
-            
+
             allCards.clear();
             for (JsonValue cardJson : root.get("cards")) {
-                SampleCardHandler cardHandler = json.readValue(SampleCardHandler.class, cardJson);
-                allCards.add(cardHandler);
+                // Manually map to support both old and new schemas
+                SampleCardHandler card = new SampleCardHandler();
+
+                // Common/new fields
+                card.id = safeString(cardJson, "id", "");
+                card.name = safeString(cardJson, "name", "");
+                card.description = safeString(cardJson, "description", "");
+                card.cost = safeInt(cardJson, "cost", 0);
+                card.baseEffect = safeInt(cardJson, "baseEffect", 0);
+                card.codeEffect = safeString(cardJson, "codeEffect", "");
+                card.suggestion = safeString(cardJson, "suggestion", "");
+
+                // Old schema fields
+                String type = safeString(cardJson, "type", null);
+                String targetType = safeString(cardJson, "targetType", null);
+                Array<String> tags = readStringArray(cardJson.get("tags"));
+
+                // New schema fields
+                String singleTag = safeString(cardJson, "tag", null);
+                String target = safeString(cardJson, "target", null);
+
+                // Normalize type
+                if (type == null) {
+                    type = inferTypeFromTag(singleTag);
+                }
+                card.type = type != null ? type : "BUFF";
+
+                // Normalize targetType
+                if (targetType == null) {
+                    targetType = inferTargetType(target);
+                }
+                card.targetType = targetType != null ? targetType : "ENEMY";
+
+                // Normalize tags[]
+                if (tags == null) {
+                    tags = new Array<>();
+                }
+                if (singleTag != null && !containsIgnoreCase(tags, singleTag)) {
+                    tags.add(singleTag);
+                }
+                if (!containsIgnoreCase(tags, card.type)) {
+                    tags.add(card.type.toUpperCase());
+                }
+                card.tags = tags;
+
+                allCards.add(card);
             }
-            
+
             Gdx.app.log("CardParser", "Successfully loaded " + allCards.size + " cards");
             return allCards;
-            
+
         } catch (Exception e) {
             Gdx.app.error("CardParser", "Error loading cards: " + e.getMessage());
             return new Array<>();
         }
+    }
+
+    // ---- helpers ----
+    private String safeString(JsonValue obj, String key, String def) {
+        return obj.has(key) && !obj.get(key).isNull() ? obj.getString(key) : def;
+    }
+
+    private int safeInt(JsonValue obj, String key, int def) {
+        return obj.has(key) && !obj.get(key).isNull() ? obj.getInt(key) : def;
+    }
+
+    private Array<String> readStringArray(JsonValue arr) {
+        if (arr == null || !arr.isArray()) return null;
+        Array<String> out = new Array<>();
+        for (JsonValue v = arr.child; v != null; v = v.next) {
+            if (!v.isNull()) out.add(v.asString());
+        }
+        return out;
+    }
+
+    private boolean containsIgnoreCase(Array<String> arr, String val) {
+        for (String s : arr) if (s != null && s.equalsIgnoreCase(val)) return true;
+        return false;
+    }
+
+    private String inferTypeFromTag(String tag) {
+        if (tag == null) return null;
+        String t = tag.toUpperCase();
+        switch (t) {
+            case "BASIC": return "ATTACK";
+            case "SHIELD": return "DEFENSE";
+            case "HEAL": return "BUFF";
+            case "POISON":
+            case "BLEED":
+            case "STUN": return "DEBUFF";
+            default: return null;
+        }
+    }
+
+    private String inferTargetType(String target) {
+        if (target == null) return null;
+        String t = target.toUpperCase();
+        if (t.contains("SELF")) return "SELF";
+        return "ENEMY";
     }
     
     /**

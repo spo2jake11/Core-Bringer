@@ -13,7 +13,6 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
-import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.altf4studios.corebringer.screens.GameScreen;
 
@@ -22,7 +21,7 @@ public class CardStageUI {
     private Skin skin;
     private CardParser cardParser;
     private CardHandTable cardHandTable;
-    private float worldHeight;
+    // private float worldHeight; // unused
     private boolean[] discardedCards;
     private int cardsInHand;
     private TextButton drawButton;
@@ -43,7 +42,7 @@ public class CardStageUI {
         this.discardedCards = new boolean[5];
         this.cardsInHand = 5;
         setupCardUI();
-        worldHeight = cardStage.getViewport().getWorldHeight();
+        // worldHeight = cardStage.getViewport().getWorldHeight();
     }
 
     private int[] getCardCosts(String[] cardNames) {
@@ -139,7 +138,6 @@ public class CardStageUI {
             final int cardIndex = i;
             final TextButton cardButton = cardHandTable.cardNameButtons[i];
             final String cardName = cardNames[i];
-            final int cardCost = cardCosts[i];
             cardButton.clearListeners();
             cardButton.addListener(new ClickListener() {
                 @Override
@@ -347,6 +345,33 @@ public class CardStageUI {
                 }
             }
 
+            // Heal handling: parse from description or fallback to baseEffect
+            if (card.description != null && card.description.toLowerCase().contains("heal")) {
+                int healAmount = parseNumberBeforeKeyword(card.description, "heal");
+                if (healAmount <= 0) healAmount = Math.max(0, card.baseEffect);
+                if (player != null && player.isAlive() && healAmount > 0) {
+                    player.heal(healAmount);
+                }
+            }
+
+            // Bleed handling: apply simple status using Entity.addStatus as a baseline
+            if (card.description != null && card.description.toLowerCase().contains("bleed")) {
+                int bleedStacks = parseNumberBeforeKeyword(card.description, "bleed");
+                if (bleedStacks <= 0) bleedStacks = Math.max(0, card.baseEffect);
+                if (enemy != null && enemy.isAlive() && bleedStacks > 0) {
+                    enemy.addStatus("Bleed", bleedStacks);
+                }
+            }
+
+            // Stun handling: apply duration as baseEffect or parsed from description
+            if (card.description != null && card.description.toLowerCase().contains("stun")) {
+                int stunDuration = parseNumberBeforeKeyword(card.description, "stun");
+                if (stunDuration <= 0) stunDuration = Math.max(0, card.baseEffect);
+                if (enemy != null && enemy.isAlive() && stunDuration > 0) {
+                    enemy.addStatus("Stun", stunDuration);
+                }
+            }
+
             // End player turn after playing a card
             if (turnManager != null && turnManager.isPlayerTurn()) {
                 turnManager.endPlayerTurn();
@@ -355,6 +380,26 @@ public class CardStageUI {
         } else {
             Gdx.app.log("CardEffect", "No such card found: " + cardName);
         }
+    }
+
+    // Extract the integer immediately before a given keyword in a case-insensitive way
+    private int parseNumberBeforeKeyword(String text, String keyword) {
+        if (text == null || keyword == null) return 0;
+        String lower = text.toLowerCase();
+        String[] words = lower.split("\\s+");
+        for (int i = 0; i < words.length; i++) {
+            if (words[i].startsWith(keyword.toLowerCase())) {
+                if (i > 0) {
+                    try {
+                        return Integer.parseInt(words[i - 1].replaceAll("[^0-9]", ""));
+                    } catch (NumberFormatException ignored) {
+                        return 0;
+                    }
+                }
+                return 0;
+            }
+        }
+        return 0;
     }
 
     private int parseShieldFromDescription(String description) {

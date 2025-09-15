@@ -203,6 +203,20 @@ public class BattleStageUI {
         }
     }
 
+    // New: Update enemy HP color by status (priority: Stun → Bleed → Poison → White)
+    public void updateEnemyHpStatusColor(boolean isEnemyPoisoned, boolean isEnemyBleeding, boolean isEnemyStunned) {
+        if (enemyHpLabel == null) return;
+        if (isEnemyStunned) {
+            enemyHpLabel.setColor(Color.YELLOW);
+        } else if (isEnemyBleeding) {
+            enemyHpLabel.setColor(Color.RED);
+        } else if (isEnemyPoisoned) {
+            enemyHpLabel.setColor(Color.PURPLE);
+        } else {
+            enemyHpLabel.setColor(Color.WHITE);
+        }
+    }
+
     public String getCurrentEnemyName() {
         return currentEnemyName;
     }
