@@ -81,6 +81,7 @@ public class BattleStageUI {
         }
 
         enemyImage.setScaling(Scaling.fit);
+        enemyImage.setScale(0.7f);
         enemyImage.setAlign(Align.center);
         return enemyImage;
     }
@@ -93,6 +94,7 @@ public class BattleStageUI {
         actionTable.top();
         actionTable.setBackground(bgDraw);
         actionTable.setFillParent(true);
+        actionTable.padTop(75);
 
         // HP Labels
         userHpLabel = new Label("20", skin);
@@ -132,7 +134,7 @@ public class BattleStageUI {
         // Character images
         Texture playerTexture = new Texture(Gdx.files.internal("assets/basic-characters/hero.png"));
         Image userImageBG = new Image(playerTexture);
-        userImageBG.setScaling(Scaling.fit);
+        userImageBG.setScaling(Scaling.contain);
         userImageBG.setAlign(Align.center);
 
         // Random enemy selection
@@ -154,9 +156,9 @@ public class BattleStageUI {
         actionTable.add(turnIndicatorLabel).colspan(2).height(30).padTop(20).row();
 
         actionTable.defaults().reset();
-        actionTable.defaults().padTop(35);
-        actionTable.add(userTemplateStack).height(500).width(500).pad(100).center();
-        actionTable.add(enemyTemplateStack).height(200).width(200).pad(100).center();
+        actionTable.defaults().padTop(100);
+        actionTable.add(userTemplateStack).height(300).width(300).pad(250).padTop(200).left();
+        actionTable.add(enemyTemplateStack).height(300).width(300).pad(250).padTop(200).right();
 
         battleStage.addActor(actionTable);
     }

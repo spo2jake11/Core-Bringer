@@ -11,6 +11,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -28,6 +29,7 @@ public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
     private Main corebringer;
 
+    private Stage uiStage;
     private Stage battleStage;
     private Stage cardStage;
 
@@ -65,8 +67,10 @@ public class GameScreen implements Screen{
         cardParser = CardParser.getInstance();
 
         ///This stages are separated to lessen complications
+        uiStage = new Stage(new ScreenViewport());
         battleStage = new Stage(new ScreenViewport());
         cardStage = new Stage(new ScreenViewport());
+
 
         // --- Load stats from save file if exists ---
         int hp = 20;
@@ -105,10 +109,12 @@ public class GameScreen implements Screen{
         turnManager = new TurnManager(player, enemy);
         // --- End TurnManager Integration ---
 
+
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
         cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager, this);
+        createUI();
 
         // If battleWon == 1, reroll enemy and reset battleWon
         if (battleWon == 1) {
@@ -142,6 +148,7 @@ public class GameScreen implements Screen{
         /// This provides lines to be able to monitor the objects' boundaries
 //        battleStage.setDebugAll(true);
 //        cardStage.setDebugAll(true);
+//        uiStage.setDebugAll(true);
         // Interpreter removed
 
     }
@@ -151,8 +158,59 @@ public class GameScreen implements Screen{
         SaveManager.saveStats(player.getHp(), energy, new String[]{}, battleWonValue); // TODO: pass actual cards
     }
 
+    private void createUI() {
+        // Main table that fills the parent
+        Table tbltopUI = new Table();
+        tbltopUI.setFillParent(true);
+        tbltopUI.top();
+
+        // Inner table for the gray background
+        Table innerTable = new Table();
+        innerTable.setBackground(corebringer.testskin.newDrawable("white", new Color(0.5f, 0.5f, 0.5f, 1)));
+        innerTable.defaults().padTop(10).padBottom(10);
+
+        // Table handler for the left side
+        Table tblLeftPane = new Table();
+        Label lblCharName = new Label("Player", corebringer.testskin);
+        Label lblHpNum = new Label("HP: " + player.getHp() + "/" + player.getMaxHealth(), corebringer.testskin);
+        Label lblGold = new Label("Gold: 0", corebringer.testskin);
+
+        // Table handler for the right side
+        Table tblRightPane = new Table();
+        Label lblMenu = new Label("Menu", corebringer.testskin);
+        Label lblDeck = new Label("Deck", corebringer.testskin);
+        Label lblMap = new Label("Map", corebringer.testskin);
+
+        // Filler table
+        Table tblFiller = new Table();
+
+        // Left Pane placement
+        tblLeftPane.defaults().padLeft(10).padRight(10).uniform();
+        tblLeftPane.add(lblCharName);
+        tblLeftPane.add(lblHpNum);
+        tblLeftPane.add(lblGold);
+
+        // Right Pane placement
+        tblRightPane.defaults().padRight(10).padLeft(10).uniform();
+        tblRightPane.add(lblMap);
+        tblRightPane.add(lblDeck);
+        tblRightPane.add(lblMenu);
+
+        // Add content to inner table
+        innerTable.add(tblLeftPane).left();
+        innerTable.add(tblFiller).growX();
+        innerTable.add(tblRightPane).right().padRight(15);
+
+        // Add inner table to main table with fixed height
+        tbltopUI.add(innerTable).growX().height(75);
+
+        uiStage.addActor(tbltopUI);
+    }
+
     @Override
     public void show() {
+
+
         // --- Energy gain from CodeEditorScreen points ---
         if (corebringer.codeEditorScreen != null) {
             int gained = corebringer.codeEditorScreen.consumeSessionPoints();
@@ -164,6 +222,7 @@ public class GameScreen implements Screen{
         // --- End energy gain logic ---
         // Register all input processors and stages with Main's global multiplexer
         corebringer.clearInputProcessors();
+        corebringer.addInputProcessor(uiStage);
         corebringer.addInputProcessor(battleStage);
         corebringer.addInputProcessor(cardStage);
         corebringer.addInputProcessor(new InputProcessor() {
@@ -221,10 +280,13 @@ public class GameScreen implements Screen{
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
+
         battleStage.act(delta);
         battleStage.draw();
         cardStage.act(delta);
         cardStage.draw();
+        uiStage.act(delta);
+        uiStage.draw();
         // Removed: editorStage.act(delta); editorStage.draw();
 
         // --- TurnManager Integration: process turn phases and execute enemy turns ---
@@ -341,14 +403,10 @@ public class GameScreen implements Screen{
         ));
     }
 
-//    private void refreshCardHand() {
-//        if (cardStageUI != null) {
-//            cardStageUI.refreshCardHand();
-//        }
-//    }
     // --- End test methods ---
 
     @Override public void resize(int width, int height) {
+        uiStage.getViewport().update(width, height,true);
         battleStage.getViewport().update(width, height, true);
         cardStage.getViewport().update(width, height, true);
     }
@@ -363,6 +421,7 @@ public class GameScreen implements Screen{
 
     @Override
     public void dispose() {
+        uiStage.dispose();
         if (battleStageUI != null) {
             battleStageUI.dispose();
         }
@@ -430,7 +489,7 @@ public class GameScreen implements Screen{
         table.add(btnTitle).row();
         table.add(btnClose).row();
         optionsWindow.add(table).expand().fill();
-        battleStage.addActor(optionsWindow);
+        uiStage.addActor(optionsWindow);
         // No need to reset multiplexer, it's always managed by Main
     }
     public void setEnergy(int value) {

@@ -88,7 +88,7 @@ public class CardStageUI {
         Table parentTable = new Table();
         parentTable.setFillParent(true);
         parentTable.bottom();
-        parentTable.add(rowTable).expandX().padBottom(worldHeight * 0.55f - 100f);
+        parentTable.add(rowTable).expandX().padBottom(worldHeight * 0.45f - 100f);
 
         cardStage.addActor(parentTable);
         hideDrawButton(); // Hide by default
