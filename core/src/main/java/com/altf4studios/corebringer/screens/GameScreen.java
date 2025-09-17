@@ -4,6 +4,7 @@ import com.altf4studios.corebringer.Main;
 // Removed interpreter integration
 import com.altf4studios.corebringer.utils.CardParser;
 import com.altf4studios.corebringer.turns.TurnManager;
+import com.altf4studios.corebringer.battle.BattleManager;
 import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
 import com.altf4studios.corebringer.screens.gamescreen.*;
@@ -36,11 +37,12 @@ public class GameScreen implements Screen{
     // CardParser instance for managing card data
     private CardParser cardParser;
 
-    // --- TurnManager Integration ---
+    // --- Battle/Turn Management ---
     private TurnManager turnManager;
+    private BattleManager battleManager;
     private Player player;
     private Enemy enemy;
-    // --- End TurnManager Integration ---
+    // --- End Battle/Turn Management ---
 
     // --- UI Components ---
     private BattleStageUI battleStageUI;
@@ -52,6 +54,8 @@ public class GameScreen implements Screen{
     private final int MAX_ENERGY = 10;
     private Label energyLabel;
     private Window optionsWindow;
+    // Persisted deck ids for this run
+    private String[] savedDeckIds;
     // --- End Energy System ---
 
     // --- Death Screen ---
@@ -102,17 +106,41 @@ public class GameScreen implements Screen{
             }
         }
 
-        // --- TurnManager Integration ---
+        // Initialize starting deck if none exists: pick 15 random level-1 cards (allow duplicates)
+        if (cards == null || cards.length == 0) {
+            com.badlogic.gdx.utils.Array<com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler> all = cardParser.loadAllCards();
+            com.badlogic.gdx.utils.Array<com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler> level1 = new com.badlogic.gdx.utils.Array<>();
+            for (com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler c : all) {
+                if (c.level == 1) level1.add(c);
+            }
+            String[] initialDeck = new String[15];
+            for (int i = 0; i < 15; i++) {
+                int idx = com.badlogic.gdx.math.MathUtils.random(level1.size - 1);
+                initialDeck[i] = level1.get(idx).id; // duplicates allowed
+            }
+            cards = initialDeck;
+            SaveManager.saveStats(hp, energyVal, cards, battleWon);
+        }
+
+        // Expose cards to CardStageUI via getter
+
+        // --- Battle/Turn Management ---
         // Initialize player and enemy (example values, adjust as needed)
         player = new Player("Player", hp, 10, 5, 3); // hp loaded from save
         enemy = new Enemy("enemy1", enemyName, enemyHp, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
+        // Temporary TurnManager for early consumers; BattleManager will hold the canonical one
         turnManager = new TurnManager(player, enemy);
-        // --- End TurnManager Integration ---
+        // --- End Battle/Turn Management ---
 
 
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
+        // Initialize BattleManager now that UI exists and replace turnManager reference for other systems
+        battleManager = new BattleManager(player, enemy, battleStageUI);
+        turnManager = battleManager.getTurnManager();
+        // Make saved deck available to card UI
+        this.savedDeckIds = cards;
         cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager, this);
         createUI();
 
@@ -151,6 +179,10 @@ public class GameScreen implements Screen{
 //        uiStage.setDebugAll(true);
         // Interpreter removed
 
+    }
+
+    public String[] getSavedDeckIds() {
+        return savedDeckIds != null ? savedDeckIds : new String[]{};
     }
 
     // Call this after any stat change (hp, energy, cards, battleWon)
@@ -289,22 +321,9 @@ public class GameScreen implements Screen{
         uiStage.draw();
         // Removed: editorStage.act(delta); editorStage.draw();
 
-        // --- TurnManager Integration: process turn phases and execute enemy turns ---
-        // Update turn manager (handles delays)
-        turnManager.update(delta);
-
-        // Execute enemy turn if it's enemy's turn and not delaying
-        if (turnManager.isEnemyTurn() && !turnManager.isDelaying()) {
-            turnManager.executeEnemyTurn();
-        }
-
-        // Check for game over (only log once)
-        if (turnManager.shouldLogGameOver()) {
-            String winner = turnManager.getWinner();
-            Gdx.app.log("GameScreen", "Game Over! Winner: " + winner);
-            // You can add game over UI here later
-        }
-        // --- End TurnManager Integration ---
+        // --- BattleManager: process turn phases, enemy AI, and UI indicator ---
+        battleManager.update(delta);
+        // --- End BattleManager ---
 
         /// For wiring the HP/Shield values properly
         battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
@@ -314,17 +333,7 @@ public class GameScreen implements Screen{
         // New: enemy HP color for bleed/stun (priority handled in UI)
         battleStageUI.updateEnemyHpStatusColor(enemy.hasPoison(), enemy.hasStatus("Bleed"), enemy.hasStatus("Stun"));
 
-        // Update turn indicator
-        if (turnManager.isPlayerTurn()) {
-            battleStageUI.updateTurnIndicator("Player's Turn");
-        } else {
-            // If enemy is stunned, reflect it in the indicator
-            if (enemy.hasStatus("Stun")) {
-                battleStageUI.updateTurnIndicator("Enemy's Turn (Stunned)");
-            } else {
-                battleStageUI.updateTurnIndicator("Enemy's Turn");
-            }
-        }
+        // Turn indicator is updated by BattleManager
 
         // --- Death Screen Trigger ---
         if (!deathScreenShown && player.getHp() <= 0) {
@@ -591,10 +600,10 @@ public class GameScreen implements Screen{
         if (cardStageUI != null) {
             cardStageUI.refreshCardHand();
         }
-        // Reset turn manager phase to player's turn and clear any pending turn state
-        if (turnManager != null) {
-            turnManager.reset();
-            Gdx.app.log("GameScreen", "TurnManager reset after reroll. Player HP: " + player.getHp() + ", Enemy HP: " + enemy.getHp());
+        // Reset turn system to player's turn and clear pending state
+        if (battleManager != null) {
+            battleManager.resetTurns();
+            Gdx.app.log("GameScreen", "Turn system reset after reroll. Player HP: " + player.getHp() + ", Enemy HP: " + enemy.getHp());
         }
     }
 }

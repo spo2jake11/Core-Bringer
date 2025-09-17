@@ -26,6 +26,24 @@ public class BattleStageUI {
     private Label userShieldLabel;
     private Label enemyShieldLabel;
     private Label turnIndicatorLabel;
+	// Status badge references for visibility toggling
+	private Stack userShieldBadge;
+	private Stack userPoisonBadge;
+	private Stack userBleedBadge;
+	private Stack userStunBadge;
+	private Stack enemyShieldBadge;
+	private Stack enemyPoisonBadge;
+	private Stack enemyBleedBadge;
+	private Stack enemyStunBadge;
+	// Numeric overlays for badges
+	private Label userShieldNum;
+	private Label userPoisonNum;
+	private Label userBleedNum;
+	private Label userStunNum;
+	private Label enemyShieldNum;
+	private Label enemyPoisonNum;
+	private Label enemyBleedNum;
+	private Label enemyStunNum;
 
     public BattleStageUI(Stage battleStage, Skin skin) {
         this.battleStage = battleStage;
@@ -96,37 +114,37 @@ public class BattleStageUI {
         actionTable.setFillParent(true);
         actionTable.padTop(75);
 
-        // HP Labels
-        userHpLabel = new Label("20", skin);
-        enemyHpLabel = new Label("100", skin);
-        // Shield Labels (blue)
-        userShieldLabel = new Label("0", skin);
-        userShieldLabel.setColor(Color.CYAN);
-        enemyShieldLabel = new Label("0", skin);
-        enemyShieldLabel.setColor(Color.CYAN);
-        Label userTemplate = new Label("", skin);
-        Label enemyTemplate = new Label("", skin);
+		// HP Labels
+		userHpLabel = new Label("20", skin);
+		enemyHpLabel = new Label("100", skin);
+		// Shield Labels (blue)
+		userShieldLabel = new Label("0", skin);
+		userShieldLabel.setColor(Color.CYAN);
+		enemyShieldLabel = new Label("0", skin);
+		enemyShieldLabel.setColor(Color.CYAN);
+		Label userTemplate = new Label("", skin);
+		Label enemyTemplate = new Label("", skin);
 
         // Turn indicator
         turnIndicatorLabel = new Label("Player's Turn", skin);
         turnIndicatorLabel.setAlignment(Align.center);
 
-        // HP Stacks
-        Stack userHpStack = new Stack();
-        userHpLabel.setAlignment(Align.center);
-        userShieldLabel.setAlignment(Align.center);
-        Table userHpTable = new Table();
-        userHpTable.add(userHpLabel).row();
-        userHpTable.add(userShieldLabel);
-        userHpStack.add(userHpTable);
+		// HP Stacks (placed above templates)
+		Stack userHpStack = new Stack();
+		userHpLabel.setAlignment(Align.center);
+		userShieldLabel.setAlignment(Align.center);
+		Table userHpTable = new Table();
+		userHpTable.add(userHpLabel).row();
+		userHpTable.add(userShieldLabel);
+		userHpStack.add(userHpTable);
 
-        Stack enemyHpStack = new Stack();
-        enemyHpLabel.setAlignment(Align.center);
-        enemyShieldLabel.setAlignment(Align.center);
-        Table enemyHpTable = new Table();
-        enemyHpTable.add(enemyHpLabel).row();
-        enemyHpTable.add(enemyShieldLabel);
-        enemyHpStack.add(enemyHpTable);
+		Stack enemyHpStack = new Stack();
+		enemyHpLabel.setAlignment(Align.center);
+		enemyShieldLabel.setAlignment(Align.center);
+		Table enemyHpTable = new Table();
+		enemyHpTable.add(enemyHpLabel).row();
+		enemyHpTable.add(enemyShieldLabel);
+		enemyHpStack.add(enemyHpTable);
 
         userTemplate.setAlignment(Align.center);
         enemyTemplate.setAlignment(Align.center);
@@ -141,27 +159,93 @@ public class BattleStageUI {
         currentEnemyName = getRandomEnemyName();
         enemyImageBG = createEnemyImage(currentEnemyName);
 
-        Stack userTemplateStack = new Stack();
-        userTemplateStack.add(userImageBG);
-        userTemplateStack.add(userTemplate);
-        enemyTemplateStack = new Stack();
-        enemyTemplateStack.add(enemyImageBG);
-        enemyTemplateStack.add(enemyTemplate);
+		Stack userTemplateStack = new Stack();
+		userTemplateStack.add(userImageBG);
+		userTemplateStack.add(userTemplate);
+		enemyTemplateStack = new Stack();
+		enemyTemplateStack.add(enemyImageBG);
+		enemyTemplateStack.add(enemyTemplate);
 
-        actionTable.defaults().padTop(50);
-        actionTable.add(userHpStack).height(50).width(200).padLeft(50);
-        actionTable.add(enemyHpStack).height(50).width(200).padRight(50).row();
+		// Status placeholders (square with status name) above HP stacks
+		Table userStatusTable = new Table();
+		userStatusTable.defaults().pad(5).size(40, 40);
+		userShieldBadge = createStatusBadge("Shield", Color.CYAN);
+		userPoisonBadge = createStatusBadge("Poison", Color.PURPLE);
+		userBleedBadge = createStatusBadge("Bleed", Color.RED);
+		userStunBadge = createStatusBadge("Stun", Color.YELLOW);
+		userShieldBadge.setVisible(false);
+		userPoisonBadge.setVisible(false);
+		userBleedBadge.setVisible(false);
+		userStunBadge.setVisible(false);
+		// numeric overlays
+		userShieldNum = createBadgeNumberOverlay(userShieldBadge);
+		userPoisonNum = createBadgeNumberOverlay(userPoisonBadge);
+		userBleedNum = createBadgeNumberOverlay(userBleedBadge);
+		userStunNum = createBadgeNumberOverlay(userStunBadge);
+		userStatusTable.add(userShieldBadge);
+		userStatusTable.add(userPoisonBadge);
+		userStatusTable.add(userBleedBadge);
+		userStatusTable.add(userStunBadge);
 
-        // Add turn indicator
-        actionTable.add(turnIndicatorLabel).colspan(2).height(30).padTop(20).row();
+		Table enemyStatusTable = new Table();
+		enemyStatusTable.defaults().pad(5).size(40, 40);
+		enemyShieldBadge = createStatusBadge("Shield", Color.CYAN);
+		enemyPoisonBadge = createStatusBadge("Poison", Color.PURPLE);
+		enemyBleedBadge = createStatusBadge("Bleed", Color.RED);
+		enemyStunBadge = createStatusBadge("Stun", Color.YELLOW);
+		enemyShieldBadge.setVisible(false);
+		enemyPoisonBadge.setVisible(false);
+		enemyBleedBadge.setVisible(false);
+		enemyStunBadge.setVisible(false);
+		// numeric overlays
+		enemyShieldNum = createBadgeNumberOverlay(enemyShieldBadge);
+		enemyPoisonNum = createBadgeNumberOverlay(enemyPoisonBadge);
+		enemyBleedNum = createBadgeNumberOverlay(enemyBleedBadge);
+		enemyStunNum = createBadgeNumberOverlay(enemyStunBadge);
+		enemyStatusTable.add(enemyShieldBadge);
+		enemyStatusTable.add(enemyPoisonBadge);
+		enemyStatusTable.add(enemyBleedBadge);
+		enemyStatusTable.add(enemyStunBadge);
 
-        actionTable.defaults().reset();
-        actionTable.defaults().padTop(100);
-        actionTable.add(userTemplateStack).height(300).width(300).pad(250).padTop(200).left();
-        actionTable.add(enemyTemplateStack).height(300).width(300).pad(250).padTop(200).right();
+		// Left and right columns
+		Table leftColumn = new Table();
+		leftColumn.add(userStatusTable).row();
+		leftColumn.add(userHpStack).height(50).width(200).padTop(10).row();
+		leftColumn.add(userTemplateStack).height(300).width(300).padTop(20);
+
+		Table rightColumn = new Table();
+		rightColumn.add(enemyStatusTable).row();
+		rightColumn.add(enemyHpStack).height(50).width(200).padTop(10).row();
+		rightColumn.add(enemyTemplateStack).height(300).width(300).padTop(20);
+
+		// Layout on main action table
+		actionTable.defaults().padTop(30);
+		actionTable.add(turnIndicatorLabel).colspan(2).height(30).padTop(10).row();
+		actionTable.add(leftColumn).expand().left().padLeft(300);
+		actionTable.add(rightColumn).expand().right().padRight(300);
 
         battleStage.addActor(actionTable);
     }
+
+	private Stack createStatusBadge(String name, Color color) {
+		// Colored square with centered status name
+		Drawable square = skin.newDrawable("white", color);
+		Image img = new Image(square);
+        img.setSize(15, 15);
+		Stack stack = new Stack();
+		stack.add(img);
+		return stack;
+	}
+
+	private Label createBadgeNumberOverlay(Stack badgeStack) {
+		Label num = new Label("", skin);
+		num.setAlignment(Align.bottomRight);
+		Container<Label> cont = new Container<Label>(num);
+		cont.align(Align.bottomRight);
+		cont.pad(1);
+		badgeStack.add(cont);
+		return num;
+	}
     /// HP Bar Updating mechanism
     public void updateHpBars(int playerHp, int enemyHp) {
         if (userHpLabel != null) {
@@ -204,6 +288,48 @@ public class BattleStageUI {
             enemyShieldLabel.setColor(isEnemyShielded ? Color.CYAN : Color.GRAY);
         }
     }
+
+	public void updatePlayerStatusBadges(boolean hasShield, boolean hasPoison, boolean hasBleed, boolean hasStun) {
+		if (userShieldBadge != null) userShieldBadge.setVisible(hasShield);
+		if (userPoisonBadge != null) userPoisonBadge.setVisible(hasPoison);
+		if (userBleedBadge != null) userBleedBadge.setVisible(hasBleed);
+		if (userStunBadge != null) userStunBadge.setVisible(hasStun);
+	}
+
+	public void updateEnemyStatusBadges(boolean hasShield, boolean hasPoison, boolean hasBleed, boolean hasStun) {
+		if (enemyShieldBadge != null) enemyShieldBadge.setVisible(hasShield);
+		if (enemyPoisonBadge != null) enemyPoisonBadge.setVisible(hasPoison);
+		if (enemyBleedBadge != null) enemyBleedBadge.setVisible(hasBleed);
+		if (enemyStunBadge != null) enemyStunBadge.setVisible(hasStun);
+	}
+
+	public void updatePlayerStatusValues(int shield, int poisonStacks, int bleedStacks, int stunDuration) {
+		if (userShieldNum != null) userShieldNum.setText(shield > 0 ? String.valueOf(shield) : "");
+		if (userPoisonNum != null) userPoisonNum.setText(poisonStacks > 0 ? String.valueOf(poisonStacks) : "");
+		if (userBleedNum != null) userBleedNum.setText(bleedStacks > 0 ? String.valueOf(bleedStacks) : "");
+		if (userStunNum != null) userStunNum.setText(stunDuration > 0 ? String.valueOf(stunDuration) : "");
+	}
+
+	public void updateEnemyStatusValues(int shield, int poisonStacks, int bleedStacks, int stunDuration) {
+		if (enemyShieldNum != null) enemyShieldNum.setText(shield > 0 ? String.valueOf(shield) : "");
+		if (enemyPoisonNum != null) enemyPoisonNum.setText(poisonStacks > 0 ? String.valueOf(poisonStacks) : "");
+		if (enemyBleedNum != null) enemyBleedNum.setText(bleedStacks > 0 ? String.valueOf(bleedStacks) : "");
+		if (enemyStunNum != null) enemyStunNum.setText(stunDuration > 0 ? String.valueOf(stunDuration) : "");
+	}
+
+	public void updatePlayerStatusValuesWithDuration(int shield, int poisonStacks, int poisonDuration, int bleedStacks, int bleedDuration, int stunDuration) {
+		if (userShieldNum != null) userShieldNum.setText(shield > 0 ? String.valueOf(shield) : "");
+		if (userPoisonNum != null) userPoisonNum.setText(poisonStacks > 0 ? (poisonDuration > 0 ? (poisonStacks + "|" + poisonDuration) : String.valueOf(poisonStacks)) : "");
+		if (userBleedNum != null) userBleedNum.setText(bleedStacks > 0 ? (bleedDuration > 0 ? (bleedStacks + "|" + bleedDuration) : String.valueOf(bleedStacks)) : "");
+		if (userStunNum != null) userStunNum.setText(stunDuration > 0 ? String.valueOf(stunDuration) : "");
+	}
+
+	public void updateEnemyStatusValuesWithDuration(int shield, int poisonStacks, int poisonDuration, int bleedStacks, int bleedDuration, int stunDuration) {
+		if (enemyShieldNum != null) enemyShieldNum.setText(shield > 0 ? String.valueOf(shield) : "");
+		if (enemyPoisonNum != null) enemyPoisonNum.setText(poisonStacks > 0 ? (poisonDuration > 0 ? (poisonStacks + "|" + poisonDuration) : String.valueOf(poisonStacks)) : "");
+		if (enemyBleedNum != null) enemyBleedNum.setText(bleedStacks > 0 ? (bleedDuration > 0 ? (bleedStacks + "|" + bleedDuration) : String.valueOf(bleedStacks)) : "");
+		if (enemyStunNum != null) enemyStunNum.setText(stunDuration > 0 ? String.valueOf(stunDuration) : "");
+	}
 
     // New: Update enemy HP color by status (priority: Stun → Bleed → Poison → White)
     public void updateEnemyHpStatusColor(boolean isEnemyPoisoned, boolean isEnemyBleeding, boolean isEnemyStunned) {

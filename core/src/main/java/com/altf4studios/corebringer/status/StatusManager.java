@@ -8,6 +8,12 @@ import java.util.ArrayList;
 import com.badlogic.gdx.Gdx;
 
 public class StatusManager {
+    private static final StatusManager INSTANCE = new StatusManager();
+
+    public static StatusManager getInstance() {
+        return INSTANCE;
+    }
+
     private Map<Entity, Map<String, StatusEffect>> entityStatusMap = new HashMap<>();
 
     /**
@@ -71,24 +77,51 @@ public class StatusManager {
      */
     public void processTurnStart(Entity entity) {
         Map<String, StatusEffect> statusMap = entityStatusMap.get(entity);
-        if (statusMap != null) {
-            List<String> expiredStatuses = new ArrayList<>();
-            
-            for (Map.Entry<String, StatusEffect> entry : statusMap.entrySet()) {
-                StatusEffect effect = entry.getValue();
-                effect.onTurnStart(entity);
-                
-                // Check if status expired after turn start
-                if (effect.isExpired()) {
-                    expiredStatuses.add(entry.getKey());
-                }
+        if (statusMap == null) return;
+
+        List<String> expiredStatuses = new ArrayList<>();
+        int totalDotDamage = 0; // combined Poison + Bleed damage
+
+        for (Map.Entry<String, StatusEffect> entry : statusMap.entrySet()) {
+            String statusName = entry.getKey();
+            StatusEffect effect = entry.getValue();
+
+            switch (statusName) {
+                case "Poison":
+                    // Deal damage equal to current power, then power-- and duration--
+                    if (effect.getPower() > 0) {
+                        totalDotDamage += effect.getPower();
+                        effect.decreasePower(1);
+                    }
+                    effect.tick();
+                    break;
+                case "Bleed":
+                    // Deal damage equal to current power; only duration--
+                    if (effect.getPower() > 0) {
+                        totalDotDamage += effect.getPower();
+                    }
+                    effect.tick();
+                    break;
+                default:
+                    // Keep default behavior for other statuses
+                    effect.onTurnStart(entity);
+                    break;
             }
-            
-            // Remove expired statuses
-            for (String statusName : expiredStatuses) {
-                StatusEffect effect = statusMap.remove(statusName);
-                effect.onExpire(entity);
+
+            if (effect.isExpired()) {
+                expiredStatuses.add(statusName);
             }
+        }
+
+        // Apply combined DOT in a single hit so it's simultaneous
+        if (totalDotDamage > 0 && entity.isAlive()) {
+            entity.takeDamage(totalDotDamage);
+        }
+
+        // Remove expired statuses
+        for (String statusName : expiredStatuses) {
+            StatusEffect effect = statusMap.remove(statusName);
+            effect.onExpire(entity);
         }
     }
 
@@ -195,6 +228,22 @@ public class StatusManager {
     public StatusEffect getStatus(Entity entity, String statusName) {
         Map<String, StatusEffect> statusMap = entityStatusMap.get(entity);
         return statusMap != null ? statusMap.get(statusName) : null;
+    }
+
+    /**
+     * Convenience: Get the power (stacks) of a status on an entity
+     */
+    public int getPower(Entity entity, String statusName) {
+        StatusEffect se = getStatus(entity, statusName);
+        return se != null ? se.getPower() : 0;
+    }
+
+    /**
+     * Convenience: Get remaining duration of a status on an entity
+     */
+    public int getDuration(Entity entity, String statusName) {
+        StatusEffect se = getStatus(entity, statusName);
+        return se != null ? se.getDuration() : 0;
     }
 
     /**

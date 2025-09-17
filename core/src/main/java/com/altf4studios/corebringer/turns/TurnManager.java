@@ -54,7 +54,7 @@ public class TurnManager {
             isDelaying = true;
             delayTimer = turnDelay;
             Gdx.app.log("TurnManager", "Player turn ended, switching to enemy turn");
-            // Schedule poison to resolve for enemy after the initial delay
+            // After delay, resolve start-of-turn statuses for enemy (poison/bleed/stun)
             pendingPoisonTarget = PendingPoisonTarget.ENEMY;
             isResolvingPoison = false;
         }
@@ -67,7 +67,7 @@ public class TurnManager {
             isDelaying = true;
             delayTimer = turnDelay;
             Gdx.app.log("TurnManager", "Enemy turn ended, switching to player turn");
-            // Schedule poison to resolve for player after the initial delay
+            // After delay, resolve start-of-turn statuses for player (poison/bleed/stun)
             pendingPoisonTarget = PendingPoisonTarget.PLAYER;
             isResolvingPoison = false;
         }
@@ -162,14 +162,16 @@ public class TurnManager {
             }
         }
 
-        // After initial delay, resolve scheduled poison and add a short delay so it's visible
+        // After initial delay, resolve scheduled start-of-turn statuses and add a short delay so it's visible
         if (!isDelaying && pendingPoisonTarget != PendingPoisonTarget.NONE) {
-            if (pendingPoisonTarget == PendingPoisonTarget.ENEMY && enemy.hasPoison()) {
-                Gdx.app.log("TurnManager", "Resolving enemy poison before enemy acts");
-                enemy.applyPoisonEffects();
-            } else if (pendingPoisonTarget == PendingPoisonTarget.PLAYER && player.hasPoison()) {
-                Gdx.app.log("TurnManager", "Resolving player poison before player acts");
-                player.applyPoisonEffects();
+            com.altf4studios.corebringer.status.StatusManager sm = com.altf4studios.corebringer.status.StatusManager.getInstance();
+            if (pendingPoisonTarget == PendingPoisonTarget.ENEMY) {
+                Gdx.app.log("TurnManager", "Resolving enemy start-of-turn statuses");
+                // Process all statuses (Poison, Bleed, Stun effects via their handlers)
+                sm.processTurnStart(enemy);
+            } else if (pendingPoisonTarget == PendingPoisonTarget.PLAYER) {
+                Gdx.app.log("TurnManager", "Resolving player start-of-turn statuses");
+                sm.processTurnStart(player);
             }
             pendingPoisonTarget = PendingPoisonTarget.NONE;
             isResolvingPoison = true;
