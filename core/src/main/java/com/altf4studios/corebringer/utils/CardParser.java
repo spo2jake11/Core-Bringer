@@ -52,6 +52,7 @@ public class CardParser {
 
                 // Common/new fields
                 card.id = safeString(cardJson, "id", "");
+                card.level = safeInt(cardJson, "level", 1);
                 card.name = safeString(cardJson, "name", "");
                 card.description = safeString(cardJson, "description", "");
                 card.cost = safeInt(cardJson, "cost", 0);
@@ -197,6 +198,23 @@ public class CardParser {
             }
         }
         
+        return null;
+    }
+
+    /**
+     * Find a card by its id
+     * @param cardId The id of the card
+     * @return SampleCardHandler if found, null otherwise
+     */
+    public SampleCardHandler findCardById(String cardId) {
+        if (cardId == null) {
+            return null;
+        }
+        for (SampleCardHandler card : allCards) {
+            if (card.id.equals(cardId)) {
+                return card;
+            }
+        }
         return null;
     }
     

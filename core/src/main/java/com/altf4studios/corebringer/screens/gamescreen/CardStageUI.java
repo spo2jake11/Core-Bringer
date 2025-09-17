@@ -26,6 +26,7 @@ public class CardStageUI {
     private int cardsInHand;
     private TextButton drawButton;
     private Array<String> availableCardNames;
+    private Array<String> drawPoolNames; // names derived from saved deck ids (with duplicates)
     private Player player;
     private Enemy enemy;
     private TurnManager turnManager;
@@ -62,7 +63,7 @@ public class CardStageUI {
         float cardWidth = (worldWidth * 0.8f) / 5;
 
         // Initialize available card names
-        initializeAvailableCards();
+        initializeDrawPoolFromSave();
 
         // Get card names and costs
         String[] cardNames = getCardNames();
@@ -95,6 +96,7 @@ public class CardStageUI {
     }
 
     private void initializeAvailableCards() {
+        // Backward-compatible random pool from all cards if saved deck is not provided
         availableCardNames = new Array<>();
         if (cardParser.isCardsLoaded()) {
             Array<SampleCardHandler> allCards = cardParser.getAllCards();
@@ -114,6 +116,28 @@ public class CardStageUI {
             availableCardNames.add("Card 9");
             availableCardNames.add("Card 10");
         }
+    }
+
+    private void initializeDrawPoolFromSave() {
+        drawPoolNames = new Array<>();
+        availableCardNames = new Array<>();
+        // Load from GameScreen saved deck ids
+        String[] savedIds = gameScreen != null ? gameScreen.getSavedDeckIds() : null;
+        if (savedIds != null && savedIds.length > 0 && cardParser.isCardsLoaded()) {
+            for (String id : savedIds) {
+                SampleCardHandler c = cardParser.findCardById(id);
+                if (c != null) {
+                    drawPoolNames.add(c.name); // duplicates preserved
+                }
+            }
+        }
+        // Fallback to all cards if saved draw pool is empty
+        if (drawPoolNames.size == 0) {
+            initializeAvailableCards();
+            drawPoolNames.addAll(availableCardNames);
+        }
+        // Start with draw pool as the available pool; we remove as we draw
+        availableCardNames.addAll(drawPoolNames);
     }
 
     private String[] getCardNames() {
@@ -241,7 +265,7 @@ public class CardStageUI {
         }
         cardsInHand = 5;
         if (availableCardNames.size == 0) {
-            initializeAvailableCards();
+            initializeDrawPoolFromSave();
         }
         String[] newCardNames = getCardNames();
         int[] newCardCosts = getCardCosts(newCardNames);
@@ -340,7 +364,8 @@ public class CardStageUI {
                 }
 
                 if (enemy != null && enemy.isAlive()) {
-                    Poison poison = new Poison("Poison", poisonStacks, 0);
+                    // Apply poison with base duration 3 and additive stacks
+                    Poison poison = new Poison("Poison", poisonStacks, 3);
                     enemy.addPoison(poison);
                 }
             }
@@ -359,7 +384,9 @@ public class CardStageUI {
                 int bleedStacks = parseNumberBeforeKeyword(card.description, "bleed");
                 if (bleedStacks <= 0) bleedStacks = Math.max(0, card.baseEffect);
                 if (enemy != null && enemy.isAlive() && bleedStacks > 0) {
-                    enemy.addStatus("Bleed", bleedStacks);
+                    // Route through StatusManager so duration stacks are honored
+                    com.altf4studios.corebringer.status.StatusManager.getInstance()
+                        .applyStatus(enemy, new com.altf4studios.corebringer.status.Bleed("Bleed", bleedStacks, 5));
                 }
             }
 
