@@ -61,7 +61,7 @@ public class Main extends Game {
         corebringerstartmenubgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Mortal-Gaming-144000-(GameIntro1).mp3"));
         corebringerstartmenubgm.setLooping(true);
         corebringerstartmenubgm.setVolume(1.0f);
-        corebringermapstartbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Intro-Video-Game-365760-(GameIntro2).mp3"));
+        corebringermapstartbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/To-The-Teath-159171-(NormalBattleMusic1).mp3"));
         corebringermapstartbgm.setLooping(true);
         corebringermapstartbgm.setVolume(1.0f);
         corebringergamescreenbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/0-Top-Battle-Game-BGM-264625-(NormalBattleMusic2).mp3"));
