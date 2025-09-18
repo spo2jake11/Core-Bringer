@@ -178,6 +178,25 @@ public class GameMapScreen implements Screen{
             }
         });
 
+        // Search node: show a small dialog with a Puzzle option that navigates to PuzzleScreen
+        nodeG.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Dialog dialog = new Dialog("Search", corebringer.testskin) {
+                    @Override
+                    protected void result(Object obj) {
+                        if (Boolean.TRUE.equals(obj)) {
+                            corebringer.setScreen(corebringer.puzzleScreen);
+                        }
+                    }
+                };
+                dialog.text("Choose an action:");
+                dialog.button("Puzzle", true);
+                dialog.button("Close", false);
+                dialog.show(coregamemapstage);
+            }
+        });
+
         ///This is where the messages and tips in the game will go
         gamemapmessagetable = new Table();
         gamemapmessages = new Label("Did you know?: Dying in this game is permanent. :D", corebringer.testskin);
