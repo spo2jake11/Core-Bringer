@@ -87,7 +87,7 @@ public class BattleStageUI {
     }
 
     private void setupBattleUI() {
-        Texture bg = new Texture(Gdx.files.internal("backgrounds/new_bg_design/stg1_background.png"));
+        Texture bg = new Texture(Gdx.files.internal("assets/backgrounds/stg1_bg.png"));
         Drawable bgDraw = new TextureRegionDrawable(new TextureRegion(bg));
 
         Table actionTable = new Table();

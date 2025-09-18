@@ -1,11 +1,13 @@
 nodes_atlas.png
 size:2048,512
 repeat:none
+boss_node
+bounds:324,2,320,320
 combat_node
 bounds:2,2,320,320
 rest_node
-bounds:646,2,320,320
-search_node
-bounds:324,2,320,320
-shop_node
 bounds:968,2,320,320
+search_node
+bounds:646,2,320,320
+shop_node
+bounds:1290,2,320,320
