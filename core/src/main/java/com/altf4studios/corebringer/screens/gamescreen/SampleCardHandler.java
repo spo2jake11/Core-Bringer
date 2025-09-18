@@ -4,6 +4,7 @@ import com.badlogic.gdx.utils.Array;
 
 public class SampleCardHandler {
     public String id;
+    public int level;
     public String name;
     public String type;
     public String description;

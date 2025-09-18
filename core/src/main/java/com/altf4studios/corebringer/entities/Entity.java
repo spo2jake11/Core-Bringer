@@ -81,7 +81,8 @@ public abstract class Entity implements BattleEntity {
 
     // Status management
     public void addStatus(String status, int value) {
-        statusEffects.put(status, value);
+        int current = statusEffects.getOrDefault(status, 0);
+        statusEffects.put(status, Math.max(0, current + Math.max(1, value)));
     }
 
     public void removeStatus(String status) {
