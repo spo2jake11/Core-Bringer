@@ -111,6 +111,14 @@ public class GameMapScreen implements Screen{
             merchantnode = new TextButton("M", corebringer.testskin);
             cardsmithnode = new TextButton("CS", corebringer.testskin);
             searchnode = new TextButton("S", corebringer.testskin);
+            
+            // Add click listener for search node to show puzzle screen
+            searchnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.puzzleScreen);
+                }
+            });
 
             ///Functionalities for the Randomized Nodes
             randombattlenode.addListener(new ClickListener() {
@@ -159,6 +167,14 @@ public class GameMapScreen implements Screen{
             merchantnode = new TextButton("M", corebringer.testskin);
             cardsmithnode = new TextButton("CS", corebringer.testskin);
             searchnode = new TextButton("S", corebringer.testskin);
+            
+            // Add click listener for search node to show puzzle screen
+            searchnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.puzzleScreen);
+                }
+            });
 
             ///Functionalities for the Randomized Nodes
             randombattlenode.addListener(new ClickListener() {
@@ -207,6 +223,14 @@ public class GameMapScreen implements Screen{
             merchantnode = new TextButton("M", corebringer.testskin);
             cardsmithnode = new TextButton("CS", corebringer.testskin);
             searchnode = new TextButton("S", corebringer.testskin);
+            
+            // Add click listener for search node to show puzzle screen
+            searchnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.puzzleScreen);
+                }
+            });
 
             ///Functionalities for the Randomized Nodes
             randombattlenode.addListener(new ClickListener() {
@@ -255,6 +279,14 @@ public class GameMapScreen implements Screen{
             merchantnode = new TextButton("M", corebringer.testskin);
             cardsmithnode = new TextButton("CS", corebringer.testskin);
             searchnode = new TextButton("S", corebringer.testskin);
+            
+            // Add click listener for search node to show puzzle screen
+            searchnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.puzzleScreen);
+                }
+            });
 
             ///Functionalities for the Randomized Nodes
             randombattlenode.addListener(new ClickListener() {
@@ -303,6 +335,14 @@ public class GameMapScreen implements Screen{
             merchantnode = new TextButton("M", corebringer.testskin);
             cardsmithnode = new TextButton("CS", corebringer.testskin);
             searchnode = new TextButton("S", corebringer.testskin);
+            
+            // Add click listener for search node to show puzzle screen
+            searchnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.puzzleScreen);
+                }
+            });
 
             ///Functionalities for the Randomized Nodes
             randombattlenode.addListener(new ClickListener() {
@@ -351,6 +391,14 @@ public class GameMapScreen implements Screen{
             merchantnode = new TextButton("M", corebringer.testskin);
             cardsmithnode = new TextButton("CS", corebringer.testskin);
             searchnode = new TextButton("S", corebringer.testskin);
+            
+            // Add click listener for search node to show puzzle screen
+            searchnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.puzzleScreen);
+                }
+            });
 
             ///Functionalities for the Randomized Nodes
             randombattlenode.addListener(new ClickListener() {
@@ -399,6 +447,14 @@ public class GameMapScreen implements Screen{
             merchantnode = new TextButton("M", corebringer.testskin);
             cardsmithnode = new TextButton("CS", corebringer.testskin);
             searchnode = new TextButton("S", corebringer.testskin);
+            
+            // Add click listener for search node to show puzzle screen
+            searchnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.puzzleScreen);
+                }
+            });
 
             ///Functionalities for the Randomized Nodes
             randombattlenode.addListener(new ClickListener() {
@@ -447,6 +503,14 @@ public class GameMapScreen implements Screen{
             merchantnode = new TextButton("M", corebringer.testskin);
             cardsmithnode = new TextButton("CS", corebringer.testskin);
             searchnode = new TextButton("S", corebringer.testskin);
+            
+            // Add click listener for search node to show puzzle screen
+            searchnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.puzzleScreen);
+                }
+            });
 
             ///Functionalities for the Randomized Nodes
             randombattlenode.addListener(new ClickListener() {
