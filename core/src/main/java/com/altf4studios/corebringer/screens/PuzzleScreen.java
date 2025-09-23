@@ -14,6 +14,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.math.MathUtils;
 
 public class PuzzleScreen implements Screen {
     private Main corebringer;
@@ -29,8 +30,7 @@ public class PuzzleScreen implements Screen {
     private Image resultCubeImage;
     private Label instructionLabel;
     private Label resultLabel;
-    private TextButton andButton;
-    private TextButton orButton;
+    // Removed operator selection buttons; player only toggles inputs
     private TextButton backButton;
     
     // Puzzle state
@@ -85,57 +85,64 @@ public class PuzzleScreen implements Screen {
         input1Image = new Image(input1Texture);
         input0Image = new Image(input0Texture);
         
-        // Create operator image (default to &&)
+        // Randomize operator at start and set operator image accordingly
         operatorImage = new Image(andTexture);
         
         // Create result cube image (default to plain)
         resultCubeImage = new Image(cubePlainTexture);
         
         // Create labels
-        instructionLabel = new Label("Choose the correct operator to make the result TRUE:", corebringer.testskin);
+        instructionLabel = new Label("Set inputs (0/1) so the result is TRUE:", corebringer.testskin);
         instructionLabel.setColor(Color.WHITE);
         instructionLabel.setFontScale(1.5f);
         
-        resultLabel = new Label("Result: " + (input1 && input0), corebringer.testskin);
+        resultLabel = new Label("Result: ", corebringer.testskin);
         resultLabel.setColor(Color.WHITE);
         resultLabel.setFontScale(1.2f);
-        
-        // Create operator buttons
-        andButton = new TextButton("&&", corebringer.testskin);
-        orButton = new TextButton("||", corebringer.testskin);
         
         // Create back button
         backButton = new TextButton("Back to Map", corebringer.testskin);
         
+        // Setup input listeners (toggle 0/1)
+        setupInputToggleListeners();
+        // Randomize operator at init
+        randomizeOperator();
         // Add button listeners
         setupButtonListeners();
     }
     
     private void setupButtonListeners() {
-        andButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                currentOperator = "&&";
-                operatorImage.setDrawable(new TextureRegionDrawable(andTexture));
-                updateResult();
-            }
-        });
-        
-        orButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                currentOperator = "||";
-                operatorImage.setDrawable(new TextureRegionDrawable(orTexture));
-                updateResult();
-            }
-        });
-        
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 corebringer.setScreen(corebringer.gameMapScreen);
             }
         });
+    }
+    
+    private void setupInputToggleListeners() {
+        input1Image.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                input1 = !input1;
+                input1Image.setDrawable(new TextureRegionDrawable(input1 ? input1Texture : input0Texture));
+                updateResult();
+            }
+        });
+        input0Image.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                input0 = !input0;
+                input0Image.setDrawable(new TextureRegionDrawable(input0 ? input1Texture : input0Texture));
+                updateResult();
+            }
+        });
+    }
+    
+    private void randomizeOperator() {
+        boolean useAnd = MathUtils.randomBoolean();
+        currentOperator = useAnd ? "&&" : "||";
+        operatorImage.setDrawable(new TextureRegionDrawable(useAnd ? andTexture : orTexture));
     }
     
     private void updateResult() {
@@ -146,7 +153,7 @@ public class PuzzleScreen implements Screen {
             result = input1 || input0;
         }
         
-        resultLabel.setText("Result: " + result);
+        resultLabel.setText("Gate " + currentOperator + " → Result: " + result);
         
         // Update cube color based on result
         if (result) {
@@ -164,11 +171,6 @@ public class PuzzleScreen implements Screen {
         backgroundImage.setScaling(com.badlogic.gdx.utils.Scaling.fill);
         mainTable.setBackground(new TextureRegionDrawable(backgroundTexture));
         
-        // Create button table
-        buttonTable = new Table();
-        buttonTable.add(andButton).pad(10f);
-        buttonTable.add(orButton).pad(10f);
-        
         // Add elements to puzzle table
         puzzleTable.add(instructionLabel).colspan(3).padBottom(30f).row();
         puzzleTable.add(input1Image).pad(20f);
@@ -176,7 +178,6 @@ public class PuzzleScreen implements Screen {
         puzzleTable.add(input0Image).pad(20f).row();
         puzzleTable.add(resultCubeImage).colspan(3).padTop(20f).row();
         puzzleTable.add(resultLabel).colspan(3).padTop(20f).row();
-        puzzleTable.add(buttonTable).colspan(3).padTop(30f).row();
         puzzleTable.add(backButton).colspan(3).padTop(20f);
         
         // Add puzzle table to main table
@@ -188,6 +189,14 @@ public class PuzzleScreen implements Screen {
 
     @Override
     public void show() {
+        // Reset inputs each time puzzle opens
+        input1 = true;
+        input0 = false;
+        input1Image.setDrawable(new TextureRegionDrawable(input1Texture));
+        input0Image.setDrawable(new TextureRegionDrawable(input0Texture));
+        // Randomize operator per entry and refresh result/UI
+        randomizeOperator();
+        updateResult();
         Gdx.input.setInputProcessor(puzzleStage);
     }
 
