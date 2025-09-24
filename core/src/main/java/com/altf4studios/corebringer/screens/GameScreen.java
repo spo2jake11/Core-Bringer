@@ -51,7 +51,7 @@ public class GameScreen implements Screen{
 
     // --- Energy System ---
     private int energy = 0;
-    private final int MAX_ENERGY = 10;
+    private final int MAX_ENERGY = 3;
     private Label energyLabel;
     private Window optionsWindow;
     // Persisted deck ids for this run
@@ -62,6 +62,11 @@ public class GameScreen implements Screen{
     private Window deathScreenWindow = null;
     private boolean deathScreenShown = false;
     // --- End Death Screen ---
+
+    // --- Victory Screen ---
+    private Window victoryScreenWindow = null;
+    private boolean victoryScreenShown = false;
+    // --- End Victory Screen ---
 
 
     public GameScreen(Main corebringer) {
@@ -76,13 +81,32 @@ public class GameScreen implements Screen{
         cardStage = new Stage(new ScreenViewport());
 
 
-        // --- Load stats from save file if exists ---
-        int hp = 20;
+        // --- Load stats from save file (must exist at this point) ---
+        int hp = 20; // Default fallback values
         int energyVal = 0;
-        String[] cards = new String[]{};
+        String[] cards = new String[]{
+            "basic_variable_strash_1", "basic_variable_strash_1", "basic_variable_strash_1",
+            "basic_function_strash_1", "basic_function_strash_1", "shield_final_shield_1",
+            "shield_final_shield_1", "shield_final_shield_1", "shield_final_shield_1",
+            "shield_final_shield_1", "heal_ultimate_heal_1", "heal_ultimate_heal_1",
+            "heal_ultimate_heal_1", "poison_looping_bite_1", "poison_looping_bite_1"
+        };
         int battleWon = 0;
         String enemyName = "Enemy";
         int enemyHp = 20;
+
+        // Load from save file (should exist from MainMenuScreen)
+        if (SaveManager.saveExists()) {
+            com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+            if (stats != null) {
+                hp = stats.hp;
+                energyVal = stats.energy;
+                cards = stats.cards;
+                battleWon = stats.battleWon;
+            }
+        }
+
+        // Load random enemy from JSON
         try {
             com.badlogic.gdx.files.FileHandle file = Gdx.files.internal("assets/enemies.json");
             String json = file.readString();
@@ -97,24 +121,6 @@ public class GameScreen implements Screen{
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Failed to load enemy from JSON: " + e.getMessage());
         }
-        if (SaveManager.saveExists()) {
-            com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
-            if (stats != null) {
-                hp = stats.hp;
-                energyVal = stats.energy;
-                cards = stats.cards;
-            }
-        }
-
-        // Initialize starting deck if none exists: pick 15 random level-1 cards (allow duplicates)
-        cards = new String[]{
-            "basic_variable_strash_1", "basic_variable_strash_1", "basic_variable_strash_1",
-            "basic_function_strash_1", "basic_function_strash_1", "shield_final_shield_1",
-            "shield_final_shield_1", "shield_final_shield_1", "shield_final_shield_1",
-            "shield_final_shield_1", "heal_ultimate_heal_1", "heal_ultimate_heal_1",
-            "heal_ultimate_heal_1", "poison_looping_bite_1", "poison_looping_bite_1"
-        };
-        SaveManager.saveStats(hp, energyVal, cards, battleWon);
 
         // Expose cards to CardStageUI via getter
 
@@ -177,6 +183,10 @@ public class GameScreen implements Screen{
 
     public String[] getSavedDeckIds() {
         return savedDeckIds != null ? savedDeckIds : new String[]{};
+    }
+
+    public BattleManager getBattleManager() {
+        return battleManager;
     }
 
     // Call this after any stat change (hp, energy, cards, battleWon)
@@ -294,7 +304,7 @@ public class GameScreen implements Screen{
         btnRecharge.setName("RechargeButton");
         btnRecharge.setWidth(200);
         btnRecharge.setHeight(50);
-        btnRecharge.setPosition((Gdx.graphics.getWidth() - btnRecharge.getWidth()) / 2f, 100);
+        btnRecharge.setPosition((Gdx.graphics.getWidth() / btnRecharge.getWidth()) + 50, 100);
         btnRecharge.addListener(new ClickListener() {
             @Override public void clicked(InputEvent event, float x, float y) {
                 corebringer.setScreen(corebringer.codeEditorScreen);
@@ -322,10 +332,10 @@ public class GameScreen implements Screen{
         /// For wiring the HP/Shield values properly
         battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
         battleStageUI.updateShieldBars(player.getBlock(), enemy.getBlock());
-        battleStageUI.updateHpColors(player.hasPoison(), enemy.hasPoison());
-        battleStageUI.updateShieldColors(player.getBlock() > 0, enemy.getBlock() > 0);
-        // New: enemy HP color for bleed/stun (priority handled in UI)
-        battleStageUI.updateEnemyHpStatusColor(enemy.hasPoison(), enemy.hasStatus("Bleed"), enemy.hasStatus("Stun"));
+//        battleStageUI.updateHpColors(player.hasPoison(), enemy.hasPoison());
+//        battleStageUI.updateShieldColors(player.getBlock() > 0, enemy.getBlock() > 0);
+//        // New: enemy HP color for bleed/stun (priority handled in UI)
+//        battleStageUI.updateEnemyHpStatusColor(enemy.hasPoison(), enemy.hasStatus("Bleed"), enemy.hasStatus("Stun"));
 
         // Turn indicator is updated by BattleManager
 
@@ -334,6 +344,12 @@ public class GameScreen implements Screen{
             showDeathScreen();
         }
         // --- End Death Screen Trigger ---
+
+        // --- Victory Screen Trigger ---
+        if (!victoryScreenShown && !deathScreenShown && enemy.getHp() <= 0) {
+            showVictoryScreen();
+        }
+        // --- End Victory Screen Trigger ---
     }
 
 
@@ -431,6 +447,11 @@ public class GameScreen implements Screen{
         battleStage.dispose();
         // Removed: editorStage.dispose();
         cardStage.dispose();
+        // Clean up victory screen
+        if (victoryScreenWindow != null) {
+            victoryScreenWindow.remove();
+            victoryScreenWindow = null;
+        }
         this.dispose();
 
     }
@@ -552,6 +573,65 @@ public class GameScreen implements Screen{
         overlay.add(btnReturn).center().padTop(-300f); // Adjust as needed for button position
         deathScreenWindow.add(overlay).expand().fill();
         battleStage.addActor(deathScreenWindow);
+        // Block all input except the button
+        Gdx.input.setInputProcessor(battleStage);
+    }
+
+    private void showVictoryScreen() {
+        if (victoryScreenWindow != null) return; // Already shown
+        victoryScreenShown = true;
+
+        // Calculate window size (70% width, 80% height)
+        float windowWidth = Gdx.graphics.getWidth() * 0.7f;
+        float windowHeight = Gdx.graphics.getHeight() * 0.8f;
+        float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
+        float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
+
+        // Create victory window with gray background
+        victoryScreenWindow = new Window("", corebringer.testskin);
+        victoryScreenWindow.setModal(true);
+        victoryScreenWindow.setMovable(false);
+        victoryScreenWindow.setResizable(false);
+        victoryScreenWindow.setSize(windowWidth, windowHeight);
+        victoryScreenWindow.setPosition(windowX, windowY);
+        victoryScreenWindow.setTouchable(Touchable.enabled);
+
+        // Set gray background color
+        victoryScreenWindow.setColor(0.5f, 0.5f, 0.5f, 1f);
+
+        // Create content table
+        Table contentTable = new Table();
+        contentTable.setFillParent(true);
+
+        // Victory message
+        Label victoryMessage = new Label("You win!", corebringer.testskin);
+        victoryMessage.setAlignment(Align.center);
+        victoryMessage.setFontScale(2.0f); // Make it larger
+
+        // Proceed button
+        TextButton btnProceed = new TextButton("Proceed", corebringer.testskin);
+        btnProceed.addListener(new ClickListener() {
+            @Override public void clicked(InputEvent event, float x, float y) {
+                // Save progress with battle won = 1
+                saveProgress(1);
+                // Reroll enemy and cards for next battle
+                rerollEnemyAndCards();
+                // Hide victory screen
+                if (victoryScreenWindow != null) {
+                    victoryScreenWindow.remove();
+                    victoryScreenWindow = null;
+                    victoryScreenShown = false;
+                }
+            }
+        });
+
+        // Add content to table
+        contentTable.add(victoryMessage).expand().center().row();
+        contentTable.add(btnProceed).center().padTop(50f);
+
+        victoryScreenWindow.add(contentTable).expand().fill();
+        battleStage.addActor(victoryScreenWindow);
+
         // Block all input except the button
         Gdx.input.setInputProcessor(battleStage);
     }

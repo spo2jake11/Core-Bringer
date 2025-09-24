@@ -45,7 +45,7 @@ public class CodeEditorScreen implements Screen {
     private final Random random = new Random();
 
     private int energy;
-    private final int MAX_ENERGY = 10;
+    private final int MAX_ENERGY = 3;
     private Label energyLabel;
     private Dialog maxEnergyDialog;
 

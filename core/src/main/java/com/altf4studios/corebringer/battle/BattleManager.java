@@ -29,20 +29,20 @@ public class BattleManager {
         // Progress turn timings and staged effects
         turnManager.update(deltaTime);
 
-        // Enemy AI action
-        if (turnManager.isEnemyTurn() && !turnManager.isDelaying()) {
-            turnManager.executeEnemyTurn();
-        }
+        // Enemy AI action - REMOVED: No longer automatic, only when player ends turn
+        // if (turnManager.isEnemyTurn() && !turnManager.isDelaying()) {
+        //     turnManager.executeEnemyTurn();
+        // }
 
         // Reflect current turn state on the UI
         if (battleStageUI != null) {
             if (turnManager.isPlayerTurn()) {
-                battleStageUI.updateTurnIndicator("Player's Turn");
+                battleStageUI.updateTurnIndicator("Your Turn - Play cards or end turn");
             } else {
                 if (enemy.hasStatus("Stun")) {
-                    battleStageUI.updateTurnIndicator("Enemy's Turn (Stunned)");
+                    battleStageUI.updateTurnIndicator("Enemy Turn (Stunned)");
                 } else {
-                    battleStageUI.updateTurnIndicator("Enemy's Turn");
+                    battleStageUI.updateTurnIndicator("Enemy Turn - Enemy is acting...");
                 }
             }
 
@@ -100,6 +100,15 @@ public class BattleManager {
 
     public TurnManager getTurnManager() {
         return turnManager;
+    }
+
+    /**
+     * Manually execute enemy turn - called when player ends their turn
+     */
+    public void executeEnemyTurn() {
+        if (turnManager.isEnemyTurn() && !turnManager.isDelaying()) {
+            turnManager.executeEnemyTurn();
+        }
     }
 }
 

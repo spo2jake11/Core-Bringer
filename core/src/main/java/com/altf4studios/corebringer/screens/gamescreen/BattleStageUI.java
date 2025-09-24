@@ -112,7 +112,7 @@ public class BattleStageUI {
         actionTable.top();
         actionTable.setBackground(bgDraw);
         actionTable.setFillParent(true);
-        actionTable.padTop(75);
+        actionTable.padTop(200);
 
 		// HP Labels
 		userHpLabel = new Label("20", skin);
@@ -219,10 +219,10 @@ public class BattleStageUI {
 		rightColumn.add(enemyTemplateStack).height(300).width(300).padTop(20);
 
 		// Layout on main action table
-		actionTable.defaults().padTop(30);
-		actionTable.add(turnIndicatorLabel).colspan(2).height(30).padTop(10).row();
-		actionTable.add(leftColumn).expand().left().padLeft(300);
-		actionTable.add(rightColumn).expand().right().padRight(300);
+		actionTable.defaults().padTop(10);
+		actionTable.add(turnIndicatorLabel).colspan(2).padBottom(50).row();
+        actionTable.add(leftColumn).expandX().fillX().left();
+        actionTable.add(rightColumn).expandX().fillX().right();
 
         battleStage.addActor(actionTable);
     }
@@ -249,7 +249,7 @@ public class BattleStageUI {
 		// Colored square with centered status name
 		Texture status = new Texture(Gdx.files.internal(imgPath));
 		Image img = new Image(status);
-        img.setSize(15, 15);
+        img.setSize(20, 20);
 		Stack stack = new Stack();
 		stack.add(img);
 		return stack;
@@ -289,23 +289,23 @@ public class BattleStageUI {
         }
     }
 
-    public void updateHpColors(boolean isPlayerPoisoned, boolean isEnemyPoisoned) {
-        if (userHpLabel != null) {
-            userHpLabel.setColor(isPlayerPoisoned ? Color.PURPLE : Color.WHITE);
-        }
-        if (enemyHpLabel != null) {
-            enemyHpLabel.setColor(isEnemyPoisoned ? Color.PURPLE : Color.WHITE);
-        }
-    }
+//    public void updateHpColors(boolean isPlayerPoisoned, boolean isEnemyPoisoned) {
+//        if (userHpLabel != null) {
+//            userHpLabel.setColor(isPlayerPoisoned ? Color.PURPLE : Color.WHITE);
+//        }
+//        if (enemyHpLabel != null) {
+//            enemyHpLabel.setColor(isEnemyPoisoned ? Color.PURPLE : Color.WHITE);
+//        }
+//    }
 
-    public void updateShieldColors(boolean isPlayerShielded, boolean isEnemyShielded) {
-        if (userShieldLabel != null) {
-            userShieldLabel.setColor(isPlayerShielded ? Color.CYAN : Color.GRAY);
-        }
-        if (enemyShieldLabel != null) {
-            enemyShieldLabel.setColor(isEnemyShielded ? Color.CYAN : Color.GRAY);
-        }
-    }
+//    public void updateShieldColors(boolean isPlayerShielded, boolean isEnemyShielded) {
+//        if (userShieldLabel != null) {
+//            userShieldLabel.setColor(isPlayerShielded ? Color.CYAN : Color.GRAY);
+//        }
+//        if (enemyShieldLabel != null) {
+//            enemyShieldLabel.setColor(isEnemyShielded ? Color.CYAN : Color.GRAY);
+//        }
+//    }
 
 	public void updatePlayerStatusBadges(boolean hasShield, boolean hasPoison, boolean hasBleed, boolean hasStun) {
 		if (userShieldBadge != null) userShieldBadge.setVisible(hasShield);
@@ -350,18 +350,18 @@ public class BattleStageUI {
 	}
 
     // New: Update enemy HP color by status (priority: Stun → Bleed → Poison → White)
-    public void updateEnemyHpStatusColor(boolean isEnemyPoisoned, boolean isEnemyBleeding, boolean isEnemyStunned) {
-        if (enemyHpLabel == null) return;
-        if (isEnemyStunned) {
-            enemyHpLabel.setColor(Color.YELLOW);
-        } else if (isEnemyBleeding) {
-            enemyHpLabel.setColor(Color.RED);
-        } else if (isEnemyPoisoned) {
-            enemyHpLabel.setColor(Color.PURPLE);
-        } else {
-            enemyHpLabel.setColor(Color.WHITE);
-        }
-    }
+//    public void updateEnemyHpStatusColor(boolean isEnemyPoisoned, boolean isEnemyBleeding, boolean isEnemyStunned) {
+//        if (enemyHpLabel == null) return;
+//        if (isEnemyStunned) {
+//            enemyHpLabel.setColor(Color.YELLOW);
+//        } else if (isEnemyBleeding) {
+//            enemyHpLabel.setColor(Color.RED);
+//        } else if (isEnemyPoisoned) {
+//            enemyHpLabel.setColor(Color.PURPLE);
+//        } else {
+//            enemyHpLabel.setColor(Color.WHITE);
+//        }
+//    }
 
     public String getCurrentEnemyName() {
         return currentEnemyName;

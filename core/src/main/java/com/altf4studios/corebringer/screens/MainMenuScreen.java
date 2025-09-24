@@ -117,21 +117,16 @@ public class MainMenuScreen implements Screen {
                 // Fade out main menu music, fade in map music
                 corebringer.fadeOutMusic(corebringer.corebringerstartmenubgm, 1f, () -> {
                     corebringer.fadeInMusic(corebringer.corebringermapstartbgm, 1f);
-                    // Save file logic
+                    // Create save file with default values if it doesn't exist
                     boolean saveExists = SaveManager.saveExists();
-                    if (!saveExists) {
-                        SaveManager.saveStats(20, 0, new String[]{}, 0);
-                    } else {
-                        com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
-                        if (stats != null && stats.battleWon == 1) {
-                            SaveManager.saveStats(
-                                stats.hp,
-                                stats.energy,
-                                stats.cards,
-                                0
-                            );
-                        }
-                    }
+                    String[] defaultCards = new String[]{
+                        "basic_variable_strash_1", "basic_variable_strash_1", "basic_variable_strash_1",
+                        "basic_function_strash_1", "basic_function_strash_1", "shield_final_shield_1",
+                        "shield_final_shield_1", "shield_final_shield_1", "shield_final_shield_1",
+                        "shield_final_shield_1", "heal_ultimate_heal_1", "heal_ultimate_heal_1",
+                        "heal_ultimate_heal_1", "poison_looping_bite_1", "poison_looping_bite_1"
+                    };
+                    SaveManager.saveStats(50, 0, defaultCards, 0);
                     corebringer.setScreen(corebringer.gameMapScreen);
                 });
             }
