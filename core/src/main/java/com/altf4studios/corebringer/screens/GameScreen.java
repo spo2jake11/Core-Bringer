@@ -107,20 +107,14 @@ public class GameScreen implements Screen{
         }
 
         // Initialize starting deck if none exists: pick 15 random level-1 cards (allow duplicates)
-        if (cards == null || cards.length == 0) {
-            com.badlogic.gdx.utils.Array<com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler> all = cardParser.loadAllCards();
-            com.badlogic.gdx.utils.Array<com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler> level1 = new com.badlogic.gdx.utils.Array<>();
-            for (com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler c : all) {
-                if (c.level == 1) level1.add(c);
-            }
-            String[] initialDeck = new String[15];
-            for (int i = 0; i < 15; i++) {
-                int idx = com.badlogic.gdx.math.MathUtils.random(level1.size - 1);
-                initialDeck[i] = level1.get(idx).id; // duplicates allowed
-            }
-            cards = initialDeck;
-            SaveManager.saveStats(hp, energyVal, cards, battleWon);
-        }
+        cards = new String[]{
+            "basic_variable_strash_1", "basic_variable_strash_1", "basic_variable_strash_1",
+            "basic_function_strash_1", "basic_function_strash_1", "shield_final_shield_1",
+            "shield_final_shield_1", "shield_final_shield_1", "shield_final_shield_1",
+            "shield_final_shield_1", "heal_ultimate_heal_1", "heal_ultimate_heal_1",
+            "heal_ultimate_heal_1", "poison_looping_bite_1", "poison_looping_bite_1"
+        };
+        SaveManager.saveStats(hp, energyVal, cards, battleWon);
 
         // Expose cards to CardStageUI via getter
 

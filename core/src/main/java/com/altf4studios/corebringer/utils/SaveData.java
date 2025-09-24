@@ -8,6 +8,7 @@ public class SaveData {
 
     public SaveData() {}
 
+
     public SaveData(int hp, int energy, String[] cards, int battleWon) {
         this.hp = hp;
         this.energy = energy;

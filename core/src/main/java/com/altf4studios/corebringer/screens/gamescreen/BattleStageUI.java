@@ -169,10 +169,10 @@ public class BattleStageUI {
 		// Status placeholders (square with status name) above HP stacks
 		Table userStatusTable = new Table();
 		userStatusTable.defaults().pad(5).size(40, 40);
-		userShieldBadge = createStatusBadge("Shield", Color.CYAN);
-		userPoisonBadge = createStatusBadge("Poison", Color.PURPLE);
-		userBleedBadge = createStatusBadge("Bleed", Color.RED);
-		userStunBadge = createStatusBadge("Stun", Color.YELLOW);
+		userShieldBadge = createStatusBadge("Shield");
+		userPoisonBadge = createStatusBadge("Poison");
+		userBleedBadge = createStatusBadge("Bleed");
+		userStunBadge = createStatusBadge("Stun");
 		userShieldBadge.setVisible(false);
 		userPoisonBadge.setVisible(false);
 		userBleedBadge.setVisible(false);
@@ -189,10 +189,10 @@ public class BattleStageUI {
 
 		Table enemyStatusTable = new Table();
 		enemyStatusTable.defaults().pad(5).size(40, 40);
-		enemyShieldBadge = createStatusBadge("Shield", Color.CYAN);
-		enemyPoisonBadge = createStatusBadge("Poison", Color.PURPLE);
-		enemyBleedBadge = createStatusBadge("Bleed", Color.RED);
-		enemyStunBadge = createStatusBadge("Stun", Color.YELLOW);
+		enemyShieldBadge = createStatusBadge("Shield");
+		enemyPoisonBadge = createStatusBadge("Poison");
+		enemyBleedBadge = createStatusBadge("Bleed");
+		enemyStunBadge = createStatusBadge("Stun");
 		enemyShieldBadge.setVisible(false);
 		enemyPoisonBadge.setVisible(false);
 		enemyBleedBadge.setVisible(false);
@@ -227,10 +227,28 @@ public class BattleStageUI {
         battleStage.addActor(actionTable);
     }
 
-	private Stack createStatusBadge(String name, Color color) {
+	private Stack createStatusBadge(String name) {
+
+        String imgPath = null;
+        switch (name){
+            case "Shield":
+                imgPath = "assets/Status/shield.png";
+                break;
+            case "Poison":
+                imgPath = "assets/Status/poison.png";
+                break;
+            case "Bleed":
+                imgPath = "assets/Status/droplets.png";
+                break;
+            case "Stun":
+                imgPath = "assets/Status/stun.png";
+                break;
+            default:
+                imgPath = null;
+        }
 		// Colored square with centered status name
-		Drawable square = skin.newDrawable("white", color);
-		Image img = new Image(square);
+		Texture status = new Texture(Gdx.files.internal(imgPath));
+		Image img = new Image(status);
         img.setSize(15, 15);
 		Stack stack = new Stack();
 		stack.add(img);
