@@ -72,26 +72,31 @@ public class CardStageUI {
         // Create card hand table
         cardHandTable = new CardHandTable(skin, cardWidth, cardHeight, cardNames, cardCosts);
 
+        cardStage.addActor(cardHandTable.cardGroup);
+
         // Add click and hover listeners to cards
-        setupCardListeners(cardNames, cardCosts);
+        setupCardListeners();
 
         // Create draw button (TextButton)
         createDrawButton();
 
-        // Layout: cards in a row, draw button at the right
-        Table rowTable = new Table();
-        for (Table cardTable : cardHandTable.cardTables) {
-            rowTable.add(cardTable).padRight(10f).width(cardWidth).height(cardHeight);
-        }
-        rowTable.add(drawButton).padLeft(20f).width(120f).height(cardHeight).right();
+        drawButton.setPosition(cardStage.getViewport().getScreenX() * 0.80f, cardStage.getViewport().getScreenY() * 0.25f);
+        cardStage.addActor(drawButton);
 
-        // Parent table for positioning
-        Table parentTable = new Table();
-        parentTable.setFillParent(true);
-        parentTable.bottom();
-        parentTable.add(rowTable).expandX().padBottom(worldHeight * 0.25f - 100f);
+//        // Layout: cards in a row, draw button at the right
+//        Table rowTable = new Table();
+//        for (Table cardTable : cardHandTable.cardTables) {
+//            rowTable.add(cardTable).padRight(10f).width(cardWidth).height(cardHeight);
+//        }
+//        rowTable.add(drawButton).padLeft(20f).width(120f).height(cardHeight).right();
 
-        cardStage.addActor(parentTable);
+//        // Parent table for positioning
+//        Table parentTable = new Table();
+//        parentTable.setFillParent(true);
+//        parentTable.bottom();
+//        parentTable.add(rowTable).expandX().padBottom(worldHeight * 0.25f - 100f);
+//
+//        cardStage.addActor(parentTable);
 
         // Ensure cards are visible by default
         showCards();
@@ -159,70 +164,114 @@ public class CardStageUI {
         return cardNames;
     }
 
-    private void setupCardListeners(String[] cardNames, int[] cardCosts) {
-        for (int i = 0; i < cardHandTable.cardImageButtons.length; i++) {
-            final int cardIndex = i;
-            final ImageButton cardButton = cardHandTable.cardImageButtons[i];
-            final String cardName = cardNames[i];
-            cardButton.clearListeners();
-            cardButton.addListener(new InputListener() {
+    private void setupCardListeners() {
+
+        for (ImageButton card : getCardHandTable().handCards) {
+            card.clearListeners();
+            card.addListener(new InputListener(){
                 @Override
                 public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
-                    cardButton.setScale(1.5f);
-                    cardButton.addListener(new ClickListener() {
-                        @Override
-                        public void clicked(InputEvent event, float x, float y) {
-                            SampleCardHandler card = cardParser.findCardByName(cardName);
-                            int cost = (card != null) ? card.cost : 0;
-                            if (gameScreen.getEnergy() < cost) {
-                                Dialog dialog = new Dialog("No Energy", skin) {
-                                    @Override
-                                    protected void result(Object object) {
-                                        this.hide();
-                                    }
-                                };
-                                dialog.text("No energy! Please recharge!");
-                                dialog.button("OK");
-                                dialog.show(cardStage);
-                                return;
-                            }
-                            // Deduct energy
-                            gameScreen.addEnergy(-cost);
-                            // Call the effect resolver before discarding
-                            resolveCardEffect(cardName);
-                            // Discard the card
-                            discardedCards[cardIndex] = true;
-                            cardButton.setColor(0.5f, 0.5f, 0.5f, 0.5f); // Gray out the card
-                            cardsInHand--;
-                            cardButton.clearListeners();
-                            // Check if all cards are used
-                            showDrawButton();
-                        }
-                    });
+                    card.scaleBy(1.5f);
                 }
+
                 @Override
                 public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-                    cardButton.setScale(1f);
+                    card.setScale(1.0f);
+                }
+            });
+            card.addListener(new ClickListener(){
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    SampleCardHandler cardInfo = cardParser.findCardByName(card.getName());
+                    int cost = (cardInfo != null) ? cardInfo.cost : 0;
+                    if (gameScreen.getEnergy() <= cost) {
+                        Dialog dialog = new Dialog("No Energy", skin) {
+                            @Override
+                            protected void result(Object object) {
+                                this.hide();
+                            }
+                        };
+                        dialog.text("No energy! Please recharge!");
+                        dialog.button("OK");
+                        dialog.show(cardStage);
+                        return;
+                    }
+                    // Deduct energy
+                    gameScreen.addEnergy(-cost);
+                    // Call the effect resolver before discarding
+                    resolveCardEffect(card.getName());
+
+
+                    cardHandTable.removeCardFromHand(card);
+
                 }
             });
 
+        }
 
+//        for (int i = 0; i < cardHandTable.cardImageButtons.length; i++) {
+//            final int cardIndex = i;
+//            final ImageButton cardButton = cardHandTable.cardImageButtons[i];
+//            final String cardName = cardNames[i];
+//            cardButton.clearListeners();
 //            cardButton.addListener(new InputListener() {
 //                @Override
-//                public boolean mouseMoved(InputEvent event, float x, float y) {
-//                    SampleCardHandler card = cardParser.findCardByName(cardName);
-//                    if (card != null) {
-//                        // Show tooltip or description - you can implement this later
-//                        Gdx.app.log("CardHover", card.description != null ? card.description : "No description");
-//                    }
-//                    return true;
+//                public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+//                    cardButton.setScale(1.5f);
+//                    cardButton.addListener(new ClickListener() {
+//                        @Override
+//                        public void clicked(InputEvent event, float x, float y) {
+//                            SampleCardHandler card = cardParser.findCardByName(cardName);
+//                            int cost = (card != null) ? card.cost : 0;
+//                            if (gameScreen.getEnergy() < cost) {
+//                                Dialog dialog = new Dialog("No Energy", skin) {
+//                                    @Override
+//                                    protected void result(Object object) {
+//                                        this.hide();
+//                                    }
+//                                };
+//                                dialog.text("No energy! Please recharge!");
+//                                dialog.button("OK");
+//                                dialog.show(cardStage);
+//                                return;
+//                            }
+//                            // Deduct energy
+//                            gameScreen.addEnergy(-cost);
+//                            // Call the effect resolver before discarding
+//                            resolveCardEffect(cardName);
+//                            // Discard the card
+//                            discardedCards[cardIndex] = true;
+//                            cardButton.setColor(0.5f, 0.5f, 0.5f, 0.5f); // Gray out the card
+//                            cardsInHand--;
+//                            cardButton.clearListeners();
+//                            // Check if all cards are used
+//                            showDrawButton();
+//                        }
+//                    });
 //                }
 //                @Override
 //                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
-//                    // Hide tooltip - you can implement this later
+//                    cardButton.setScale(1f);
 //                }
 //            });
-        }
+//
+//
+////            cardButton.addListener(new InputListener() {
+////                @Override
+////                public boolean mouseMoved(InputEvent event, float x, float y) {
+////                    SampleCardHandler card = cardParser.findCardByName(cardName);
+////                    if (card != null) {
+////                        // Show tooltip or description - you can implement this later
+////                        Gdx.app.log("CardHover", card.description != null ? card.description : "No description");
+////                    }
+////                    return true;
+////                }
+////                @Override
+////                public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+////                    // Hide tooltip - you can implement this later
+////                }
+////            });
+//        }
     }
 
     private void createDrawButton() {
@@ -286,7 +335,7 @@ public class CardStageUI {
             com.badlogic.gdx.scenes.scene2d.actions.Actions.delay(2.0f), // 2 second delay
             com.badlogic.gdx.scenes.scene2d.actions.Actions.run(() -> {
                 showCards();
-                refreshCardHand(); // Refresh the card hand when showing
+//                refreshCardHand(); // Refresh the card hand when showing
             })
         ));
     }
@@ -314,24 +363,24 @@ public class CardStageUI {
         return cardHandTable;
     }
 
-    public void refreshCardHand() {
-        for (int i = 0; i < discardedCards.length; i++) {
-            discardedCards[i] = false;
-        }
-        cardsInHand = 5;
-        if (availableCardNames.size == 0) {
-            initializeDrawPoolFromSave();
-        }
-        String[] newCardNames = getCardNames();
-        int[] newCardCosts = getCardCosts(newCardNames);
-        for (int i = 0; i < cardHandTable.cardImageButtons.length && i < newCardNames.length; i++) {
-            // Reset card button color
-            cardHandTable.cardImageButtons[i].setColor(1f, 1f, 1f, 1f);
-            // Update cost label
-            //cardHandTable.cardCostLabels[i].setText("Cost: " + newCardCosts[i]);
-        }
-        setupCardListeners(newCardNames, newCardCosts);
-    }
+//    public void refreshCardHand() {
+//        for (int i = 0; i < discardedCards.length; i++) {
+//            discardedCards[i] = false;
+//        }
+//        cardsInHand = 5;
+//        if (availableCardNames.size == 0) {
+//            initializeDrawPoolFromSave();
+//        }
+//        String[] newCardNames = getCardNames();
+//        int[] newCardCosts = getCardCosts(newCardNames);
+//        for (int i = 0; i < cardHandTable.cardImageButtons.length && i < newCardNames.length; i++) {
+//            // Reset card button color
+//            cardHandTable.cardImageButtons[i].setColor(1f, 1f, 1f, 1f);
+//            // Update cost label
+//            //cardHandTable.cardCostLabels[i].setText("Cost: " + newCardCosts[i]);
+//        }
+//        setupCardListeners();
+//    }
 
     private void resolveCardEffect(String cardName) {
         SampleCardHandler card = cardParser.findCardByName(cardName);

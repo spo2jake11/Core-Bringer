@@ -85,8 +85,8 @@ public class GameScreen implements Screen{
         int hp = 20; // Default fallback values
         int energyVal = 0;
         String[] cards = new String[]{
-            "basic_variable_strash_1", "basic_variable_strash_1", "basic_variable_strash_1",
-            "basic_function_strash_1", "basic_function_strash_1", "shield_final_shield_1",
+            "basic_variable_slash_1", "basic_variable_slash_1", "basic_variable_slash_1",
+            "basic_variable_slash_1", "basic_variable_slash_1", "shield_final_shield_1",
             "shield_final_shield_1", "shield_final_shield_1", "shield_final_shield_1",
             "shield_final_shield_1", "heal_ultimate_heal_1", "heal_ultimate_heal_1",
             "heal_ultimate_heal_1", "poison_looping_bite_1", "poison_looping_bite_1"
@@ -671,9 +671,9 @@ public class GameScreen implements Screen{
             Gdx.app.error("GameScreen", "Failed to reroll enemy from JSON: " + e.getMessage());
         }
         // Reroll cards
-        if (cardStageUI != null) {
-            cardStageUI.refreshCardHand();
-        }
+//        if (cardStageUI != null) {
+//            cardStageUI.refreshCardHand();
+//        }
         // Reset turn system to player's turn and clear pending state
         if (battleManager != null) {
             battleManager.resetTurns();
