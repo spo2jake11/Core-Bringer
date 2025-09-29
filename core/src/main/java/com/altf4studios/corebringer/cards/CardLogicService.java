@@ -29,10 +29,17 @@ public class CardLogicService {
                 int damage = card.baseEffect;
                 if (damage > 0 && enemy != null && enemy.isAlive()) enemy.takeDamage(damage);
             }
-        } else if ("BUFF".equalsIgnoreCase(card.type)) {
-            Gdx.app.log("CardEffect", "Buff applied: " + card.name);
         } else if ("DEBUFF".equalsIgnoreCase(card.type)) {
             Gdx.app.log("CardEffect", "Debuff applied: " + card.name);
+        } else if ("BUFF".equalsIgnoreCase(card.type)) {
+            // If a BUFF card is actually a heal card, log it as heal instead of generic buff
+            if (card.id != null && card.id.toLowerCase().contains("heal")) {
+                int healLogAmount = parseNumberBeforeKeyword(card.id, "heal");
+                if (healLogAmount <= 0) healLogAmount = Math.max(0, card.baseEffect);
+                Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Heal: " + healLogAmount + " HP");
+            } else {
+                Gdx.app.log("CardEffect", "Buff applied: " + card.name);
+            }
         }
 
 
@@ -40,16 +47,21 @@ public class CardLogicService {
         if (card.description != null && card.description.toLowerCase().contains("heal")) {
             int healAmount = parseNumberBeforeKeyword(card.description, "heal");
             if (healAmount <= 0) healAmount = Math.max(0, card.baseEffect);
-            if (player != null && player.isAlive() && healAmount > 0) player.heal(healAmount);
+            if (player != null && player.isAlive() && healAmount > 0) {
+                // Instant heal on use
+                player.heal(healAmount);
+                Gdx.app.log("CardEffect", "Healed " + healAmount + " HP using '" + card.name + "'");
+            }
         }
 
 
-        // Stun
+        /* // Stun (commented out per request)
         if (card.description != null && card.description.toLowerCase().contains("stun")) {
             int stunDuration = parseNumberBeforeKeyword(card.description, "stun");
             if (stunDuration <= 0) stunDuration = Math.max(0, card.baseEffect);
             if (enemy != null && enemy.isAlive() && stunDuration > 0) enemy.addStatus("Stun", stunDuration);
         }
+        */
     }
 
     // Extract the integer immediately before keyword

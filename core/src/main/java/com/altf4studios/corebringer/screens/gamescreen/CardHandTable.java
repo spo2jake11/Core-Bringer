@@ -8,6 +8,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -79,30 +80,42 @@ public class CardHandTable {
 
             ImageButton cardButton = new ImageButton(cardStyle);
             cardButton.setSize(200, 250);
-            cardButton.setName(nameToId.get(cardNames[i]));
+            cardButton.setName(cardNames[i]);
             handCards.add(cardButton);
             cardGroup.addActor(cardButton);
 
-//            cardImageButtons[i] = new ImageButton(cardStyle);
-//            cardImageButtons[i].setSize(100, 200); // Set size as requested
-//
-//            cardTables[i].add(cardImageButtons[i]).size(200, 250).row();
-//            //cardTables[i].add(cardCostLabels[i]).padTop(10f);
-//            cardTable.add(cardTables[i]).height(cardHeight).width(cardWidth);
         }
         cardTable.padTop(20);
         updateHandLayout();
     }
 
     public void updateHandLayout(){
-        float startX = 200; // Starting X position
-        float y = 50; // Fixed Y position
-        float spacing = 220; // Space between cards
+        float worldWidth;
+        if (cardGroup != null && cardGroup.getStage() != null && cardGroup.getStage().getViewport() != null) {
+            worldWidth = cardGroup.getStage().getViewport().getWorldWidth();
+        } else {
+            worldWidth = Gdx.graphics.getWidth();
+        }
+        float spacing = 20f; // horizontal gap between cards
+        float y = 50; // Fixed Y position from bottom
 
+        // Compute total width of the hand: sum of card widths + gaps
+        float totalWidth = 0f;
+        for (int i = 0; i < handCards.size(); i++) {
+            totalWidth += handCards.get(i).getWidth();
+            if (i < handCards.size() - 1) totalWidth += spacing;
+        }
+
+        // Left-most X such that the whole hand is horizontally centered
+        float startX = (worldWidth - totalWidth) * 0.5f;
+
+        // Place each card sequentially from startX
+        float cursorX = startX;
         for (int i = 0; i < handCards.size(); i++) {
             ImageButton card = handCards.get(i);
-            float targetX = startX + i * spacing;
-            card.setPosition(targetX, y);
+            card.setPosition(cursorX, y);
+            cursorX += card.getWidth();
+            if (i < handCards.size() - 1) cursorX += spacing;
         }
     }
 
@@ -127,6 +140,14 @@ public class CardHandTable {
         }
         // Final fallback
         return new TextureRegionDrawable(cardAtlas.findRegion("bck_card"));
+    }
+
+    public void flushHand(Array<String> discardPile){
+        for (ImageButton card : handCards) {
+            discardPile.add(card.getName());
+        }
+        handCards.clear();
+        cardGroup.clear();
     }
 
     public void dispose() {
