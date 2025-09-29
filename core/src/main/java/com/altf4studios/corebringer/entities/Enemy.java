@@ -65,6 +65,13 @@ public class Enemy extends Entity {
         }
     }
 
+    // Simple heal method for basic turn-based combat
+    public void heal(int amount) {
+        if (!this.isAlive()) return;
+        if (amount <= 0) return;
+        this.setHp(this.getHp() + amount);
+    }
+
     @Override
     public void target(Player player) {
         // Enemy targets a player (e.g., attack or use skill)

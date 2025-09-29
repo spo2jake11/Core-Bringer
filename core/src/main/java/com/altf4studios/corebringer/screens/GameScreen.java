@@ -25,6 +25,8 @@ import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.altf4studios.corebringer.utils.SaveManager;
+import com.badlogic.gdx.scenes.scene2d.ui.Stack;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
 
 public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
@@ -47,12 +49,16 @@ public class GameScreen implements Screen{
     // --- UI Components ---
     private BattleStageUI battleStageUI;
     private CardStageUI cardStageUI;
+    // Top submenu HP label to sync with character image HP
+    private Label topHpNumLabel;
     // --- End UI Components ---
 
     // --- Energy System ---
     private int energy = 0;
     private final int MAX_ENERGY = 3;
     private Label energyLabel;
+    private Stack energyWidget; // label + background
+    private Texture energyBgTexture;
     private Window optionsWindow;
     // Persisted deck ids for this run
     private String[] savedDeckIds;
@@ -125,8 +131,12 @@ public class GameScreen implements Screen{
         // Expose cards to CardStageUI via getter
 
         // --- Battle/Turn Management ---
-        // Initialize player and enemy (example values, adjust as needed)
-        player = new Player("Player", hp, 10, 5, 3); // hp loaded from save
+        // Initialize player and enemy
+        // Important: do NOT set player's maxHealth to the saved current HP.
+        // Create with a reasonable max, then set current HP from save so healing can increase HP.
+        int playerMaxHp = Math.max(hp, 20); // ensure max >= current; default to 20 min
+        player = new Player("Player", playerMaxHp, 10, 5, 3);
+        player.setHp(hp); // set current HP to saved value
         enemy = new Enemy("enemy1", enemyName, enemyHp, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
         // Temporary TurnManager for early consumers; BattleManager will hold the canonical one
         turnManager = new TurnManager(player, enemy);
@@ -153,11 +163,27 @@ public class GameScreen implements Screen{
 
         // Set energy from save
         setEnergy(energyVal);
-        // Add energy label to battleStage
-        energyLabel = new Label("Energy: " + energy + "/10", corebringer.testskin);
-        energyLabel.setAlignment(Align.topLeft);
-        energyLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
-        battleStage.addActor(energyLabel);
+        // Create energy label with background icon (text like 0/3)
+        energyLabel = new Label(energy + "/" + MAX_ENERGY, corebringer.testskin);
+        energyLabel.setAlignment(Align.center);
+        // Background image from assets/icons/energy.png
+        try {
+            energyBgTexture = new Texture(Gdx.files.internal("assets/icons/energy.png"));
+            Image bg = new Image(energyBgTexture);
+            bg.setSize(100, 100);
+            // Build stacked widget: background under, text over
+            energyWidget = new Stack();
+            energyWidget.add(bg);
+            energyWidget.add(energyLabel);
+            // Reasonable size for the icon + text
+            energyWidget.setSize(bg.getWidth(), bg.getHeight());
+            battleStage.addActor(energyWidget);
+        } catch (Exception e) {
+            // Fallback: add label alone if texture missing
+            energyWidget = new Stack();
+            energyWidget.add(energyLabel);
+            battleStage.addActor(energyWidget);
+        }
 
         // Test output to verify new UI classes are working
         Gdx.app.log("GameScreen", "Successfully initialized all UI components:");
@@ -208,7 +234,7 @@ public class GameScreen implements Screen{
         // Table handler for the left side
         Table tblLeftPane = new Table();
         Label lblCharName = new Label("Player", corebringer.testskin);
-        Label lblHpNum = new Label("HP: " + player.getHp() + "/" + player.getMaxHealth(), corebringer.testskin);
+        topHpNumLabel = new Label("HP: " + player.getHp() + "/" + player.getMaxHealth(), corebringer.testskin);
         Label lblGold = new Label("Gold: 0", corebringer.testskin);
 
         // Table handler for the right side
@@ -223,7 +249,7 @@ public class GameScreen implements Screen{
         // Left Pane placement
         tblLeftPane.defaults().padLeft(10).padRight(10).uniform();
         tblLeftPane.add(lblCharName);
-        tblLeftPane.add(lblHpNum);
+        tblLeftPane.add(topHpNumLabel);
         tblLeftPane.add(lblGold);
 
         // Right Pane placement
@@ -311,6 +337,13 @@ public class GameScreen implements Screen{
             }
         });
         battleStage.addActor(btnRecharge);
+
+        // Reposition energy widget to be at least 200 units above the Recharge button
+        if (energyWidget != null) {
+            float newX = btnRecharge.getX() + 50;
+            float newY = btnRecharge.getY() + btnRecharge.getHeight() + 100f;
+            energyWidget.setPosition(newX, newY);
+        }
     }
 
     @Override
@@ -338,6 +371,10 @@ public class GameScreen implements Screen{
 //        battleStageUI.updateEnemyHpStatusColor(enemy.hasPoison(), enemy.hasStatus("Bleed"), enemy.hasStatus("Stun"));
 
         // Turn indicator is updated by BattleManager
+        // Sync top submenu HP label with current player HP each frame
+        if (topHpNumLabel != null) {
+            topHpNumLabel.setText("HP: " + player.getHp() + "/" + player.getMaxHealth());
+        }
 
         // --- Death Screen Trigger ---
         if (!deathScreenShown && player.getHp() <= 0) {
@@ -447,6 +484,11 @@ public class GameScreen implements Screen{
         battleStage.dispose();
         // Removed: editorStage.dispose();
         cardStage.dispose();
+        // Dispose energy background texture if created
+        if (energyBgTexture != null) {
+            energyBgTexture.dispose();
+            energyBgTexture = null;
+        }
         // Clean up victory screen
         if (victoryScreenWindow != null) {
             victoryScreenWindow.remove();
@@ -531,7 +573,7 @@ public class GameScreen implements Screen{
     }
     private void updateEnergyLabel() {
         if (energyLabel != null) {
-            energyLabel.setText("Energy: " + energy + "/" + MAX_ENERGY);
+            energyLabel.setText(energy + "/" + MAX_ENERGY);
         }
     }
 
