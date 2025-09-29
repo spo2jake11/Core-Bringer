@@ -80,12 +80,13 @@ public class StatusManager {
         if (statusMap == null) return;
 
         List<String> expiredStatuses = new ArrayList<>();
-        int totalDotDamage = 0; // combined Poison + Bleed damage
+        /* int totalDotDamage = 0; // combined Poison + Bleed damage (commented out per request) */
 
         for (Map.Entry<String, StatusEffect> entry : statusMap.entrySet()) {
             String statusName = entry.getKey();
             StatusEffect effect = entry.getValue();
 
+            /*
             switch (statusName) {
                 case "Poison":
                     // Deal damage equal to current power, then power-- and duration--
@@ -107,16 +108,20 @@ public class StatusManager {
                     effect.onTurnStart(entity);
                     break;
             }
+            */
+            // Default behavior for all statuses while Poison/Bleed are disabled
+            effect.onTurnStart(entity);
 
             if (effect.isExpired()) {
                 expiredStatuses.add(statusName);
             }
         }
 
-        // Apply combined DOT in a single hit so it's simultaneous
+        /* // Apply combined DOT in a single hit so it's simultaneous (commented out per request)
         if (totalDotDamage > 0 && entity.isAlive()) {
             entity.takeDamage(totalDotDamage);
         }
+        */
 
         // Remove expired statuses
         for (String statusName : expiredStatuses) {

@@ -14,12 +14,12 @@ public class TurnManager {
     private Player player;
     private Enemy enemy;
     private boolean turnEnded = false;
-    
+
     // Turn delay system
     private float turnDelay = 1.0f; // 1 second delay between turns
     private float delayTimer = 0.0f;
     private boolean isDelaying = false;
-    
+
     // Game over logging control
     private boolean gameOverLogged = false;
 
@@ -83,18 +83,21 @@ public class TurnManager {
                 endEnemyTurn();
                 return;
             }
-            // Randomly decide to defend instead of attacking
-            double defendChance = 0.35; // 35% chance to defend
-            if (Math.random() < defendChance) {
-                Gdx.app.log("TurnManager", "Enemy chooses to defend this turn");
+            // Randomize action: 40% attack, 35% defend, 25% heal
+            double roll = Math.random();
+            if (roll < 0.60) {
+                Gdx.app.log("TurnManager", "Enemy attacks (40%)");
+                enemy.attack(player);
+                endEnemyTurn();
+            } else if (roll < 0.6 + 0.25) { // 0.75
+                Gdx.app.log("TurnManager", "Enemy defends (35%)");
                 enemy.defend();
-                // End enemy turn after defending
                 endEnemyTurn();
             } else {
-                Gdx.app.log("TurnManager", "Executing enemy turn - enemy attacks player");
-                // Simple enemy attack using the enemy's attack method
-                enemy.attack(player);
-                // End enemy turn after attacking
+                // Heal branch (25%)
+                int healAmount = Math.max(3, enemy.getMaxHealth() / 10); // at least 3, ~10% max HP
+                Gdx.app.log("TurnManager", "Enemy heals for " + healAmount + " HP (25%)");
+                enemy.heal(healAmount);
                 endEnemyTurn();
             }
         }
@@ -109,17 +112,17 @@ public class TurnManager {
         // Reset player and enemy HP to full
         player.setHp(player.getMaxHealth());
         enemy.setHp(enemy.getMaxHealth());
-        
+
         // Reset turn system
         reset();
-        
+
         // Reset delay system
         isDelaying = false;
         delayTimer = 0.0f;
-        
+
         // Reset game over logging
         gameOverLogged = false;
-        
+
         Gdx.app.log("TurnManager", "Game reset - Player HP: " + player.getHp() + ", Enemy HP: " + enemy.getHp());
     }
 
