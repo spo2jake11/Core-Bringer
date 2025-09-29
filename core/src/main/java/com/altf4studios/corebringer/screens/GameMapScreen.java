@@ -40,31 +40,41 @@ public class GameMapScreen implements Screen{
     private Table rank8table;
     private Table rank9table;
     private Table rank10table;
-    private TextButton staticbattlenodeA;
-    private TextButton staticbattlenodeB;
-    private TextButton staticbattlenodeC;
-    private TextButton staticbattlenodeD;
-    private TextButton randombattlenode;
-    private TextButton restnode;
-    private TextButton merchantnode;
-    private TextButton cardsmithnode;
-    private TextButton searchnode;
-    private TextButton bossnodeA;
-    private TextButton bossnodeB;
-    private TextButton bossnodeC;
-    private TextButton bossnodeD;
+    private Image mapbackgroundimg;
+    private ImageButton staticbattlenodeA;
+    private ImageButton staticbattlenodeB;
+    private ImageButton staticbattlenodeC;
+    private ImageButton staticbattlenodeD;
+    private ImageButton randombattlenode;
+    private ImageButton restnode;
+    private ImageButton merchantnode;
+    private ImageButton cardsmithnode;
+    private ImageButton searchnode;
+    private ImageButton bossnodeA;
     private TextButton returnbutton;
     private Label gamemapmessages;
+    private Label gamemapmessages2;
+    private Label gamemapmessages3;
+    private Image gamemapmessagesdisplay;
     private Random counter;
     private int totalnodescounter;
+    private TextureAtlas gamemapatlas;
+    private TextureAtlas gamemapbackgroundatlas;
 
     public GameMapScreen(Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
         this.corebringer = corebringer; /// The Master Key that holds all screens together
         coregamemapstage = new Stage(new FitViewport(1280, 720));
         coregamemaptable = new Table();
+        gamemapatlas = new TextureAtlas(Utils.getInternalPath("assets/icons/nodes/200node_atlas.atlas")); ///Change to 200 or 300node_atlas.atlas if needed
+        gamemapbackgroundatlas = new TextureAtlas(Utils.getInternalPath("assets/icons/nodes/100node_atlas.atlas"));
         coregamemaptable.setFillParent(true);
         coregamemapstage.addActor(coregamemaptable);
+
+        ///Core Table Parameters
+        mapbackgroundimg = new Image(new Texture("backgrounds/map_table.png"));
+        mapbackgroundimg.setFillParent(true);
+        coregamemaptable.addActor(mapbackgroundimg);
 
         ///Code for the initialization of the Game Map Node Table
         gamemapnodetable = new Table();
@@ -72,10 +82,14 @@ public class GameMapScreen implements Screen{
         ///Code for the Nodes (Rank represents Columns, meaning Rank 1 is First Node Column of 4)
         ///First row (RANK 1)
         rank1table = new Table();
-        staticbattlenodeA = new TextButton("EB", corebringer.testskin);
-        staticbattlenodeB = new TextButton("EB", corebringer.testskin);
-        staticbattlenodeC = new TextButton("EB", corebringer.testskin);
-        staticbattlenodeD = new TextButton("EB", corebringer.testskin);
+        staticbattlenodeA = createAtlasButton("combat_node");
+        staticbattlenodeB = createAtlasButton("combat_node");
+        staticbattlenodeC = createAtlasButton("combat_node");
+        staticbattlenodeD = createAtlasButton("combat_node");
+        staticbattlenodeA.getImage().setScaling(Scaling.stretch);
+        staticbattlenodeB.getImage().setScaling(Scaling.stretch);
+        staticbattlenodeC.getImage().setScaling(Scaling.stretch);
+        staticbattlenodeD.getImage().setScaling(Scaling.stretch);
 
         ///Rank 2 to 9 Tables Initialized here
         rank2table = new Table();
@@ -98,20 +112,25 @@ public class GameMapScreen implements Screen{
 
         ///Tenth row (RANK 10)
         rank10table = new Table();
-        bossnodeA = new TextButton("BF", corebringer.testskin);
-        bossnodeB = new TextButton("BF", corebringer.testskin);
+        bossnodeA = createAtlasButton("boss_node");
+        bossnodeA.getImage().setScaling(Scaling.fit);
+
+        /*bossnodeB = new TextButton("BF", corebringer.testskin);
         bossnodeC = new TextButton("BF", corebringer.testskin);
-        bossnodeD = new TextButton("BF", corebringer.testskin);
+        bossnodeD = new TextButton("BF", corebringer.testskin);*/
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank2table.getChildren().size == 0) {
             ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = new TextButton("B", corebringer.testskin);
-            restnode = new TextButton("R", corebringer.testskin);
-            merchantnode = new TextButton("M", corebringer.testskin);
-            cardsmithnode = new TextButton("CS", corebringer.testskin);
-            searchnode = new TextButton("S", corebringer.testskin);
-            
+            randombattlenode = createAtlasButton("combat_node");
+            restnode = createAtlasButton("rest_node");
+            merchantnode = createAtlasButton("shop_node");
+            searchnode = createAtlasButton("search_node");
+            randombattlenode.getImage().setScaling(Scaling.stretch);
+            restnode.getImage().setScaling(Scaling.stretch);
+            merchantnode.getImage().setScaling(Scaling.stretch);
+            searchnode.getImage().setScaling(Scaling.stretch);
+
             // Add click listener for search node to show puzzle screen
             searchnode.addListener(new ClickListener() {
                 @Override
@@ -162,12 +181,15 @@ public class GameMapScreen implements Screen{
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank3table.getChildren().size == 0) {
             ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = new TextButton("B", corebringer.testskin);
-            restnode = new TextButton("R", corebringer.testskin);
-            merchantnode = new TextButton("M", corebringer.testskin);
-            cardsmithnode = new TextButton("CS", corebringer.testskin);
-            searchnode = new TextButton("S", corebringer.testskin);
-            
+            randombattlenode = createAtlasButton("combat_node");
+            restnode = createAtlasButton("rest_node");
+            merchantnode = createAtlasButton("shop_node");
+            searchnode = createAtlasButton("search_node");
+            randombattlenode.getImage().setScaling(Scaling.stretch);
+            restnode.getImage().setScaling(Scaling.stretch);
+            merchantnode.getImage().setScaling(Scaling.stretch);
+            searchnode.getImage().setScaling(Scaling.stretch);
+
             // Add click listener for search node to show puzzle screen
             searchnode.addListener(new ClickListener() {
                 @Override
@@ -218,12 +240,15 @@ public class GameMapScreen implements Screen{
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank4table.getChildren().size == 0) {
             ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = new TextButton("B", corebringer.testskin);
-            restnode = new TextButton("R", corebringer.testskin);
-            merchantnode = new TextButton("M", corebringer.testskin);
-            cardsmithnode = new TextButton("CS", corebringer.testskin);
-            searchnode = new TextButton("S", corebringer.testskin);
-            
+            randombattlenode = createAtlasButton("combat_node");
+            restnode = createAtlasButton("rest_node");
+            merchantnode = createAtlasButton("shop_node");
+            searchnode = createAtlasButton("search_node");
+            randombattlenode.getImage().setScaling(Scaling.stretch);
+            restnode.getImage().setScaling(Scaling.stretch);
+            merchantnode.getImage().setScaling(Scaling.stretch);
+            searchnode.getImage().setScaling(Scaling.stretch);
+
             // Add click listener for search node to show puzzle screen
             searchnode.addListener(new ClickListener() {
                 @Override
@@ -274,12 +299,15 @@ public class GameMapScreen implements Screen{
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank5table.getChildren().size == 0) {
             ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = new TextButton("B", corebringer.testskin);
-            restnode = new TextButton("R", corebringer.testskin);
-            merchantnode = new TextButton("M", corebringer.testskin);
-            cardsmithnode = new TextButton("CS", corebringer.testskin);
-            searchnode = new TextButton("S", corebringer.testskin);
-            
+            randombattlenode = createAtlasButton("combat_node");
+            restnode = createAtlasButton("rest_node");
+            merchantnode = createAtlasButton("shop_node");
+            searchnode = createAtlasButton("search_node");
+            randombattlenode.getImage().setScaling(Scaling.stretch);
+            restnode.getImage().setScaling(Scaling.stretch);
+            merchantnode.getImage().setScaling(Scaling.stretch);
+            searchnode.getImage().setScaling(Scaling.stretch);
+
             // Add click listener for search node to show puzzle screen
             searchnode.addListener(new ClickListener() {
                 @Override
@@ -330,12 +358,15 @@ public class GameMapScreen implements Screen{
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank6table.getChildren().size == 0) {
             ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = new TextButton("B", corebringer.testskin);
-            restnode = new TextButton("R", corebringer.testskin);
-            merchantnode = new TextButton("M", corebringer.testskin);
-            cardsmithnode = new TextButton("CS", corebringer.testskin);
-            searchnode = new TextButton("S", corebringer.testskin);
-            
+            randombattlenode = createAtlasButton("combat_node");
+            restnode = createAtlasButton("rest_node");
+            merchantnode = createAtlasButton("shop_node");
+            searchnode = createAtlasButton("search_node");
+            randombattlenode.getImage().setScaling(Scaling.stretch);
+            restnode.getImage().setScaling(Scaling.stretch);
+            merchantnode.getImage().setScaling(Scaling.stretch);
+            searchnode.getImage().setScaling(Scaling.stretch);
+
             // Add click listener for search node to show puzzle screen
             searchnode.addListener(new ClickListener() {
                 @Override
@@ -386,12 +417,15 @@ public class GameMapScreen implements Screen{
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank7table.getChildren().size == 0) {
             ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = new TextButton("B", corebringer.testskin);
-            restnode = new TextButton("R", corebringer.testskin);
-            merchantnode = new TextButton("M", corebringer.testskin);
-            cardsmithnode = new TextButton("CS", corebringer.testskin);
-            searchnode = new TextButton("S", corebringer.testskin);
-            
+            randombattlenode = createAtlasButton("combat_node");
+            restnode = createAtlasButton("rest_node");
+            merchantnode = createAtlasButton("shop_node");
+            searchnode = createAtlasButton("search_node");
+            randombattlenode.getImage().setScaling(Scaling.stretch);
+            restnode.getImage().setScaling(Scaling.stretch);
+            merchantnode.getImage().setScaling(Scaling.stretch);
+            searchnode.getImage().setScaling(Scaling.stretch);
+
             // Add click listener for search node to show puzzle screen
             searchnode.addListener(new ClickListener() {
                 @Override
@@ -442,12 +476,15 @@ public class GameMapScreen implements Screen{
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank8table.getChildren().size == 0) {
             ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = new TextButton("B", corebringer.testskin);
-            restnode = new TextButton("R", corebringer.testskin);
-            merchantnode = new TextButton("M", corebringer.testskin);
-            cardsmithnode = new TextButton("CS", corebringer.testskin);
-            searchnode = new TextButton("S", corebringer.testskin);
-            
+            randombattlenode = createAtlasButton("combat_node");
+            restnode = createAtlasButton("rest_node");
+            merchantnode = createAtlasButton("shop_node");
+            searchnode = createAtlasButton("search_node");
+            randombattlenode.getImage().setScaling(Scaling.stretch);
+            restnode.getImage().setScaling(Scaling.stretch);
+            merchantnode.getImage().setScaling(Scaling.stretch);
+            searchnode.getImage().setScaling(Scaling.stretch);
+
             // Add click listener for search node to show puzzle screen
             searchnode.addListener(new ClickListener() {
                 @Override
@@ -498,12 +535,15 @@ public class GameMapScreen implements Screen{
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank9table.getChildren().size == 0) {
             ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = new TextButton("B", corebringer.testskin);
-            restnode = new TextButton("R", corebringer.testskin);
-            merchantnode = new TextButton("M", corebringer.testskin);
-            cardsmithnode = new TextButton("CS", corebringer.testskin);
-            searchnode = new TextButton("S", corebringer.testskin);
-            
+            randombattlenode = createAtlasButton("combat_node");
+            restnode = createAtlasButton("rest_node");
+            merchantnode = createAtlasButton("shop_node");
+            searchnode = createAtlasButton("search_node");
+            randombattlenode.getImage().setScaling(Scaling.stretch);
+            restnode.getImage().setScaling(Scaling.stretch);
+            merchantnode.getImage().setScaling(Scaling.stretch);
+            searchnode.getImage().setScaling(Scaling.stretch);
+
             // Add click listener for search node to show puzzle screen
             searchnode.addListener(new ClickListener() {
                 @Override
@@ -614,17 +654,20 @@ public class GameMapScreen implements Screen{
 
         ///For Rank 10
         rank10table.add(bossnodeA).padBottom(20f).row();
-        rank10table.add(bossnodeB).padBottom(20f).row();
+
+        /*rank10table.add(bossnodeB).padBottom(20f).row();
         rank10table.add(bossnodeC).padBottom(20f).row();
-        rank10table.add(bossnodeD).padBottom(20f).row();
+        rank10table.add(bossnodeD).padBottom(20f).row();*/
 
 
         ///This is where the messages and tips in the game will go
         gamemapmessagetable = new Table();
-        gamemapmessages = new Label("Did you know?: Dying in this game is permanent. :D" +
-            "\nHere's what the Nodes means: EB = Entry Battle" +
-            "\nB = Battle, R= Rest, M = Merchant, CS = Card Smith" +
-            "\nS = Search, BF = Boss Fight", corebringer.testskin);
+
+        gamemapmessages = new Label("Did you know?: Dying in this game is permanent. :D", corebringer.testskin);
+        gamemapmessages2 = new Label("Here's what the nodes mean: ", corebringer.testskin);
+        gamemapmessagesdisplay = new Image(new Texture("assets/icons/nodes/100node_atlas.png"));
+        gamemapmessagesdisplay.setSize(20f, 20f);
+        gamemapmessages3 = new Label("Boss, Battle, Search, Rest, Merchant", corebringer.testskin);
 
         ///This is where the navigation buttons will go (Going back to title to forfeit the game etc.)
         gamemapbuttonstable = new Table();
@@ -646,28 +689,40 @@ public class GameMapScreen implements Screen{
         });
 
         ///Placement of the messages in the Game Map Messages Table
-        gamemapmessagetable.add(gamemapmessages);
+        /*gamemapmessagetable.add(gamemapmessages2).row();
+        gamemapmessagetable.add(gamemapmessagesdisplay).row();
+        gamemapmessagetable.add(gamemapmessages3).row();*/
 
         ///Placement of the buttons in the Game Map Buttons Table
         gamemapbuttonstable.add(returnbutton);
 
         ///Placement of Ranks to the Game Map Node Table (Not the Core Game Map Table, but the separate one)
-        gamemapnodetable.add(rank1table).padLeft(30f);
-        gamemapnodetable.add(rank2table).padLeft(30f);
-        gamemapnodetable.add(rank3table).padLeft(30f);
-        gamemapnodetable.add(rank4table).padLeft(30f);
-        gamemapnodetable.add(rank5table).padLeft(30f);
-        gamemapnodetable.add(rank6table).padLeft(30f);
-        gamemapnodetable.add(rank7table).padLeft(30f);
-        gamemapnodetable.add(rank8table).padLeft(30f);
-        gamemapnodetable.add(rank9table).padLeft(30f);
-        gamemapnodetable.add(rank10table).padLeft(30f);
+        gamemapnodetable.add(rank1table).padLeft(40f);
+        gamemapnodetable.add(rank2table).padLeft(40f);
+        gamemapnodetable.add(rank3table).padLeft(40f);
+        gamemapnodetable.add(rank4table).padLeft(40f);
+        gamemapnodetable.add(rank5table).padLeft(40f);
+        gamemapnodetable.add(rank6table).padLeft(40f);
+        gamemapnodetable.add(rank7table).padLeft(40f);
+        gamemapnodetable.add(rank8table).padLeft(40f);
+        gamemapnodetable.add(rank9table).padLeft(40f);
+        gamemapnodetable.add(rank10table).padLeft(40f);
 
         ///This is where the Game Map Node Table is then added to the Core Game Map Table
-        coregamemaptable.add(gamemapmessagetable).padBottom(60f).row();
-        coregamemaptable.add(gamemapnodetable).padBottom(60f).row();
-        coregamemaptable.add(gamemapbuttonstable).padBottom(60f).row();
+        coregamemaptable.add(gamemapmessagetable).padBottom(50f).row();
+        coregamemaptable.add(gamemapnodetable).padBottom(50f).row();
+        coregamemaptable.add(gamemapbuttonstable).padBottom(50f).row();
 
+    }
+
+    private ImageButton createAtlasButton(String regionName) {
+        TextureRegionDrawable base = new TextureRegionDrawable(gamemapatlas.findRegion(regionName));
+        ImageButton.ImageButtonStyle style = new ImageButton.ImageButtonStyle();
+        style.up = base;
+        style.over = base.tint(new Color(1f, 1f, 1f, 0.9f));
+        style.down = base.tint(new Color(0.85f, 0.85f, 0.85f, 1f));
+        style.checked = base.tint(new Color(0.9f, 0.9f, 0.9f, 1f));
+        return new ImageButton(style);
     }
 
     @Override
