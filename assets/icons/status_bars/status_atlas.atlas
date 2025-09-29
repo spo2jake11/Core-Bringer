@@ -1,0 +1,7 @@
+status_atlas.png
+size:512,1024
+repeat:none
+energy_icon
+bounds:104,322,320,320
+hp_bar
+bounds:2,2,100,640
