@@ -1,0 +1,13 @@
+500node_atlas.png
+size:1024,256
+repeat:none
+boss_node
+bounds:2,2,160,160
+combat_node
+bounds:164,2,160,160
+rest_node
+bounds:488,2,160,160
+search_node
+bounds:326,2,160,160
+shop_node
+bounds:650,2,160,160
