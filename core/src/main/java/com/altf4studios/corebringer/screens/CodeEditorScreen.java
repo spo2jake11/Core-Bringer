@@ -4,6 +4,8 @@ import com.altf4studios.corebringer.Main;
 import com.altf4studios.corebringer.Utils;
 import com.altf4studios.corebringer.compiler.CodePolicyValidator;
 import com.altf4studios.corebringer.compiler.JavaExternalRunner;
+import com.altf4studios.corebringer.quiz.CodeEvaluationService;
+import com.altf4studios.corebringer.quiz.QuestionnaireManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -14,14 +16,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.Array;
-import com.badlogic.gdx.utils.JsonReader;
-import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
-
-import java.util.Random;
-import java.util.regex.Pattern;
 
 public class CodeEditorScreen implements Screen {
     private final Main corebringer;
@@ -39,10 +35,11 @@ public class CodeEditorScreen implements Screen {
     private TextArea codeInputArea;
     private Label outputLabel;
     private Label questionLabel;
+    private Label keyPointsLabel;
+    private boolean showHints = true;
 
-    private Array<QuizQuestion> questions;
-    private QuizQuestion current;
-    private final Random random = new Random();
+    private QuestionnaireManager.Question currentQ;
+    private final CodeEvaluationService evaluator = new CodeEvaluationService();
 
     private int energy;
     private final int MAX_ENERGY = 3;
@@ -78,50 +75,29 @@ public class CodeEditorScreen implements Screen {
     }
 
     private void loadQuestions() {
-        questions = new Array<>();
         try {
-            JsonReader reader = new JsonReader();
-            JsonValue root;
-            if (Gdx.files.internal("variables_quiz.json").exists()) {
-                root = reader.parse(Gdx.files.internal("variables_quiz.json"));
-            } else if (Gdx.files.internal("assets/variables_quiz.json").exists()) {
-                root = reader.parse(Gdx.files.internal("assets/variables_quiz.json"));
-            } else {
-                Gdx.app.error("CodeEditorScreen", "variables_quiz.json not found in assets");
-                return;
-            }
-            for (JsonValue item : root) {
-                QuizQuestion q = new QuizQuestion();
-                q.id = item.getInt("id");
-                q.question = item.getString("question");
-                q.expectedOutputRegex = item.get("validations").getString("expectedOutputRegex");
-                q.codePatterns = new Array<>();
-                for (JsonValue p : item.get("validations").get("codePatterns")) {
-                    q.codePatterns.add(p.asString());
-                }
-                JsonValue points = item.get("points");
-                q.pointClass = points.getInt("class", 0);
-                q.pointMain = points.getInt("mainMethod", 0);
-                q.pointVarDecl = points.getInt("variableDeclaration", 0);
-                q.pointAssign = points.getInt("assignment", 0);
-                q.pointPrint = points.getInt("print", 0);
-                q.pointCorrectOutput = points.getInt("correctOutput", 0);
-                questions.add(q);
+            QuestionnaireManager.get().initDefault();
+            if (!QuestionnaireManager.get().isReady()) {
+                Gdx.app.error("CodeEditorScreen", "questionnaire.json not ready or empty");
             }
         } catch (Exception e) {
-            Gdx.app.error("CodeEditorScreen", "Failed to load questions: " + e.getMessage());
+            Gdx.app.error("CodeEditorScreen", "Failed to initialize questionnaire: " + e.getMessage());
         }
     }
 
     private void pickRandomQuestion() {
-        if (questions == null || questions.size == 0) {
-            current = null;
+        if (!QuestionnaireManager.get().isReady()) {
+            currentQ = null;
             if (questionLabel != null) questionLabel.setText("No questions available.");
+            if (keyPointsLabel != null) keyPointsLabel.setText("");
             return;
         }
-        current = questions.get(random.nextInt(questions.size));
-        if (questionLabel != null) {
-            questionLabel.setText("Q" + current.id + ": " + current.question);
+        currentQ = QuestionnaireManager.get().getRandomUnsolved();
+        if (questionLabel != null && currentQ != null) {
+            questionLabel.setText("Q" + currentQ.id + ": " + currentQ.questions);
+        }
+        if (keyPointsLabel != null && currentQ != null) {
+            keyPointsLabel.setText(showHints ? formatKeyPoints(currentQ.keyPoints) : "");
         }
     }
 
@@ -132,7 +108,16 @@ public class CodeEditorScreen implements Screen {
         questionLabel = new Label("Loading questions...", skin);
         questionLabel.setAlignment(Align.topLeft);
         questionLabel.setWrap(true);
-        ScrollPane questionPane = new ScrollPane(questionLabel, skin);
+        keyPointsLabel = new Label("", skin);
+        keyPointsLabel.setWrap(true);
+        keyPointsLabel.setAlignment(Align.topLeft);
+
+        // Container for question + hints
+        Table qContainer = new Table();
+        qContainer.add(questionLabel).expandX().fillX().padBottom(6).row();
+        qContainer.add(keyPointsLabel).expandX().fillX();
+
+        ScrollPane questionPane = new ScrollPane(qContainer, skin);
         questionPane.setFadeScrollBars(false);
         questionTable.add(questionPane).expand().fill().padLeft(5);
 
@@ -154,6 +139,7 @@ public class CodeEditorScreen implements Screen {
         // Buttons
         TextButton btnRun = new TextButton("Run Code", skin);
         TextButton btnBack = new TextButton("Back to Game", skin);
+        TextButton btnToggleHints = new TextButton("Hide Hints", skin);
         TextButton btnNextQ = new TextButton("Next Question", skin);
         outputLabel = new Label("Ready", skin);
 
@@ -173,6 +159,16 @@ public class CodeEditorScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 pickRandomQuestion();
+            }
+        });
+        btnToggleHints.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                showHints = !showHints;
+                btnToggleHints.setText(showHints ? "Hide Hints" : "Show Hints");
+                if (currentQ != null && keyPointsLabel != null) {
+                    keyPointsLabel.setText(showHints ? formatKeyPoints(currentQ.keyPoints) : "");
+                }
             }
         });
 
@@ -196,6 +192,7 @@ public class CodeEditorScreen implements Screen {
         right.add(btnNextQ).padTop(10).left().row();
         right.add(btnBack).padTop(10).left();
         right.add(outputLabel).padTop(10).left();
+        right.add(btnToggleHints).padTop(10).left().row();
         right.add(btnGainEnergy).padTop(10).left().row();
 
         // Layout root
@@ -228,6 +225,52 @@ public class CodeEditorScreen implements Screen {
         pickRandomQuestion();
     }
 
+    private String formatKeyPoints(com.badlogic.gdx.utils.Array<String> keyPoints) {
+        if (keyPoints == null || keyPoints.size == 0) return "";
+        StringBuilder sb = new StringBuilder();
+        sb.append("Hints:\n");
+        for (String kp : keyPoints) {
+            String h = humanizeKeyPoint(kp);
+            if (!h.isEmpty()) sb.append("• ").append(h).append('\n');
+        }
+        return sb.toString();
+    }
+
+    private String humanizeKeyPoint(String kp) {
+        if (kp == null) return "";
+        String k = kp.trim();
+        if (k.startsWith("needs:")) {
+            String need = k.substring(6);
+            if (need.contains("|")) {
+                return "Use one of: " + need.replace('|', '/');
+            }
+            String[] parts = need.split(":");
+            String type = parts[0];
+            int n = 1;
+            if (parts.length > 1) try { n = Integer.parseInt(parts[1]); } catch (Exception ignored) {}
+            switch (type) {
+                case "print": return "Print something using System.out";
+                case "int": return n == 1 ? "Use at least 1 int variable" : ("Use at least " + n + " int variables");
+                case "string": return n == 1 ? "Use a String" : ("Use at least " + n + " Strings");
+                case "char": return "Use a char";
+                case "double": return "Use a double";
+                case "float": return "Use a float";
+                default: return k;
+            }
+        }
+        if (k.startsWith("op:")) {
+            String op = k.substring(3);
+            switch (op) {
+                case "add": return "Perform addition";
+                case "sub": return "Perform subtraction";
+                case "mul": return "Perform multiplication";
+                case "div": return "Perform division";
+                default: return k;
+            }
+        }
+        return k;
+    }
+
     private void runAndJudge() {
         final String code = codeInputArea.getText();
         outputLabel.setText("Compiling...");
@@ -243,18 +286,30 @@ public class CodeEditorScreen implements Screen {
                 }
 
                 String result = javaRunner.compileAndRun(code);
-                boolean correct = evaluateCorrectness(code, result);
-                String judgement = correct ? "\n\n=== Judgement: ✅ Correct ===" : "\n\n=== Judgement: ❌ Incorrect ===";
-                int score = computeScore(code, result);
-                // --- Add to session points if correct ---
-                if (score > 0) sessionPoints += score;
-                // --- End session points logic ---
-                String scoreLine = "\nPoints: " + score + "/" + (current != null ? current.totalPoints() : 0);
+                // Extract actual program output (optional)
+                String actual = result;
+                int idx = result.indexOf("Program output:\n");
+                if (idx >= 0) {
+                    actual = result.substring(idx + "Program output:\n".length()).trim();
+                }
+
+                QuestionnaireManager.Question q = currentQ;
+                CodeEvaluationService.EvaluationResult ev = evaluator.evaluate(q, code, actual, null);
+
+                if (ev.passed && q != null) {
+                    QuestionnaireManager.get().markSolved(q.id);
+                }
+
+                StringBuilder fb = new StringBuilder();
+                for (String f : ev.feedback) fb.append("- ").append(f).append('\n');
+
+                String judgement = ev.passed ? "\n\n=== Judgement: ✅ Correct ===" : "\n\n=== Judgement: ❌ Incorrect ===";
+                String scoreLine = "\nScore: " + ev.score + "/" + ev.total + "\n\nFeedback:\n" + fb;
                 final String finalText = result + judgement + scoreLine;
 
                 Gdx.app.postRunnable(() -> {
                     showResult("Code Execution Result", finalText);
-                    outputLabel.setText(correct ? "Correct" : "Incorrect");
+                    outputLabel.setText(ev.passed ? "Correct" : "Incorrect");
                 });
             } catch (Exception e) {
                 Gdx.app.postRunnable(() -> {
@@ -265,59 +320,7 @@ public class CodeEditorScreen implements Screen {
         }).start();
     }
 
-    private boolean evaluateCorrectness(String code, String runnerOutput) {
-        if (current == null) return false;
-        // Must compile and run successfully producing output
-        if (runnerOutput == null) return false;
-        if (!runnerOutput.startsWith("Program")) return false;
-        // Extract actual output lines
-        String actual = runnerOutput;
-        int idx = runnerOutput.indexOf("Program output:\n");
-        if (idx >= 0) {
-            actual = runnerOutput.substring(idx + "Program output:\n".length()).trim();
-        }
-        boolean outputOk = Pattern.compile(current.expectedOutputRegex, Pattern.MULTILINE).matcher(actual).find();
-        boolean codeOk = true;
-        for (String pattern : current.codePatterns) {
-            try {
-                if (!Pattern.compile(pattern).matcher(code).find()) {
-                    codeOk = false; break;
-                }
-            } catch (Exception ignored) { codeOk = false; break; }
-        }
-        return outputOk && codeOk;
-    }
-
-    private int computeScore(String code, String runnerOutput) {
-        if (current == null) return 0;
-        int score = 0;
-        if (code.contains("public class ")) score += current.pointClass;
-        if (code.contains("public static void main")) score += current.pointMain;
-        // Heuristic mappings using patterns
-        boolean decl = false, assign = false, prnt = false;
-        for (String pattern : current.codePatterns) {
-            try {
-                if (pattern.contains("=") && Pattern.compile(pattern).matcher(code).find()) {
-                    if (pattern.contains("println")) prnt = true;
-                    else { decl = true; assign = true; }
-                } else if (pattern.toLowerCase().contains("println") && Pattern.compile(pattern).matcher(code).find()) {
-                    prnt = true;
-                }
-            } catch (Exception ignored) {}
-        }
-        if (decl) score += current.pointVarDecl;
-        if (assign) score += current.pointAssign;
-        if (prnt) score += current.pointPrint;
-
-        // Output correctness
-        String actual = runnerOutput;
-        int idx = runnerOutput.indexOf("Program output:\n");
-        if (idx >= 0) actual = runnerOutput.substring(idx + "Program output:\n".length()).trim();
-        if (Pattern.compile(current.expectedOutputRegex, Pattern.MULTILINE).matcher(actual).find()) {
-            score += current.pointCorrectOutput;
-        }
-        return score;
-    }
+    // Old variable_quiz-based evaluation removed; now handled by CodeEvaluationService
 
     private void createOutputWindow() {
         outputArea = new TextArea("", skin);
@@ -430,20 +433,6 @@ public class CodeEditorScreen implements Screen {
         }
     }
 
-    private static class QuizQuestion {
-        int id;
-        String question;
-        Array<String> codePatterns;
-        String expectedOutputRegex;
-        int pointClass;
-        int pointMain;
-        int pointVarDecl;
-        int pointAssign;
-        int pointPrint;
-        int pointCorrectOutput;
-        int totalPoints() {
-            return pointClass + pointMain + pointVarDecl + pointAssign + pointPrint + pointCorrectOutput;
-        }
-    }
+    // Removed legacy QuizQuestion structure in favor of QuestionnaireManager.Question
 }
 

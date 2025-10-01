@@ -1,0 +1,201 @@
+(=Print the results using System.out.println() or System.out.print()=) 
+
+Declare an int variable age = 18 and print it. 
+
+Create a String variable with your name and print it. 
+
+Print: “I am learning Java!” using a variable with a String data type. 
+
+Declare two int variables a = 5, b = 10 and print them. 
+
+Print: “My favorite number is *blank*” using a variable named favNum. 
+
+Print two variables (firstName containing Mike, lastName containing Oxmaul) together as full name. 
+
+Store the year 2004 in a variable named year and print it. 
+
+Declare a variable city and print: I live in Philippines. 
+
+Print: “Java is fun!” using a variable. 
+
+Print: “Hello, my name is Nathaniel, and I am 21 years old.” using variables for name and age. 
+
+Print the same number twice using two different variables. 
+
+Store the value “Deez Nuts” in a variable named favoriteFood and print it. 
+
+Create a variable named letter with a char data type and place the value ‘A’ inside it and print it. 
+
+Store a double variable named price and place 9.99 inside it and print it. 
+
+Print the message: “The price is: 9.99” using a variable. 
+
+Print this sentence using two variables: “Corebringer is a great game, and I will recommend it to my friends.” 
+
+Declare a variable for your school’s name (full name of STI which is Systems Technology Institute) and print it. 
+
+Declare two String variables and print them in the same line. 
+
+Print your age initialized from a variable named age and add it to a message to print: “I am 18 years old and young, not old.” 
+
+Store a float value in a variable and print it. 
+
+Declare a = 5, b = 3. Print their sum. 
+
+Declare a = 29, b = 30. Print their difference. 
+
+Declare a = 98, b = 67. Print their product. 
+
+Declare a = 45, b = 24. Print their quotient. 
+
+Print: 5 + 3 = 8. 
+
+Print: 5 - 3 = 2. 
+
+Print: 5 * 3 = 15. 
+
+Print: 5 / 3 = 1. 
+
+Use the variable x = 12, and the variable y = 4. Print their sum. 
+
+Use the variable x = 23, and the variable y = 76. Print their difference. 
+
+Use the variable x = 120, and the variable y = 10. Print their product. 
+
+Use the variable x = 190, and the variable y = 56. Print their quotient. 
+
+Create three variables a, b and c and print their total sum. 
+
+Create three variables x, y and z and print their average. 
+
+Print the result of (10 + 2) using variables. 
+
+Print the result of (10 - 2) using variables. 
+
+Print the result of (10 * 2) using variables. 
+
+Print the result of (10 / 2) using variables. 
+
+Print the answer of (20 + 5) - 3 using variables (remember the PEMDAS). 
+
+Print the answer of (6 * 2) + 4 using variables (remember the PEMDAS). 
+
+Print the answer of (10 + 20) / 2 using variables (remember the PEMDAS). 
+
+Print the answer of (15 - 5) * 3 using variables (remember the PEMDAS). 
+
+Print the answer of (8 / 2) + 7 using variables (remember the PEMDAS). 
+
+Print the result of 7 * 7 using variables. 
+
+Print the result of 9 + 9 using variables. 
+
+Print the result of 100 – 25 using variables. 
+
+Print the result of 50 / 5 using variables. 
+
+Print the result of 6 + 4 * 2 using variables. 
+
+Print the result of (6 + 4) * 2 using variables. 
+
+Print the result of (20 / 2) + (3 * 4) using variables. 
+
+Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a + b) * c. Then print variable d. 
+
+Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a * b) - c. Then, print variable d. 
+
+Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a + b + c) / 3. Then, print variable d. 
+
+Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a * b * c). Then, print variable d. 
+
+Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a + b) / c. Then, print variable d. 
+
+Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a + b) * (b - c). Then, print variable d. 
+
+Declare x = 120, y = 60. Print (x / y) + (x * y).  
+
+Declare x = 37, y = 62 Print (x + y) * (x - y). 
+
+Declare x = 23, y = 98 Print (x * x) + (y * y). 
+
+Print x = 100 - 20 and divide it against y = 5 + 5. 
+
+Print x = 50 / 5 and add it against y = 20 * 2. 
+
+Print x = 720 + 254 and multiply it against y = 865 + 243. 
+
+Print (10 * (2 + 3)) using variables. 
+
+Print (20 / (4 + 1)) using variables. 
+
+Print (15 + (3 * 2)) - 5 using variables. 
+
+Print (2 * (5 + 5)) + (3 * 2) using variables. 
+
+Print (100 / (5 * 2)) + 10 using variables. 
+
+Print (8 + 2) * (6 - 1) using variables. 
+
+Print (10 + 20 + 30) / 3 using variables. 
+
+Print (25 - 5) * (2 + 3) using variables. 
+
+Store your name in a variable and print: Alice has 10 candies. 
+
+Store two numbers (56 and 75) in variables and print: “The sum of 56 and 75 is *blank*.” 
+
+Store two numbers (12 and 9) and print: “The product of 12 and 9 is *blank*.” 
+
+Store two numbers (24 and 21) and print: “The difference between 24 and 21 is *blank*.” 
+
+Store two numbers (50 and 5) and print: “The quotient of 50 and 5 is *blank*.” 
+
+Write a program that calculates the total cost of 3 pens, each costing 15 using variables. 
+
+Write a program that calculates the total cost of 5 apples, each costing 12 using variables. 
+
+Write a program that calculates the cost of 3 books, each costing 100 and 2 notebooks each costing 50 using variables. 
+
+Store 25 in a variable named age. Then print this message: “Next year, I will be *age* years old.” 
+
+Store the year 2020 in a variable named year. Subtract the year 2001 from it and print the result. 
+
+Write a program that converts hours to minutes (2 hours). 
+
+Write a program that converts days to hours (3 days). 
+
+Write a program that converts weeks to days (2 weeks). 
+
+Write a program that converts months to days (assume 1 month = 30 days, 2 months). 
+
+Write a program that prints how many seconds there are in 5 minutes. 
+
+Write a program that calculates the total price of 2 burgers (50 each) and 1 drink (20). 
+
+A student scored 85, 90, 78. Calculate and print the average. Use variables. 
+
+Print: The area of a rectangle is: *blank* (length = 8, width = 5). Use variables. 
+
+Print: The perimeter of a rectangle is: *blank* (length = 8, width = 5). Use variables. 
+
+Print: The area of a square is: *blank* (side = 6). Use variables. 
+
+Print: The area of a triangle is: *blank* (base = 10, height = 5). Use variables. 
+
+Print: The total salary is: *blank* (daily rate = 500, days worked = 20). Use variables. 
+
+Print: The average of 5, 10, 15, 20, 25 is: *blank*. Use variables. 
+
+Print: The total cost of 4 pencils (7 each), 3 erasers (5 each), and 2 rulers (15 each). Use variables. 
+
+Print the square of 12. Use variables. 
+
+Print the cube of 3. Use variables. 
+
+Print: The difference between the largest number (50) and the smallest number (12) is: *blank*. Use variables. 
+
+Print the sum of the first 5 even numbers: 2 + 4 + 6 + 8 + 10. Use variables. 
+
+Print the sum of the first 5 odd numbers: 1 + 3 + 5 + 7 + 9. Use variables. 
+
+Print: “My name is *your name*.” “I am *age* years old.” “My favorite subject is Java Programming.” using separate variables and print it in separate print stream statements. 
