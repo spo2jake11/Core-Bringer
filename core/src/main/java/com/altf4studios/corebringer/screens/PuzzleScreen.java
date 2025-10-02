@@ -23,21 +23,22 @@ public class PuzzleScreen implements Screen {
     private Table puzzleTable;
     private Table buttonTable;
 
-    // Puzzle elements for 4 layers
-    private Image[][] inputImages; // [layer][input] - 4 layers, 2 inputs each
-    private Image[] operatorImages; // 4 operators
-    private Image[] resultCubeImages; // 4 result cubes
+    // Puzzle elements for single expression: input op input op input op input = cube
+    private Image[] inputImages; // 4 inputs
+    private Image[] operatorImages; // 3 operators
+    private Image resultCubeImage; // 1 result cube
     private Label instructionLabel;
-    private Label[] resultLabels; // 4 result labels
+    private Label resultLabel;
+    private Label expressionLabel;
     private Image congratulationsImage;
     private TextButton backButton;
 
-    // Puzzle state for 4 layers
-    private boolean[][] inputs; // [layer][input] - 4 layers, 2 inputs each
-    private boolean[][] isQuestionMark; // [layer][input] - track if input is question mark
-    private String[] operators = {"&&", "||", "^", "!"}; // AND, OR, XOR, NOT
-    private boolean[] layerSolved = new boolean[4];
-    private boolean allPuzzlesSolved = false;
+    // Puzzle state for single expression
+    private boolean[] inputs; // 4 inputs
+    private boolean[] isQuestionMark; // track if input is question mark
+    private String[] operators = {"&&", "||", "^"}; // AND, OR, XOR (no NOT)
+    private int[] currentOperators = {-1, -1, -1}; // indices into operators array (-1 = question mark)
+    private boolean puzzleSolved = false;
 
     // Textures
     private Texture input1Texture;
@@ -89,61 +90,56 @@ public class PuzzleScreen implements Screen {
         // Create puzzle table
         puzzleTable = new Table();
 
-        // Initialize arrays for 4 layers
-        inputImages = new Image[4][2];
-        operatorImages = new Image[4];
-        resultCubeImages = new Image[4];
-        resultLabels = new Label[4];
-        inputs = new boolean[4][2];
-        isQuestionMark = new boolean[4][2];
+        // Initialize arrays for single expression (4 inputs, 3 operators)
+        inputImages = new Image[4];
+        operatorImages = new Image[3];
+        inputs = new boolean[4];
+        isQuestionMark = new boolean[4];
 
         // Initialize inputs (all start as question marks)
-        for (int layer = 0; layer < 4; layer++) {
-            for (int input = 0; input < 2; input++) {
-                inputs[layer][input] = false;
-                isQuestionMark[layer][input] = true; // Start as question marks
-            }
+        for (int i = 0; i < 4; i++) {
+            inputs[i] = false;
+            isQuestionMark[i] = true; // Start as question marks
         }
 
-        // Create input images for all layers (start with question marks)
-        for (int layer = 0; layer < 4; layer++) {
-            for (int input = 0; input < 2; input++) {
-                inputImages[layer][input] = new Image(questionMarkTexture);
-            }
+        // Create input images (start with question marks)
+        for (int i = 0; i < 4; i++) {
+            inputImages[i] = new Image(questionMarkTexture);
         }
 
-        // Create operator images for all layers
-        operatorImages[0] = new Image(andTexture);
-        operatorImages[1] = new Image(orTexture);
-        operatorImages[2] = new Image(xorTexture);
-        operatorImages[3] = new Image(notTexture);
-
-        // Create result cube images for all layers
-        for (int layer = 0; layer < 4; layer++) {
-            resultCubeImages[layer] = new Image(cubePlainTexture);
+        // Create operator images (start with question marks)
+        for (int i = 0; i < 3; i++) {
+            operatorImages[i] = new Image(questionMarkTexture);
+            currentOperators[i] = -1; // Start with question mark (index -1)
         }
+
+        // Create result cube image
+        resultCubeImage = new Image(cubePlainTexture);
 
         // Create labels
-        instructionLabel = new Label("Solve all 4 layers to complete the puzzle:", corebringer.testskin);
+        instructionLabel = new Label("Click inputs and operators to solve: ? op ? op ? op ? = Cube", corebringer.testskin);
         instructionLabel.setColor(Color.WHITE);
-        instructionLabel.setFontScale(1.5f);
+        instructionLabel.setFontScale(1.2f);
+
+        expressionLabel = new Label("", corebringer.testskin);
+        expressionLabel.setColor(Color.YELLOW);
+        expressionLabel.setFontScale(1.0f);
+
+        resultLabel = new Label("Result: ?", corebringer.testskin);
+        resultLabel.setColor(Color.WHITE);
+        resultLabel.setFontScale(1.0f);
 
         // Create congratulations image
         congratulationsImage = new Image(congratulationsTexture);
         congratulationsImage.setVisible(false);
 
-        // Create result labels for each layer
-        for (int layer = 0; layer < 4; layer++) {
-            resultLabels[layer] = new Label("Layer " + (layer + 1) + ": ", corebringer.testskin);
-            resultLabels[layer].setColor(Color.WHITE);
-            resultLabels[layer].setFontScale(1.0f);
-        }
-
         // Create back button
         backButton = new TextButton("Back to Map", corebringer.testskin);
 
-        // Setup input listeners for all layers
+        // Setup input listeners
         setupInputToggleListeners();
+        // Setup operator listeners
+        setupOperatorToggleListeners();
         // Add button listeners
         setupButtonListeners();
     }
@@ -158,96 +154,168 @@ public class PuzzleScreen implements Screen {
     }
 
     private void setupInputToggleListeners() {
-        // Setup listeners for all layers and inputs
-        for (int layer = 0; layer < 4; layer++) {
-            for (int input = 0; input < 2; input++) {
-                final int currentLayer = layer;
-                final int currentInput = input;
-
-                inputImages[layer][input].addListener(new ClickListener() {
-                    @Override
-                    public void clicked(InputEvent event, float x, float y) {
-                        // Cycle: Question Mark → 0 → 1 → Question Mark
-                        if (isQuestionMark[currentLayer][currentInput]) {
-                            // Question Mark → 0
-                            isQuestionMark[currentLayer][currentInput] = false;
-                            inputs[currentLayer][currentInput] = false;
-                            inputImages[currentLayer][currentInput].setDrawable(
-                                new TextureRegionDrawable(input0Texture)
-                            );
-                        } else if (!inputs[currentLayer][currentInput]) {
-                            // 0 → 1
-                            inputs[currentLayer][currentInput] = true;
-                            inputImages[currentLayer][currentInput].setDrawable(
-                                new TextureRegionDrawable(input1Texture)
-                            );
-                        } else {
-                            // 1 → Question Mark
-                            isQuestionMark[currentLayer][currentInput] = true;
-                            inputs[currentLayer][currentInput] = false;
-                            inputImages[currentLayer][currentInput].setDrawable(
-                                new TextureRegionDrawable(questionMarkTexture)
-                            );
-                        }
-                        updateResult(currentLayer);
-                    }
-                });
-            }
-        }
-    }
-
-    private void updateResult(int layer) {
-        boolean result = false;
-        String operator = operators[layer];
-        boolean hasQuestionMark = isQuestionMark[layer][0] || isQuestionMark[layer][1];
-
-        // If any input is question mark, show plain cube
-        if (hasQuestionMark) {
-            resultCubeImages[layer].setDrawable(new TextureRegionDrawable(cubePlainTexture));
-            resultLabels[layer].setText("Layer " + (layer + 1) + " (" + operator + "): ?");
-            layerSolved[layer] = false;
-        } else {
-            // Calculate result based on operator
-            if (operator.equals("&&")) {
-                result = inputs[layer][0] && inputs[layer][1];
-            } else if (operator.equals("||")) {
-                result = inputs[layer][0] || inputs[layer][1];
-            } else if (operator.equals("^")) {
-                result = inputs[layer][0] ^ inputs[layer][1];
-            } else if (operator.equals("!")) {
-                result = !inputs[layer][0]; // NOT only uses first input
-            }
-
-            resultLabels[layer].setText("Layer " + (layer + 1) + " (" + operator + "): " + result);
-
-            // Update cube color based on result
-            if (result) {
-                resultCubeImages[layer].setDrawable(new TextureRegionDrawable(cubeGreenTexture));
-                layerSolved[layer] = true;
-            } else {
-                resultCubeImages[layer].setDrawable(new TextureRegionDrawable(cubeRedTexture));
-                layerSolved[layer] = false;
-            }
-        }
-
-        // Check if all layers are solved
-        checkAllPuzzlesSolved();
-    }
-
-    private void checkAllPuzzlesSolved() {
-        allPuzzlesSolved = true;
+        // Setup listeners for all 4 inputs
         for (int i = 0; i < 4; i++) {
-            if (!layerSolved[i]) {
-                allPuzzlesSolved = false;
+            final int currentInput = i;
+
+            inputImages[i].addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    // Cycle: Question Mark → 0 → 1 → Question Mark
+                    if (isQuestionMark[currentInput]) {
+                        // Question Mark → 0
+                        isQuestionMark[currentInput] = false;
+                        inputs[currentInput] = false;
+                        inputImages[currentInput].setDrawable(
+                            new TextureRegionDrawable(input0Texture)
+                        );
+                    } else if (!inputs[currentInput]) {
+                        // 0 → 1
+                        inputs[currentInput] = true;
+                        inputImages[currentInput].setDrawable(
+                            new TextureRegionDrawable(input1Texture)
+                        );
+                    } else {
+                        // 1 → Question Mark
+                        isQuestionMark[currentInput] = true;
+                        inputs[currentInput] = false;
+                        inputImages[currentInput].setDrawable(
+                            new TextureRegionDrawable(questionMarkTexture)
+                        );
+                    }
+                    updateResult();
+                }
+            });
+        }
+    }
+
+    private void setupOperatorToggleListeners() {
+        // Setup listeners for all 3 operators
+        for (int i = 0; i < 3; i++) {
+            final int currentOperator = i;
+
+            operatorImages[i].addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    // Cycle through operators: ? → && → || → ^ → ?
+                    currentOperators[currentOperator]++;
+                    if (currentOperators[currentOperator] > 2) {
+                        currentOperators[currentOperator] = -1; // back to question mark
+                    }
+                    
+                    // Update operator image
+                    switch (currentOperators[currentOperator]) {
+                        case -1: // ?
+                            operatorImages[currentOperator].setDrawable(new TextureRegionDrawable(questionMarkTexture));
+                            break;
+                        case 0: // &&
+                            operatorImages[currentOperator].setDrawable(new TextureRegionDrawable(andTexture));
+                            break;
+                        case 1: // ||
+                            operatorImages[currentOperator].setDrawable(new TextureRegionDrawable(orTexture));
+                            break;
+                        case 2: // ^
+                            operatorImages[currentOperator].setDrawable(new TextureRegionDrawable(xorTexture));
+                            break;
+                    }
+                    updateResult();
+                }
+            });
+        }
+    }
+
+    private void updateResult() {
+        // Check if any input or operator is question mark
+        boolean hasQuestionMark = false;
+        for (int i = 0; i < 4; i++) {
+            if (isQuestionMark[i]) {
+                hasQuestionMark = true;
+                break;
+            }
+        }
+        for (int i = 0; i < 3; i++) {
+            if (currentOperators[i] == -1) {
+                hasQuestionMark = true;
                 break;
             }
         }
 
-        if (allPuzzlesSolved) {
-            // Show congratulations after 3 seconds delay
+        // Build expression string for display
+        StringBuilder expressionBuilder = new StringBuilder();
+        for (int i = 0; i < 4; i++) {
+            if (isQuestionMark[i]) {
+                expressionBuilder.append("?");
+            } else {
+                expressionBuilder.append(inputs[i] ? "1" : "0");
+            }
+            
+            if (i < 3) { // Add operator after first 3 inputs
+                if (currentOperators[i] == -1) {
+                    expressionBuilder.append(" ? ");
+                } else {
+                    expressionBuilder.append(" ").append(operators[currentOperators[i]]).append(" ");
+                }
+            }
+        }
+        expressionBuilder.append(" = ");
+
+        // If any input or operator is question mark, show plain cube
+        if (hasQuestionMark) {
+            resultCubeImage.setDrawable(new TextureRegionDrawable(cubePlainTexture));
+            expressionLabel.setText(expressionBuilder.toString() + "?");
+            resultLabel.setText("Result: ?");
+            puzzleSolved = false;
+        } else {
+            // Evaluate expression with proper operator precedence
+            // Expression: input[0] op[0] input[1] op[1] input[2] op[2] input[3]
+            boolean result = evaluateExpression();
+            
+            expressionLabel.setText(expressionBuilder.toString() + (result ? "1" : "0"));
+            resultLabel.setText("Result: " + (result ? "1" : "0"));
+
+            // Update cube color based on result
+            if (result) {
+                resultCubeImage.setDrawable(new TextureRegionDrawable(cubeGreenTexture));
+                puzzleSolved = true;
+            } else {
+                resultCubeImage.setDrawable(new TextureRegionDrawable(cubeRedTexture));
+                puzzleSolved = false;
+            }
+        }
+
+        // Check if puzzle is solved (result is true/1)
+        checkPuzzleSolved();
+    }
+
+    private boolean evaluateExpression() {
+        // Evaluate: input[0] op[0] input[1] op[1] input[2] op[2] input[3]
+        // Following standard operator precedence: && has higher precedence than ||, ^ has same as &&
+        // We'll evaluate left to right for same precedence operators
+        
+        boolean result = inputs[0];
+        
+        for (int i = 0; i < 3; i++) {
+            String op = operators[currentOperators[i]];
+            boolean nextInput = inputs[i + 1];
+            
+            if (op.equals("&&")) {
+                result = result && nextInput;
+            } else if (op.equals("||")) {
+                result = result || nextInput;
+            } else if (op.equals("^")) {
+                result = result ^ nextInput;
+            }
+        }
+        
+        return result;
+    }
+
+    private void checkPuzzleSolved() {
+        if (puzzleSolved) {
+            // Show congratulations after 2 seconds delay
             new Thread(() -> {
                 try {
-                    Thread.sleep(3000);
+                    Thread.sleep(2000);
                     Gdx.app.postRunnable(() -> {
                         congratulationsImage.setVisible(true);
                         // Auto-return to map after another 3 seconds
@@ -271,31 +339,52 @@ public class PuzzleScreen implements Screen {
 
     private void setupLayout() {
         // Add background
-        Image backgroundImage = new Image(backgroundTexture);
-        backgroundImage.setScaling(com.badlogic.gdx.utils.Scaling.fill);
         mainTable.setBackground(new TextureRegionDrawable(backgroundTexture));
 
         // Add instruction label
-        puzzleTable.add(instructionLabel).colspan(3).padTop(20f).row();
+        puzzleTable.add(instructionLabel).colspan(9).padTop(20f).padBottom(20f).row();
 
-        // Add 4 layers with proper spacing (2 inches = ~144 pixels at 72 DPI)
-        for (int layer = 0; layer < 4; layer++) {
-            // Create layer table
-            Table layerTable = new Table();
+        // Create expression table for horizontal layout: input op input op input op input = cube
+        Table expressionTable = new Table();
+        
+        // Add first input
+        expressionTable.add(inputImages[0]).size(120, 84).pad(5f);
+        
+        // Add operator 1
+        expressionTable.add(operatorImages[0]).size(120, 84).pad(5f);
+        
+        // Add second input
+        expressionTable.add(inputImages[1]).size(120, 84).pad(5f);
+        
+        // Add operator 2
+        expressionTable.add(operatorImages[1]).size(120, 84).pad(5f);
+        
+        // Add third input
+        expressionTable.add(inputImages[2]).size(120, 84).pad(5f);
+        
+        // Add operator 3
+        expressionTable.add(operatorImages[2]).size(120, 84).pad(5f);
+        
+        // Add fourth input
+        expressionTable.add(inputImages[3]).size(120, 84).pad(5f);
+        
+        // Add equals label
+        Label equalsLabel = new Label("=", corebringer.testskin);
+        equalsLabel.setColor(Color.WHITE);
+        equalsLabel.setFontScale(2.0f);
+        expressionTable.add(equalsLabel).pad(10f);
+        
+        // Add result cube
+        expressionTable.add(resultCubeImage).size(120, 84).pad(5f);
 
-            // Add input images (30% reduced from 216x151 = ~151x106 pixels)
-            layerTable.add(inputImages[layer][0]).size(151, 106).pad(10f);
-            layerTable.add(operatorImages[layer]).size(151, 106).pad(10f);
-            layerTable.add(inputImages[layer][1]).size(151, 106).pad(10f);
-            // Add result cube horizontally aligned with numbers (30% reduced size)
-            layerTable.add(resultCubeImages[layer]).size(151, 106).pad(10f).row();
+        // Add expression table to puzzle table
+        puzzleTable.add(expressionTable).padBottom(20f).row();
 
-            // Add result label
-            layerTable.add(resultLabels[layer]).colspan(4).padTop(10f).row();
+        // Add expression label (shows the current expression)
+        puzzleTable.add(expressionLabel).colspan(9).padBottom(10f).row();
 
-            // Add layer to main puzzle table with reduced spacing between layers
-            puzzleTable.add(layerTable).padBottom(10f).row();
-        }
+        // Add result label
+        puzzleTable.add(resultLabel).colspan(9).padBottom(20f).row();
 
         // Add puzzle table to main table
         mainTable.add(puzzleTable).center();
@@ -304,37 +393,36 @@ public class PuzzleScreen implements Screen {
         backButton.setPosition(20f, puzzleStage.getHeight() - backButton.getHeight() - 20f);
         puzzleStage.addActor(backButton);
 
-        // Add congratulations image to middle right
-        congratulationsImage.setPosition(puzzleStage.getWidth() - congratulationsImage.getWidth() - 20f, 
+        // Add congratulations image to center
+        congratulationsImage.setPosition(puzzleStage.getWidth() / 2 - congratulationsImage.getWidth() / 2, 
                                        puzzleStage.getHeight() / 2 - congratulationsImage.getHeight() / 2);
         puzzleStage.addActor(congratulationsImage);
 
-        // Initialize results for all layers
-        for (int layer = 0; layer < 4; layer++) {
-            updateResult(layer);
-        }
+        // Initialize result
+        updateResult();
     }
 
     @Override
     public void show() {
-        // Reset all inputs to question marks for all layers
-        for (int layer = 0; layer < 4; layer++) {
-            for (int input = 0; input < 2; input++) {
-                inputs[layer][input] = false;
-                isQuestionMark[layer][input] = true;
-                inputImages[layer][input].setDrawable(new TextureRegionDrawable(questionMarkTexture));
-            }
-            layerSolved[layer] = false;
+        // Reset all inputs to question marks
+        for (int i = 0; i < 4; i++) {
+            inputs[i] = false;
+            isQuestionMark[i] = true;
+            inputImages[i].setDrawable(new TextureRegionDrawable(questionMarkTexture));
+        }
+
+        // Reset all operators to question marks
+        for (int i = 0; i < 3; i++) {
+            currentOperators[i] = -1;
+            operatorImages[i].setDrawable(new TextureRegionDrawable(questionMarkTexture));
         }
 
         // Hide congratulations image
         congratulationsImage.setVisible(false);
-        allPuzzlesSolved = false;
+        puzzleSolved = false;
 
-        // Update results for all layers
-        for (int layer = 0; layer < 4; layer++) {
-            updateResult(layer);
-        }
+        // Update result
+        updateResult();
 
         Gdx.input.setInputProcessor(puzzleStage);
     }
@@ -373,7 +461,7 @@ public class PuzzleScreen implements Screen {
         andTexture.dispose();
         orTexture.dispose();
         xorTexture.dispose();
-        notTexture.dispose();
+        notTexture.dispose(); // Still dispose it even though we don't use it
         cubePlainTexture.dispose();
         cubeGreenTexture.dispose();
         cubeRedTexture.dispose();
