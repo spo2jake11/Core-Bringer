@@ -41,14 +41,8 @@ public class CodeEditorScreen implements Screen {
     private QuestionnaireManager.Question currentQ;
     private final CodeEvaluationService evaluator = new CodeEvaluationService();
 
-    private int energy;
-    private final int MAX_ENERGY = 3;
-    private Label energyLabel;
-    private Dialog maxEnergyDialog;
-
-    // --- Session Points for Energy Transfer ---
+    // --- Session Points (unrelated to battle energy) ---
     private int sessionPoints = 0;
-    // --- End Session Points ---
 
     public CodeEditorScreen(Main corebringer) {
         this.corebringer = corebringer;
@@ -63,12 +57,6 @@ public class CodeEditorScreen implements Screen {
             stage.addActor(backgroundImage);
         } catch (Exception e) {
             Gdx.app.error("CodeEditorScreen", "Failed to load background image: " + e.getMessage());
-        }
-        // Initialize energy from GameScreen if available
-        if (corebringer.gameScreen != null) {
-            this.energy = corebringer.gameScreen.getEnergy();
-        } else {
-            this.energy = 0;
         }
         loadQuestions();
         buildUI();
@@ -172,20 +160,7 @@ public class CodeEditorScreen implements Screen {
             }
         });
 
-        // Add energy label at top left
-        energyLabel = new Label("Energy: " + energy + "/" + MAX_ENERGY, skin);
-        energyLabel.setAlignment(Align.topLeft);
-        energyLabel.setPosition(10, Gdx.graphics.getHeight() - 30);
-        stage.addActor(energyLabel);
-
-        // Add a button to gain energy for demonstration
-        TextButton btnGainEnergy = new TextButton("Gain Energy", skin);
-        btnGainEnergy.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                addEnergy(1);
-            }
-        });
+        // Removed energy UI and controls from Code Editor screen per request
         Table right = new Table();
         right.add(new ScrollPane(codeInputArea, skin)).grow().colspan(2).row();
         right.add(btnRun).padTop(10).left();
@@ -193,7 +168,7 @@ public class CodeEditorScreen implements Screen {
         right.add(btnBack).padTop(10).left();
         right.add(outputLabel).padTop(10).left();
         right.add(btnToggleHints).padTop(10).left().row();
-        right.add(btnGainEnergy).padTop(10).left().row();
+        // Energy gain button removed
 
         // Layout root
         Table root = new Table();
@@ -369,32 +344,7 @@ public class CodeEditorScreen implements Screen {
         area.setCursorPosition(cursor + toInsert.length());
     }
 
-    public void addEnergy(int amount) {
-        if (energy >= MAX_ENERGY) {
-            showMaxEnergyDialog();
-            return;
-        }
-        energy = Math.min(energy + amount, MAX_ENERGY);
-        updateEnergyLabel();
-    }
-    private void updateEnergyLabel() {
-        if (energyLabel != null) {
-            energyLabel.setText("Energy: " + energy + "/" + MAX_ENERGY);
-        }
-    }
-    private void showMaxEnergyDialog() {
-        if (maxEnergyDialog == null) {
-            maxEnergyDialog = new Dialog("Max Energy", skin) {
-                @Override
-                protected void result(Object object) {
-                    this.hide();
-                }
-            };
-            maxEnergyDialog.text("You have reached the maximum energy (10) and cannot obtain more.");
-            maxEnergyDialog.button("OK");
-        }
-        maxEnergyDialog.show(stage);
-    }
+    // Removed all energy-related methods and UI
 
     // --- Session Points Getter/Resetter ---
     public int consumeSessionPoints() {
@@ -421,10 +371,7 @@ public class CodeEditorScreen implements Screen {
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {
-        // Sync energy back to GameScreen
-        if (corebringer.gameScreen != null) {
-            corebringer.gameScreen.setEnergy(energy);
-        }
+        // No energy sync with GameScreen
     }
     @Override public void dispose() {
         stage.dispose();

@@ -63,6 +63,8 @@ public class GameScreen implements Screen{
     // Persisted deck ids for this run
     private String[] savedDeckIds;
     // --- End Energy System ---
+    // Track when we've already applied regen for the current player turn
+    private boolean playerTurnEnergyApplied = false;
 
     // --- Death Screen ---
     private Window deathScreenWindow = null;
@@ -361,6 +363,19 @@ public class GameScreen implements Screen{
         // --- BattleManager: process turn phases, enemy AI, and UI indicator ---
         battleManager.update(delta);
         // --- End BattleManager ---
+
+        // --- Energy auto-regen at start of player's actionable turn ---
+        // Regen once when player's turn becomes active (not during delay/poison resolution)
+        if (turnManager != null) {
+            boolean playerTurnActive = turnManager.isPlayerTurn() && !turnManager.isDelaying();
+            if (playerTurnActive && !playerTurnEnergyApplied) {
+                setEnergy(MAX_ENERGY);
+                playerTurnEnergyApplied = true;
+            } else if (turnManager.isEnemyTurn()) {
+                // Reset flag so next player turn will regen again
+                playerTurnEnergyApplied = false;
+            }
+        }
 
         /// For wiring the HP/Shield values properly
         battleStageUI.updateHpBars(player.getHp(), enemy.getHp());

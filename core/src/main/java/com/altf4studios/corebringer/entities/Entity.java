@@ -79,6 +79,20 @@ public abstract class Entity implements BattleEntity {
         return block;
     }
 
+    /**
+     * Explicitly set current block value (shield). Clamped to >= 0.
+     */
+    public void setBlock(int value) {
+        this.block = Math.max(0, value);
+    }
+
+    /**
+     * Convenience to clear all current block.
+     */
+    public void clearBlock() {
+        this.block = 0;
+    }
+
     // Status management
     public void addStatus(String status, int value) {
         int current = statusEffects.getOrDefault(status, 0);
