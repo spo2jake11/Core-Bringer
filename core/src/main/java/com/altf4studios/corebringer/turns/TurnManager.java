@@ -49,6 +49,8 @@ public class TurnManager {
 
     public void endPlayerTurn() {
         if (currentPhase == TurnPhase.PLAYER_TURN) {
+            // Clear enemy shield at end of player's turn
+            if (enemy != null) enemy.clearBlock();
             currentPhase = TurnPhase.ENEMY_TURN;
             turnEnded = true;
             isDelaying = true;
@@ -62,6 +64,8 @@ public class TurnManager {
 
     public void endEnemyTurn() {
         if (currentPhase == TurnPhase.ENEMY_TURN) {
+            // Clear player shield at end of enemy's turn
+            if (player != null) player.clearBlock();
             currentPhase = TurnPhase.PLAYER_TURN;
             turnEnded = true;
             isDelaying = true;
