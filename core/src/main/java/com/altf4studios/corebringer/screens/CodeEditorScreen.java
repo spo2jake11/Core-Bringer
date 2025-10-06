@@ -51,7 +51,7 @@ public class CodeEditorScreen implements Screen {
 
         // Background setup (add first so it renders behind other actors)
         try {
-            backgroundTexture = new Texture(Utils.getInternalPath("assets/backgrounds/code_window_bg.png"));
+            backgroundTexture = new Texture(Utils.getInternalPath("assets/backgrounds/code_window.png"));
             backgroundImage = new Image(backgroundTexture);
             backgroundImage.setFillParent(true);
             stage.addActor(backgroundImage);
