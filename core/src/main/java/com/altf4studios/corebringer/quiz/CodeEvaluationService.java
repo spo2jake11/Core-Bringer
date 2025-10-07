@@ -222,6 +222,148 @@ public final class CodeEvaluationService {
             }
         }
 
+        // 4) Additional keyPoints: var:, literal:, format:, constraint:
+        if (q.keyPoints != null) {
+            for (String raw : q.keyPoints) {
+                if (raw == null) continue;
+                String tag = raw.trim();
+                String lower = tag.toLowerCase(Locale.ROOT);
+
+                // var:<name> — ensure a variable with that identifier exists (any primitive/String)
+                if (lower.startsWith("var:")) {
+                    String varName = tag.substring(4).trim();
+                    if (varName.isEmpty()) continue;
+                    res.total += 1;
+                    boolean declared = false;
+                    // Accept common Java types; also allow any type identifier followed by name
+                    Pattern decl = Pattern.compile("(int|double|float|char|String|boolean)\\s+" + Pattern.quote(varName) + "\\b");
+                    if (decl.matcher(src).find()) declared = true;
+                    // Also accept usage with assignment without prior explicit type (unlikely), or reuse
+                    if (!declared) {
+                        Pattern assign = Pattern.compile("\\b" + Pattern.quote(varName) + "\\s*=\\s*");
+                        if (assign.matcher(src).find()) declared = true;
+                    }
+                    if (declared) res.score += 1; else res.feedback.add("Hint: declare variable '" + varName + "'");
+                    continue;
+                }
+
+                // literal:<text> — ensure the literal appears either in source string literals or in program output
+                if (lower.startsWith("literal:")) {
+                    String lit = tag.substring(8).trim();
+                    if (lit.isEmpty()) continue;
+                    res.total += 1;
+                    boolean ok = false;
+                    // Check output contains literal (case-insensitive for words)
+                    String litNorm = normOutput(lit).toLowerCase(Locale.ROOT);
+                    if (!litNorm.isEmpty() && out.toLowerCase(Locale.ROOT).contains(litNorm)) ok = true;
+                    // Check source contains literal inside quotes or numeric token
+                    if (!ok) {
+                        // If numeric, look for the exact digits in source
+                        if (lit.matches("[-+]?\\d+(?:\\.\\d+)?")) {
+                            if (Pattern.compile("(^|[^\\w])" + Pattern.quote(lit) + "([^\\w]|$)").matcher(src).find()) ok = true;
+                        } else {
+                            if (src.toLowerCase(Locale.ROOT).contains(litNorm)) ok = true;
+                        }
+                    }
+                    if (ok) res.score += 1; else res.feedback.add("Hint: include literal '" + lit + "' in your output or string");
+                    continue;
+                }
+
+                // format:<tag> — lightweight structural hints
+                if (lower.startsWith("format:")) {
+                    String fmt = lower.substring(7).trim();
+                    if (fmt.isEmpty()) continue;
+                    res.total += 1;
+                    boolean ok = false;
+                    switch (fmt) {
+                        case "equation":
+                            ok = out.contains("=") || Pattern.compile("=").matcher(src).find();
+                            break;
+                        case "same_line":
+                            // One println that appears to combine two values (concat via + or multiple tokens)
+                            ok = Pattern.compile("System\\.out\\.print(ln)?\\s*\\([^)]*\\+[^)]*\\)").matcher(src).find();
+                            break;
+                        case "full_name":
+                            // Look for firstName and lastName used together in a single print
+                            ok = Pattern.compile("System\\.out\\.print(ln)?\\s*\\([^)]*firstName[^)]*\\+[^)]*lastName[^)]*\\)").matcher(src).find()
+                                 || Pattern.compile("System\\.out\\.print(ln)?\\s*\\([^)]*lastName[^)]*\\+[^)]*firstName[^)]*\\)").matcher(src).find();
+                            break;
+                        case "parentheses":
+                        case "nested_parentheses":
+                            ok = Pattern.compile("\\([^(]*[+\\-*/][^)]*\\)").matcher(src).find();
+                            break;
+                        case "average":
+                            ok = Pattern.compile("/\\s*\\d+").matcher(src).find() || out.contains("/");
+                            break;
+                        case "unit_convert":
+                            ok = Pattern.compile("\\*\\s*(60|24|7|30)").matcher(src).find() || Pattern.compile("(seconds|minutes|hours|days|weeks)", Pattern.CASE_INSENSITIVE).matcher(out).find();
+                            break;
+                        case "area_rectangle":
+                        case "perimeter_rectangle":
+                        case "area_square":
+                        case "area_triangle":
+                        case "salary_total":
+                        case "series_sum":
+                        case "square":
+                        case "cube":
+                        case "two_expressions":
+                            // Treat as informational; grant credit if arithmetic with two+ ops exists
+                            ok = Pattern.compile("(\\+|\\-|\\*|/)\\s*(\\w+|\\d+).*(\\+|\\-|\\*|/)", Pattern.DOTALL).matcher(src).find();
+                            break;
+                        case "sentence":
+                            ok = out.split("\\s+").length >= 3; // at least a few words
+                            break;
+                        case "separate_prints":
+                            ok = countMatches(src, Pattern.compile("System\\.out\\.print(ln)?\\s*\\(")) >= 3; // 3 separate prints
+                            break;
+                        default:
+                            // Unknown format tag – don't penalize
+                            res.total -= 1; // neutralize since we can't check it
+                            break;
+                    }
+                    if (ok) res.score += 1; else res.feedback.add("Hint: follow format '" + fmt + "'");
+                    continue;
+                }
+
+                // constraint:<tag>
+                if (lower.startsWith("constraint:")) {
+                    String c = lower.substring(11).trim();
+                    if (c.isEmpty()) continue;
+                    res.total += 1;
+                    boolean ok = false;
+                    switch (c) {
+                        case "same_value":
+                            // Two different variables assigned the same numeric literal OR output repeats same number twice
+                            Pattern declVal = Pattern.compile("(int|double|float|char|String|boolean)\\s+(\\w+)\\s*=\\s*([-+]?\\d+(?:\\.\\d+)?)");
+                            java.util.regex.Matcher m = declVal.matcher(src);
+                            java.util.Map<String,String> varToVal = new java.util.HashMap<>();
+                            java.util.Map<String,Integer> valCount = new java.util.HashMap<>();
+                            while (m.find()) {
+                                String v = m.group(2);
+                                String val = m.group(3);
+                                varToVal.put(v, val);
+                                valCount.put(val, valCount.getOrDefault(val, 0) + 1);
+                            }
+                            for (int cnt : valCount.values()) if (cnt >= 2) { ok = true; break; }
+                            if (!ok) {
+                                // Output contains same number twice
+                                Pattern num = Pattern.compile("([-+]?\\d+(?:\\.\\d+)?)");
+                                java.util.List<String> nums = new java.util.ArrayList<>();
+                                java.util.regex.Matcher n = num.matcher(out);
+                                while (n.find()) nums.add(n.group(1));
+                                java.util.Set<String> seen = new java.util.HashSet<>();
+                                for (String sVal : nums) { if (!seen.add(sVal)) { ok = true; break; } }
+                            }
+                            break;
+                        default:
+                            res.total -= 1; // neutralize unknown constraints
+                            break;
+                    }
+                    if (ok) res.score += 1; else res.feedback.add("Hint: satisfy constraint '" + c + "'");
+                }
+            }
+        }
+
         // Passing threshold: at least 60% of total checks
         res.passed = res.total == 0 ? false : (res.score * 1.0f / res.total) >= 0.6f;
         if (res.passed) {

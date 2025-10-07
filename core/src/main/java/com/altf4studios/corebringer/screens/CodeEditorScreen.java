@@ -18,6 +18,10 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
 
 public class CodeEditorScreen implements Screen {
     private final Main corebringer;
@@ -40,6 +44,8 @@ public class CodeEditorScreen implements Screen {
 
     private QuestionnaireManager.Question currentQ;
     private final CodeEvaluationService evaluator = new CodeEvaluationService();
+    // Fallback question list if QuestionnaireManager fails to initialize
+    private Array<QuestionnaireManager.Question> localQuestions;
 
     // --- Session Points (unrelated to battle energy) ---
     private int sessionPoints = 0;
@@ -63,24 +69,127 @@ public class CodeEditorScreen implements Screen {
     }
 
     private void loadQuestions() {
+        localQuestions = null;
+        // Attempt 1: Utils internal JSON
         try {
-            QuestionnaireManager.get().initDefault();
-            if (!QuestionnaireManager.get().isReady()) {
-                Gdx.app.error("CodeEditorScreen", "questionnaire.json not ready or empty");
+            com.badlogic.gdx.files.FileHandle fh = Utils.getInternalPath("assets/questionnaire.json");
+            Gdx.app.log("CodeEditorScreen", "Attempting Utils JSON: " + fh.path() + ", exists=" + fh.exists());
+            QuestionnaireManager.get().initFromJson(fh);
+        } catch (Exception ex) {
+            Gdx.app.error("CodeEditorScreen", "Utils JSON load failed: " + ex.getMessage());
+        }
+
+        // Attempt 2: Gdx.files.internal JSON
+        if (!QuestionnaireManager.get().isReady()) {
+            try {
+                com.badlogic.gdx.files.FileHandle fh2 = com.badlogic.gdx.Gdx.files.internal("assets/questionnaire.json");
+                Gdx.app.log("CodeEditorScreen", "Attempting Internal JSON: " + fh2.path() + ", exists=" + fh2.exists());
+                QuestionnaireManager.get().initFromJson(fh2);
+            } catch (Exception ex) {
+                Gdx.app.error("CodeEditorScreen", "Internal JSON load failed: " + ex.getMessage());
             }
-        } catch (Exception e) {
-            Gdx.app.error("CodeEditorScreen", "Failed to initialize questionnaire: " + e.getMessage());
+        }
+
+        // Attempt 3: TXT fallback
+        if (!QuestionnaireManager.get().isReady()) {
+            try {
+                com.badlogic.gdx.files.FileHandle txt = Utils.getInternalPath("assets/questions.txt");
+                if (txt != null && txt.exists()) {
+                    Gdx.app.log("CodeEditorScreen", "Attempting TXT: " + txt.path());
+                    QuestionnaireManager.get().initFromTxt(txt);
+                }
+            } catch (Exception ex) {
+                Gdx.app.error("CodeEditorScreen", "TXT load failed: " + ex.getMessage());
+            }
+        }
+
+        // Mirror to localQuestions or do local JSON parse
+        if (QuestionnaireManager.get().isReady()) {
+            int count = QuestionnaireManager.get().getAll().size;
+            localQuestions = new Array<>(QuestionnaireManager.get().getAll());
+            Gdx.app.log("CodeEditorScreen", "Loaded questionnaire with " + count + " questions (mirrored locally)");
+        } else {
+            // Final fallback: parse JSON locally (tolerates manager state issues)
+            try {
+                com.badlogic.gdx.files.FileHandle src = com.badlogic.gdx.Gdx.files.internal("assets/questionnaire.json");
+                Gdx.app.log("CodeEditorScreen", "Attempting local JSON parse: " + src.path() + ", exists=" + src.exists());
+                JsonReader reader = new JsonReader();
+                JsonValue root = reader.parse(src);
+                JsonValue qArr = root.get("questions");
+                if (qArr != null && qArr.isArray()) {
+                    localQuestions = new Array<>();
+                    for (JsonValue it = qArr.child; it != null; it = it.next) {
+                        QuestionnaireManager.Question q = new QuestionnaireManager.Question();
+                        q.id = it.getInt("id", 0);
+                        q.isSolve = it.getInt("isSolve", 0);
+                        q.questions = it.getString("questions", "");
+                        q.chance = it.getFloat("chance", 0.5f);
+                        JsonValue kp = it.get("keyPoints");
+                        if (kp != null && kp.isArray()) {
+                            for (JsonValue s = kp.child; s != null; s = s.next) {
+                                q.keyPoints.add(s.asString());
+                            }
+                        }
+                        localQuestions.add(q);
+                    }
+                    Gdx.app.log("CodeEditorScreen", "Loaded localQuestions fallback count=" + localQuestions.size);
+                }
+            } catch (Exception ex) {
+                Gdx.app.error("CodeEditorScreen", "Local JSON parse failed: " + ex.getMessage());
+            }
+
+            if (localQuestions == null || localQuestions.size == 0) {
+                // Last resort: inject one question
+                localQuestions = new Array<>();
+                QuestionnaireManager.Question q = new QuestionnaireManager.Question();
+                q.id = 1;
+                q.isSolve = 0;
+                q.questions = "Declare an int x = 1 and print it.";
+                q.keyPoints.add("needs:print");
+                q.keyPoints.add("needs:int:1");
+                q.chance = 0.35f;
+                localQuestions.add(q);
+                Gdx.app.error("CodeEditorScreen", "Failed to load questions; injected 1 fallback question");
+            }
         }
     }
 
     private void pickRandomQuestion() {
-        if (!QuestionnaireManager.get().isReady()) {
+        // Prefer localQuestions if available
+        if (localQuestions != null && localQuestions.size > 0) {
+            int idx = MathUtils.random(localQuestions.size - 1);
+            currentQ = localQuestions.get(idx);
+        } else if (!QuestionnaireManager.get().isReady()) {
             currentQ = null;
-            if (questionLabel != null) questionLabel.setText("No questions available.");
-            if (keyPointsLabel != null) keyPointsLabel.setText("");
-            return;
+            // Try localQuestions fallback
+            if (localQuestions != null && localQuestions.size > 0) {
+                int idx = MathUtils.random(localQuestions.size - 1);
+                currentQ = localQuestions.get(idx);
+            } else {
+                // Try to (re)load, then retry selection once
+                Gdx.app.log("CodeEditorScreen", "No questions available; reloading and retrying selection");
+                loadQuestions();
+                if (localQuestions != null && localQuestions.size > 0) {
+                    int idx2 = MathUtils.random(localQuestions.size - 1);
+                    currentQ = localQuestions.get(idx2);
+                } else if (QuestionnaireManager.get().isReady()) {
+                    currentQ = QuestionnaireManager.get().getRandomUnsolved();
+                } else {
+                    if (questionLabel != null) questionLabel.setText("No questions available.");
+                    if (keyPointsLabel != null) keyPointsLabel.setText("");
+                    return;
+                }
+            }
         }
-        currentQ = QuestionnaireManager.get().getRandomUnsolved();
+        if (currentQ == null && QuestionnaireManager.get().isReady()) {
+            currentQ = QuestionnaireManager.get().getRandomUnsolved();
+        }
+        if (currentQ == null) {
+            // Fallback: pick first available
+            Array<QuestionnaireManager.Question> all = QuestionnaireManager.get().isReady() ? QuestionnaireManager.get().getAll() : localQuestions;
+            if (all != null && all.size > 0) currentQ = all.first();
+            Gdx.app.log("CodeEditorScreen", "Random pick returned null; using fallback first question");
+        }
         if (questionLabel != null && currentQ != null) {
             questionLabel.setText("Q" + currentQ.id + ": " + currentQ.questions);
         }
@@ -243,6 +352,45 @@ public class CodeEditorScreen implements Screen {
                 default: return k;
             }
         }
+        if (k.startsWith("var:")) {
+            String name = k.substring(4).trim();
+            return name.isEmpty() ? k : ("Declare variable '" + name + "'");
+        }
+        if (k.startsWith("literal:")) {
+            String lit = k.substring(8).trim();
+            return lit.isEmpty() ? k : ("Include literal: " + lit);
+        }
+        if (k.startsWith("format:")) {
+            String fmt = k.substring(7).trim();
+            switch (fmt) {
+                case "equation": return "Show as an equation (e.g., a + b = c)";
+                case "same_line": return "Print both values on the same line";
+                case "full_name": return "Combine firstName and lastName into a full name";
+                case "parentheses": return "Use parentheses in the expression";
+                case "nested_parentheses": return "Use nested parentheses in the expression";
+                case "average": return "Compute an average (sum then divide)";
+                case "unit_convert": return "Perform a unit conversion (e.g., *60, *24, etc.)";
+                case "area_rectangle": return "Compute rectangle area (length * width)";
+                case "perimeter_rectangle": return "Compute rectangle perimeter";
+                case "area_square": return "Compute square area (side * side)";
+                case "area_triangle": return "Compute triangle area (base * height / 2)";
+                case "salary_total": return "Compute total salary (rate * days)";
+                case "series_sum": return "Sum a numeric series";
+                case "square": return "Square a number";
+                case "cube": return "Cube a number";
+                case "two_expressions": return "Combine two expressions (then operate)";
+                case "sentence": return "Output a sentence (words combined)";
+                case "separate_prints": return "Use separate print statements for each part";
+                default: return k;
+            }
+        }
+        if (k.startsWith("constraint:")) {
+            String c = k.substring(11).trim();
+            switch (c) {
+                case "same_value": return "Two variables or outputs should have the same value";
+                default: return k;
+            }
+        }
         return k;
     }
 
@@ -273,14 +421,31 @@ public class CodeEditorScreen implements Screen {
 
                 if (ev.passed && q != null) {
                     QuestionnaireManager.get().markSolved(q.id);
+                    // Overhack proc logic: use question's chance as probability
+                    float chance = MathUtils.clamp(q.chance, 0f, 1f);
+                    boolean proc = MathUtils.random() < chance;
+                    Gdx.app.log("CodeEditorScreen", "Overhack roll: chance=" + chance + ", proc=" + proc);
+                    // Apply battle effect on main thread
+                    Gdx.app.postRunnable(() -> {
+                        if (corebringer != null && corebringer.gameScreen != null) {
+                            com.altf4studios.corebringer.battle.BattleManager bm = corebringer.gameScreen.getBattleManager();
+                            if (bm != null) {
+                                if (proc) {
+                                    bm.instakillEnemy();
+                                } else {
+                                    bm.endPlayerTurnNow();
+                                }
+                            }
+                        }
+                    });
                 }
 
                 StringBuilder fb = new StringBuilder();
                 for (String f : ev.feedback) fb.append("- ").append(f).append('\n');
 
                 String judgement = ev.passed ? "\n\n=== Judgement: ✅ Correct ===" : "\n\n=== Judgement: ❌ Incorrect ===";
-                String scoreLine = "\nScore: " + ev.score + "/" + ev.total + "\n\nFeedback:\n" + fb;
-                final String finalText = result + judgement + scoreLine;
+                String feedbackBlock = "\n\nFeedback:\n" + fb;
+                final String finalText = result + judgement + feedbackBlock;
 
                 Gdx.app.postRunnable(() -> {
                     showResult("Code Execution Result", finalText);
@@ -357,6 +522,8 @@ public class CodeEditorScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(stage);
+        // Ensure questions are reloaded when screen is shown (in case singleton was cleared elsewhere)
+        loadQuestions();
         pickRandomQuestion();
     }
 
