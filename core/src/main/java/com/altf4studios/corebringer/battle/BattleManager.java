@@ -110,6 +110,21 @@ public class BattleManager {
             turnManager.executeEnemyTurn();
         }
     }
+
+    // --- Overhack helpers ---
+    /** Instantly kill the current enemy (sets HP to 0). */
+    public void instakillEnemy() {
+        if (enemy != null && !turnManager.isGameOver()) {
+            enemy.setHp(0);
+        }
+    }
+
+    /** Ends the player's turn immediately. */
+    public void endPlayerTurnNow() {
+        if (turnManager != null && turnManager.isPlayerTurn()) {
+            turnManager.endPlayerTurn();
+        }
+    }
 }
 
 

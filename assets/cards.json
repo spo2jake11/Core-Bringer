@@ -12,16 +12,8 @@
     { "id": "shield_final_shield_2", "level": 2, "name": "Final Shield 2", "atlasName": "Final_Shield2", "tag": "SHIELD", "target": "SELF", "cost": 2, "baseEffect": 6 , "duration": 0},
     { "id": "shield_final_shield_3", "level": 3, "name": "Final Shield 3", "atlasName": "Final_Shield3", "tag": "SHIELD", "target": "SELF", "cost": 3, "baseEffect": 9 , "duration": 0},
 
-    { "id": "stun_logic_break_1", "level": 1, "name": "Logic Break 1", "atlasName": "Logic_Break1", "tag": "STUN", "target": "ENEMY", "cost": 2, "baseEffect": 0 , "duration": 1},
-    { "id": "stun_logic_break_2", "level": 2, "name": "Logic Break 2", "atlasName": "Logic_Break2", "tag": "STUN", "target": "ENEMY", "cost": 4, "baseEffect": 0 , "duration": 2},
-    { "id": "stun_logic_break_3", "level": 3, "name": "Logic Break 3", "atlasName": "Logic_Break3", "tag": "STUN", "target": "ENEMY", "cost": 6, "baseEffect": 0 , "duration": 3},
-
     { "id": "heal_heal_package_1", "level": 1, "name": "Heal Package 1", "atlasName": "Heal_Package1", "tag": "HEAL", "target": "SELF", "cost": 1, "baseEffect": 3 , "duration": 0},
     { "id": "heal_heal_package_2", "level": 2, "name": "Heal Package 2", "atlasName": "Heal_Package2", "tag": "HEAL", "target": "SELF", "cost": 2, "baseEffect": 6 , "duration": 0},
-    { "id": "heal_heal_package_3", "level": 3, "name": "Heal Package 3", "atlasName": "Heal_Package3", "tag": "HEAL", "target": "SELF", "cost": 3, "baseEffect": 9 , "duration": 0},
-
-    { "id": "bleed_memory_leak_1", "level": 1, "name": "Memory Leak 1", "atlasName": "Memory_Leak1", "tag": "BLEED", "target": "ENEMY", "cost": 1, "baseEffect": 3 , "duration": 4},
-    { "id": "bleed_memory_leak_2", "level": 2, "name": "Memory Leak 2", "atlasName": "Memory_Leak2", "tag": "BLEED", "target": "ENEMY", "cost": 2, "baseEffect": 6 , "duration": 4},
-    { "id": "bleed_memory_leak_3", "level": 3, "name": "Memory Leak 3", "atlasName": "Memory_Leak3", "tag": "BLEED", "target": "ENEMY", "cost": 3, "baseEffect": 9 , "duration": 4}
+    { "id": "heal_heal_package_3", "level": 3, "name": "Heal Package 3", "atlasName": "Heal_Package3", "tag": "HEAL", "target": "SELF", "cost": 3, "baseEffect": 9 , "duration": 0}
   ]
 }
