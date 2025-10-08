@@ -77,7 +77,7 @@ public class Main extends Game {
         //test skin used Utils.getInternalPath
         testskin = new Skin(Utils.getInternalPath("ui/uiskin.json")); ///Usage of sample skin, can be changed soon
         responsivelabelstyle = new Label.LabelStyle(testskin.getFont("default"), Color.WHITE);
-        responsivelabelstyle.font.getData().setScale(3f);
+        responsivelabelstyle.font.getData().setScale(2f);
 
         ///This is just temporary reference for the Card Handler to be used in the debug screen
         selecteddebugcard = null;
