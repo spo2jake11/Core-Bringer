@@ -10,6 +10,7 @@ public class SaveData {
     public int maxEnergy;
     public String[] cards;
     public int battleWon;
+    public int gold;
 
     public SaveData() {}
 
