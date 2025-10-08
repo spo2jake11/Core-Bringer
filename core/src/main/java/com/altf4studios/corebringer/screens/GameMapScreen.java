@@ -24,7 +24,6 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
-
 import java.util.ArrayList;
 import java.util.Random;
 
@@ -168,6 +167,22 @@ public class GameMapScreen implements Screen{
                 }
             });
 
+            ///Functionality for the Merchant Node
+            merchantnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.merchantScreen);
+                }
+            });
+
+            ///Functionality for the Rest Node
+            restnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.restScreen);
+                }
+            });
+
             for (int x = 0; x < totalnodescounter; x++) {
                 int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
                 switch (nodeselection) {
@@ -223,6 +238,22 @@ public class GameMapScreen implements Screen{
                         corebringer.setScreen(corebringer.gameScreen);
                         corebringer.gameScreen.rerollEnemyAndCards();
                     });
+                }
+            });
+
+            ///Functionality for the Merchant Node
+            merchantnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.merchantScreen);
+                }
+            });
+
+            ///Functionality for the Rest Node
+            restnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.restScreen);
                 }
             });
 
@@ -284,6 +315,22 @@ public class GameMapScreen implements Screen{
                 }
             });
 
+            ///Functionality for the Merchant Node
+            merchantnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.merchantScreen);
+                }
+            });
+
+            ///Functionality for the Rest Node
+            restnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.restScreen);
+                }
+            });
+
             for (int x = 0; x < totalnodescounter; x++) {
                 int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
                 switch (nodeselection) {
@@ -339,6 +386,22 @@ public class GameMapScreen implements Screen{
                         corebringer.setScreen(corebringer.gameScreen);
                         corebringer.gameScreen.rerollEnemyAndCards();
                     });
+                }
+            });
+
+            ///Functionality for the Merchant Node
+            merchantnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.merchantScreen);
+                }
+            });
+
+            ///Functionality for the Rest Node
+            restnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.restScreen);
                 }
             });
 
@@ -401,6 +464,22 @@ public class GameMapScreen implements Screen{
                 }
             });
 
+            ///Functionality for the Merchant Node
+            merchantnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.merchantScreen);
+                }
+            });
+
+            ///Functionality for the Rest Node
+            restnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.restScreen);
+                }
+            });
+
             for (int x = 0; x < totalnodescounter; x++) {
                 int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
                 switch (nodeselection) {
@@ -457,6 +536,22 @@ public class GameMapScreen implements Screen{
                             corebringer.gameScreen.rerollEnemyAndCards();
                         }
                     });
+                }
+            });
+
+            ///Functionality for the Merchant Node
+            merchantnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.merchantScreen);
+                }
+            });
+
+            ///Functionality for the Rest Node
+            restnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.restScreen);
                 }
             });
 
@@ -519,6 +614,22 @@ public class GameMapScreen implements Screen{
                 }
             });
 
+            ///Functionality for the Merchant Node
+            merchantnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.merchantScreen);
+                }
+            });
+
+            ///Functionality for the Rest Node
+            restnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.restScreen);
+                }
+            });
+
             for (int x = 0; x < totalnodescounter; x++) {
                 int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
                 switch (nodeselection) {
@@ -575,6 +686,22 @@ public class GameMapScreen implements Screen{
                             corebringer.gameScreen.rerollEnemyAndCards();
                         }
                     });
+                }
+            });
+
+            ///Functionality for the Merchant Node
+            merchantnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.merchantScreen);
+                }
+            });
+
+            ///Functionality for the Rest Node
+            restnode.addListener(new ClickListener() {
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    corebringer.setScreen(corebringer.restScreen);
                 }
             });
 
@@ -817,9 +944,9 @@ public class GameMapScreen implements Screen{
             }
         }
 
-        /// Overlay traversed path in light gold
-        Color lightGold = new Color(1f, 0.88f, 0.5f, 1f); /// light gold
-        shapeRenderer.setColor(lightGold);
+        /// Overlay traversed path in blue for better contrast
+        Color bluePath = new Color(0.2f, 0.6f, 1f, 1f);
+        shapeRenderer.setColor(bluePath);
         for (int i = 0; i < selectedNodesPerRank.size() - 1; i++) {
             Button fromSel = selectedNodesPerRank.get(i);
             Button toSel = selectedNodesPerRank.get(i + 1);
@@ -841,13 +968,39 @@ public class GameMapScreen implements Screen{
     private void updateRankInteractivity() {
         for (int i = 0; i < rankTables.size(); i++) {
             Table rank = rankTables.get(i);
-            boolean enable = (i == currentRankIndex) && !nodeChosenInCurrentRank;
             for (Actor child : rank.getChildren()) {
-                if (child instanceof Button) {
-                    child.setTouchable(enable ? Touchable.enabled : Touchable.disabled);
-                    Color c = child.getColor();
-                    float targetAlpha = enable ? 1f : 0.35f;
-                    child.setColor(c.r, c.g, c.b, targetAlpha);
+                if (!(child instanceof Button)) continue;
+                Button btn = (Button) child;
+
+                boolean isPastRank = i < currentRankIndex;
+                boolean isCurrentRank = i == currentRankIndex;
+                boolean isFutureRank = i > currentRankIndex;
+                boolean isSelectedInThisRank = selectedNodesPerRank != null && i < selectedNodesPerRank.size() && selectedNodesPerRank.get(i) == btn;
+
+                if (isPastRank) {
+                    // Past ranks: keep selected node fully visible, others dim. All disabled.
+                    btn.setTouchable(Touchable.disabled);
+                    Color c = btn.getColor();
+                    float targetAlpha = isSelectedInThisRank ? 1f : 0.35f;
+                    btn.setColor(c.r, c.g, c.b, targetAlpha);
+                } else if (isCurrentRank) {
+                    if (nodeChosenInCurrentRank) {
+                        // Current rank after choosing: selected node stays visible but disabled; others dim & disabled
+                        btn.setTouchable(Touchable.disabled);
+                        Color c = btn.getColor();
+                        float targetAlpha = isSelectedInThisRank ? 1f : 0.35f;
+                        btn.setColor(c.r, c.g, c.b, targetAlpha);
+                    } else {
+                        // Current rank before choosing: all enabled and visible
+                        btn.setTouchable(Touchable.enabled);
+                        Color c = btn.getColor();
+                        btn.setColor(c.r, c.g, c.b, 1f);
+                    }
+                } else if (isFutureRank) {
+                    // Future ranks: dim and disabled
+                    btn.setTouchable(Touchable.disabled);
+                    Color c = btn.getColor();
+                    btn.setColor(c.r, c.g, c.b, 0.35f);
                 }
             }
         }
@@ -866,6 +1019,15 @@ public class GameMapScreen implements Screen{
                 updateRankInteractivity();
             }
         });
+    }
+
+    /// Call this when returning from a completed node (e.g., after battle Proceed)
+    public void advanceToNextRank() {
+        if (nodeChosenInCurrentRank) {
+            currentRankIndex = Math.min(currentRankIndex + 1, Math.max(0, rankTables.size() - 1));
+            nodeChosenInCurrentRank = false;
+        }
+        updateRankInteractivity();
     }
 }
 

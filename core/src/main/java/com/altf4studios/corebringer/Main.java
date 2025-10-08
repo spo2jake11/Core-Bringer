@@ -43,6 +43,8 @@ public class Main extends Game {
     public DebugScreen debugScreen;
     public CardTestScren cardTestScren;
     public PuzzleScreen puzzleScreen;
+    public MerchantScreen merchantScreen;
+    public RestScreen restScreen;
     public SampleCardHandler selecteddebugcard;
     private AssetManager assetManager;
     public JShell jshell;
@@ -91,6 +93,8 @@ public class Main extends Game {
         codeEditorScreen = new CodeEditorScreen(this);
         debugScreen = new DebugScreen(this);
         cardTestScren = new CardTestScren(this);
+        merchantScreen = new MerchantScreen(this);
+        restScreen = new RestScreen(this);
         // Lazily create GameScreen when a map node is clicked
         gameScreen = null;
         gameMapScreen = new GameMapScreen(this);
