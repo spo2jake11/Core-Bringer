@@ -1,6 +1,7 @@
 package com.altf4studios.corebringer.screens.gamescreen;
 
 import com.altf4studios.corebringer.utils.CardParser;
+import com.altf4studios.corebringer.utils.CardDataManager;
 import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
 // import com.altf4studios.corebringer.status.Poison; // commented out per request
@@ -21,6 +22,7 @@ public class CardStageUI {
     private Stage cardStage;
     private Skin skin;
     private CardParser cardParser;
+    private CardDataManager cardDataManager;
     private CardHandTable cardHandTable;
     private TextButton drawButton;
     private Array<String> availableCardNames;
@@ -38,6 +40,7 @@ public class CardStageUI {
         this.player = player;
         this.enemy = enemy;
         this.cardParser = cardParser;
+        this.cardDataManager = CardDataManager.getInstance();
         this.turnManager = turnManager;
         this.gameScreen = gameScreen;
         this.discardPile = new Array<>();
@@ -55,8 +58,14 @@ public class CardStageUI {
     private int[] getCardCosts(String[] cardNames) {
         int[] costs = new int[cardNames.length];
         for (int i = 0; i < cardNames.length; i++) {
-            SampleCardHandler card = cardParser.findCardByName(cardNames[i]);
-            costs[i] = (card != null) ? card.cost : 0;
+            int cost = 0;
+            if (cardDataManager != null && cardDataManager.isInitialized()) {
+                cost = cardDataManager.getCostByName(cardNames[i]);
+            } else if (cardParser != null) {
+                SampleCardHandler card = cardParser.findCardByName(cardNames[i]);
+                cost = (card != null) ? card.cost : 0;
+            }
+            costs[i] = cost;
         }
         return costs;
     }
@@ -65,7 +74,13 @@ public class CardStageUI {
         initializeDrawPoolFromSave();
         createNewHand();
         createDrawButton();
-        drawButton.setPosition(cardStage.getViewport().getScreenWidth() + 300, cardStage.getViewport().getScreenHeight() * 0.25f);
+        // Place the End Turn button inside the visible area (bottom-right)
+        float sw = cardStage.getViewport().getScreenWidth();
+        float sh = cardStage.getViewport().getScreenHeight();
+        if (drawButton.getWidth() <= 0f || drawButton.getHeight() <= 0f) {
+            drawButton.setSize(200f, 50f);
+        }
+        drawButton.setPosition(sw - drawButton.getWidth() - 40f, 40f);
         cardStage.addActor(drawButton);
         showCards();
     }
@@ -111,18 +126,23 @@ public class CardStageUI {
         availableCardNames = new Array<>();
         // Load from GameScreen saved deck ids
         String[] savedIds = gameScreen != null ? gameScreen.getSavedDeckIds() : null;
-        if (savedIds != null && savedIds.length > 0 && cardParser.isCardsLoaded()) {
+        if (savedIds != null && savedIds.length > 0) {
             for (String id : savedIds) {
-                SampleCardHandler c = cardParser.findCardById(id);
-                if (c != null) {
+                SampleCardHandler c = null;
+                if (cardDataManager != null && cardDataManager.isInitialized()) {
+                    c = cardDataManager.getById(id);
+                }
+                if (c == null && cardParser != null && cardParser.isCardsLoaded()) {
+                    c = cardParser.findCardById(id);
+                }
+                if (c != null && c.name != null) {
                     drawPoolNames.add(c.name); // duplicates preserved
                 }
             }
         }
-        // Fallback to all cards if saved draw pool is empty
+        // Do NOT fallback to all cards; keep pool empty if player has no saved cards
         if (drawPoolNames.size == 0) {
-            initializeAvailableCards();
-            drawPoolNames.addAll(availableCardNames);
+            Gdx.app.log("CardStageUI", "Saved deck empty or invalid. No fallback to all cards.");
         }
         // Start with draw pool as the available pool; we remove as we draw
         availableCardNames.addAll(drawPoolNames);
@@ -179,7 +199,13 @@ public class CardStageUI {
     }
 
     private void handleCardClick(ImageButton card) {
-        SampleCardHandler cardInfo = cardParser.findCardByName(card.getName());
+        SampleCardHandler cardInfo = null;
+        if (cardDataManager != null && cardDataManager.isInitialized()) {
+            cardInfo = cardDataManager.getByName(card.getName());
+        }
+        if (cardInfo == null && cardParser != null) {
+            cardInfo = cardParser.findCardByName(card.getName());
+        }
         int cost = (cardInfo != null) ? cardInfo.cost : 0;
 
         if (gameScreen.getEnergy() < cost) {
@@ -262,7 +288,13 @@ public class CardStageUI {
     }
 
     private void resolveCardEffect(String cardName) {
-        SampleCardHandler card = cardParser.findCardByName(cardName);
+        SampleCardHandler card = null;
+        if (cardDataManager != null && cardDataManager.isInitialized()) {
+            card = cardDataManager.getByName(cardName);
+        }
+        if (card == null && cardParser != null) {
+            card = cardParser.findCardByName(cardName);
+        }
 
         if (card == null) {
             Gdx.app.log("CardEffect", "No such card found: " + cardName);

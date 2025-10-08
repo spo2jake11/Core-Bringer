@@ -76,12 +76,19 @@ public class GameScreen implements Screen{
     private boolean victoryScreenShown = false;
     // --- End Victory Screen ---
 
+    // --- Game Lifecycle State ---
+    private enum GameState { RUNNING, VICTORY, DEFEAT }
+    private GameState gameState = GameState.RUNNING;
+    // --- End Game Lifecycle State ---
+
 
     public GameScreen(Main corebringer) {
         this.corebringer = corebringer; /// The Master Key that holds all screens together
 
         // Initialize CardParser
         cardParser = CardParser.getInstance();
+        // Initialize CardDataManager maps from parser data for O(1) lookups
+        com.altf4studios.corebringer.utils.CardDataManager.getInstance().initFrom(cardParser);
 
         ///This stages are separated to lessen complications
         uiStage = new Stage(new ScreenViewport());
@@ -90,7 +97,8 @@ public class GameScreen implements Screen{
 
 
         // --- Load stats from save file (must exist at this point) ---
-        int hp = 20; // Default fallback values
+        int hp = 20; // Legacy fallback current HP
+        int maxHpFromSave = 20; // Default fallback max HP
         int energyVal = 0;
         String[] cards = new String[]{
             "basic_variable_slash_1", "basic_variable_slash_1", "basic_variable_slash_1",
@@ -107,7 +115,9 @@ public class GameScreen implements Screen{
         if (SaveManager.saveExists()) {
             com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
             if (stats != null) {
-                hp = stats.hp;
+                // Prefer new fields; fallback to legacy hp if needed
+                hp = (stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : hp));
+                maxHpFromSave = (stats.maxHp > 0 ? stats.maxHp : Math.max(hp, maxHpFromSave));
                 energyVal = stats.energy;
                 cards = stats.cards;
                 battleWon = stats.battleWon;
@@ -136,9 +146,9 @@ public class GameScreen implements Screen{
         // Initialize player and enemy
         // Important: do NOT set player's maxHealth to the saved current HP.
         // Create with a reasonable max, then set current HP from save so healing can increase HP.
-        int playerMaxHp = Math.max(hp, 20); // ensure max >= current; default to 20 min
+        int playerMaxHp = Math.max(maxHpFromSave, 20); // ensure max >= 20
         player = new Player("Player", playerMaxHp, 10, 5, 3);
-        player.setHp(hp); // set current HP to saved value
+        player.setHp(Math.min(hp, playerMaxHp)); // clamp to max
         enemy = new Enemy("enemy1", enemyName, enemyHp, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
         // Temporary TurnManager for early consumers; BattleManager will hold the canonical one
         turnManager = new TurnManager(player, enemy);
@@ -160,7 +170,8 @@ public class GameScreen implements Screen{
         if (battleWon == 1) {
             battleStageUI.changeEnemy();
             battleWon = 0;
-            SaveManager.saveStats(player.getHp(), energyVal, cards, battleWon);
+            // Persist stats with maxEnergy and current deck
+            SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energyVal, getMaxEnergy(), cards, battleWon);
         }
 
         // Set energy from save
@@ -219,7 +230,8 @@ public class GameScreen implements Screen{
 
     // Call this after any stat change (hp, energy, cards, battleWon)
     public void saveProgress(int battleWonValue) {
-        SaveManager.saveStats(player.getHp(), energy, new String[]{}, battleWonValue); // TODO: pass actual cards
+        String[] deck = savedDeckIds != null ? savedDeckIds : new String[]{};
+        SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energy, getMaxEnergy(), deck, battleWonValue);
     }
 
     private void createUI() {
@@ -312,24 +324,24 @@ public class GameScreen implements Screen{
             @Override public boolean mouseMoved(int screenX, int screenY) { return false; }
             @Override public boolean scrolled(float amountX, float amountY) { return false; }
         });
-        // Add Recharge button at the bottom of the screen, below cardStageUI
-        addRechargeButtonToBottom();
+        // Add Overhack button at the bottom of the screen, below cardStageUI
+        addOverhackButtonToBottom();
 
         // --- Ensure viewport is updated to current window size ---
         battleStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         cardStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
     }
 
-    private void addRechargeButtonToBottom() {
-        // Remove previous Recharge button if any
+    private void addOverhackButtonToBottom() {
+        // Remove previous Overhack button if any
         for (Actor actor : battleStage.getActors()) {
-            if (actor.getName() != null && actor.getName().equals("RechargeButton")) {
+            if (actor.getName() != null && actor.getName().equals("OverhackButton")) {
                 actor.remove();
                 break;
             }
         }
-        TextButton btnRecharge = new TextButton("Recharge", corebringer.testskin);
-        btnRecharge.setName("RechargeButton");
+        TextButton btnRecharge = new TextButton("Overhack", corebringer.testskin);
+        btnRecharge.setName("OverhackButton");
         btnRecharge.setWidth(200);
         btnRecharge.setHeight(50);
         btnRecharge.setPosition((Gdx.graphics.getWidth() / btnRecharge.getWidth()) + 50, 100);
@@ -340,7 +352,7 @@ public class GameScreen implements Screen{
         });
         battleStage.addActor(btnRecharge);
 
-        // Reposition energy widget to be at least 200 units above the Recharge button
+        // Reposition energy widget to be at least 200 units above the Overhack button
         if (energyWidget != null) {
             float newX = btnRecharge.getX() + 50;
             float newY = btnRecharge.getY() + btnRecharge.getHeight() + 100f;
@@ -351,17 +363,21 @@ public class GameScreen implements Screen{
     @Override
     public void render(float delta) {
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
-
-        battleStage.act(delta);
+        // Act only when game is running; always draw so UI remains visible
+        if (gameState == GameState.RUNNING) {
+            battleStage.act(delta);
+            cardStage.act(delta);
+        }
         battleStage.draw();
-        cardStage.act(delta);
         cardStage.draw();
         uiStage.act(delta);
         uiStage.draw();
         // Removed: editorStage.act(delta); editorStage.draw();
 
         // --- BattleManager: process turn phases, enemy AI, and UI indicator ---
-        battleManager.update(delta);
+        if (gameState == GameState.RUNNING) {
+            battleManager.update(delta);
+        }
         // --- End BattleManager ---
 
         // --- Energy auto-regen at start of player's actionable turn ---
@@ -509,8 +525,7 @@ public class GameScreen implements Screen{
             victoryScreenWindow.remove();
             victoryScreenWindow = null;
         }
-        this.dispose();
-
+        // Removed recursive self-dispose call
     }
 
     private void showOptionsWindow() {
@@ -595,17 +610,24 @@ public class GameScreen implements Screen{
     private void showDeathScreen() {
         if (deathScreenWindow != null) return; // Already shown
         deathScreenShown = true;
+        gameState = GameState.DEFEAT;
         // Load the death screen texture
         Texture deathTexture = new Texture(Gdx.files.internal("assets/nameplates/death_scrn.png"));
         Image deathImage = new Image(deathTexture);
         deathImage.getColor().a = 0f;
         deathImage.addAction(Actions.fadeIn(1.5f)); // 1.5 seconds fade in
+        // Calculate window size (60% width, 90% height) and center
+        float windowWidth = Gdx.graphics.getWidth() * 0.6f;
+        float windowHeight = Gdx.graphics.getHeight() * 0.9f;
+        float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
+        float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
         // Create window to overlay everything
         deathScreenWindow = new Window("", corebringer.testskin);
         deathScreenWindow.setModal(true);
         deathScreenWindow.setMovable(false);
         deathScreenWindow.setResizable(false);
-        deathScreenWindow.setFillParent(true);
+        deathScreenWindow.setSize(windowWidth, windowHeight);
+        deathScreenWindow.setPosition(windowX, windowY);
         deathScreenWindow.setTouchable(Touchable.enabled);
         deathScreenWindow.setColor(1,1,1,0f);
         deathScreenWindow.addAction(Actions.fadeIn(1.5f));
@@ -615,6 +637,9 @@ public class GameScreen implements Screen{
             @Override public void clicked(InputEvent event, float x, float y) {
                 // Delete save file on death
                 com.altf4studios.corebringer.utils.SaveManager.deleteSave();
+                // Transfer input ownership to the next screen before disposing
+                corebringer.clearInputProcessors();
+                // Switch screen; LibGDX will call show() on the next screen automatically
                 corebringer.setScreen(corebringer.mainMenuScreen);
                 // Optionally reset death screen state
                 if (deathScreenWindow != null) {
@@ -622,6 +647,11 @@ public class GameScreen implements Screen{
                     deathScreenWindow = null;
                     deathScreenShown = false;
                 }
+                // End this GameScreen lifecycle safely: clear stages and dispose next frame
+                try { if (battleStage != null) { battleStage.clear(); } } catch (Exception ignored) {}
+                try { if (cardStage != null) { cardStage.clear(); } } catch (Exception ignored) {}
+                try { if (uiStage != null) { uiStage.clear(); } } catch (Exception ignored) {}
+                Gdx.app.postRunnable(() -> GameScreen.this.dispose());
             }
         });
         Table overlay = new Table();
@@ -629,18 +659,21 @@ public class GameScreen implements Screen{
         overlay.add(deathImage).expand().fill().row();
         overlay.add(btnReturn).center().padTop(-300f); // Adjust as needed for button position
         deathScreenWindow.add(overlay).expand().fill();
-        battleStage.addActor(deathScreenWindow);
-        // Block all input except the button
-        Gdx.input.setInputProcessor(battleStage);
+        // Add to uiStage so it renders on top of other stages
+        uiStage.addActor(deathScreenWindow);
+        deathScreenWindow.toFront();
+        // Block all input except the modal by routing input to uiStage
+        Gdx.input.setInputProcessor(uiStage);
     }
 
     private void showVictoryScreen() {
         if (victoryScreenWindow != null) return; // Already shown
         victoryScreenShown = true;
+        gameState = GameState.VICTORY;
 
-        // Calculate window size (70% width, 80% height)
-        float windowWidth = Gdx.graphics.getWidth() * 0.7f;
-        float windowHeight = Gdx.graphics.getHeight() * 0.8f;
+        // Calculate window size (60% width, 90% height)
+        float windowWidth = Gdx.graphics.getWidth() * 0.6f;
+        float windowHeight = Gdx.graphics.getHeight() * 0.9f;
         float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
         float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
 
@@ -671,14 +704,22 @@ public class GameScreen implements Screen{
             @Override public void clicked(InputEvent event, float x, float y) {
                 // Save progress with battle won = 1
                 saveProgress(1);
-                // Reroll enemy and cards for next battle
-                rerollEnemyAndCards();
                 // Hide victory screen
                 if (victoryScreenWindow != null) {
                     victoryScreenWindow.remove();
                     victoryScreenWindow = null;
                     victoryScreenShown = false;
                 }
+                // Return to game map and end this GameScreen's lifecycle
+                corebringer.clearInputProcessors();
+                // Switch to map; LibGDX will call show() on map screen
+                corebringer.setScreen(corebringer.gameMapScreen);
+                // Clear stages to cancel actions and detach actors before disposing
+                try { if (battleStage != null) { battleStage.clear(); } } catch (Exception ignored) {}
+                try { if (cardStage != null) { cardStage.clear(); } } catch (Exception ignored) {}
+                try { if (uiStage != null) { uiStage.clear(); } } catch (Exception ignored) {}
+                // Dispose on next frame to ensure no native resources are still in use this tick
+                Gdx.app.postRunnable(() -> GameScreen.this.dispose());
             }
         });
 
@@ -687,10 +728,12 @@ public class GameScreen implements Screen{
         contentTable.add(btnProceed).center().padTop(50f);
 
         victoryScreenWindow.add(contentTable).expand().fill();
-        battleStage.addActor(victoryScreenWindow);
+        // Add to uiStage so it renders on top of other stages
+        uiStage.addActor(victoryScreenWindow);
+        victoryScreenWindow.toFront();
 
-        // Block all input except the button
-        Gdx.input.setInputProcessor(battleStage);
+        // Block all input except the modal by routing input to uiStage
+        Gdx.input.setInputProcessor(uiStage);
     }
 
     /**

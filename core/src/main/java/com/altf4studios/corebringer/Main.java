@@ -91,7 +91,8 @@ public class Main extends Game {
         codeEditorScreen = new CodeEditorScreen(this);
         debugScreen = new DebugScreen(this);
         cardTestScren = new CardTestScren(this);
-        gameScreen = new GameScreen(this);
+        // Lazily create GameScreen when a map node is clicked
+        gameScreen = null;
         gameMapScreen = new GameMapScreen(this);
         puzzleScreen = new PuzzleScreen(this);
         setScreen(mainMenuScreen);

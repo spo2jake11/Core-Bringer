@@ -126,7 +126,8 @@ public class MainMenuScreen implements Screen {
                         "shield_final_shield_1", "heal_heal_package_1", "heal_heal_package_1",
                         "heal_heal_package_1", "poison_looping_bite_1", "poison_looping_bite_1"
                     };
-                    SaveManager.saveStats(50, 0, defaultCards, 0);
+                    // Initialize save with currentHp=50 and maxHp=50
+                    SaveManager.saveStats(50, 50, 0, defaultCards, 0);
                     corebringer.setScreen(corebringer.gameMapScreen);
                 });
             }

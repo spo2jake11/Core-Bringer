@@ -146,10 +146,10 @@ public class GameMapScreen implements Screen{
                     // Fade out map music, fade in game music
                     corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                         corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                        // Create a fresh GameScreen instance (previous may have been disposed)
+                        corebringer.gameScreen = new GameScreen(corebringer);
                         corebringer.setScreen(corebringer.gameScreen);
-                        if (corebringer.gameScreen != null) {
-                            corebringer.gameScreen.rerollEnemyAndCards();
-                        }
+                        corebringer.gameScreen.rerollEnemyAndCards();
                     });
                 }
             });
@@ -205,10 +205,9 @@ public class GameMapScreen implements Screen{
                     // Fade out map music, fade in game music
                     corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                         corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                        corebringer.gameScreen = new GameScreen(corebringer);
                         corebringer.setScreen(corebringer.gameScreen);
-                        if (corebringer.gameScreen != null) {
-                            corebringer.gameScreen.rerollEnemyAndCards();
-                        }
+                        corebringer.gameScreen.rerollEnemyAndCards();
                     });
                 }
             });
@@ -264,10 +263,9 @@ public class GameMapScreen implements Screen{
                     // Fade out map music, fade in game music
                     corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                         corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                        corebringer.gameScreen = new GameScreen(corebringer);
                         corebringer.setScreen(corebringer.gameScreen);
-                        if (corebringer.gameScreen != null) {
-                            corebringer.gameScreen.rerollEnemyAndCards();
-                        }
+                        corebringer.gameScreen.rerollEnemyAndCards();
                     });
                 }
             });
@@ -323,10 +321,9 @@ public class GameMapScreen implements Screen{
                     // Fade out map music, fade in game music
                     corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                         corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                        corebringer.gameScreen = new GameScreen(corebringer);
                         corebringer.setScreen(corebringer.gameScreen);
-                        if (corebringer.gameScreen != null) {
-                            corebringer.gameScreen.rerollEnemyAndCards();
-                        }
+                        corebringer.gameScreen.rerollEnemyAndCards();
                     });
                 }
             });
@@ -598,10 +595,9 @@ public class GameMapScreen implements Screen{
                 // Fade out map music, fade in game music
                 corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                     corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                    corebringer.gameScreen = new GameScreen(corebringer);
                     corebringer.setScreen(corebringer.gameScreen);
-                    if (corebringer.gameScreen != null) {
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    }
+                    corebringer.gameScreen.rerollEnemyAndCards();
                 });
             }
         });
@@ -611,10 +607,9 @@ public class GameMapScreen implements Screen{
             public void clicked(InputEvent event, float x, float y) {
                 corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                     corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                    corebringer.gameScreen = new GameScreen(corebringer);
                     corebringer.setScreen(corebringer.gameScreen);
-                    if (corebringer.gameScreen != null) {
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    }
+                    corebringer.gameScreen.rerollEnemyAndCards();
                 });
             }
         });
@@ -624,10 +619,9 @@ public class GameMapScreen implements Screen{
             public void clicked(InputEvent event, float x, float y) {
                 corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                     corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                    corebringer.gameScreen = new GameScreen(corebringer);
                     corebringer.setScreen(corebringer.gameScreen);
-                    if (corebringer.gameScreen != null) {
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    }
+                    corebringer.gameScreen.rerollEnemyAndCards();
                 });
             }
         });
@@ -637,10 +631,9 @@ public class GameMapScreen implements Screen{
             public void clicked(InputEvent event, float x, float y) {
                 corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                     corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                    corebringer.gameScreen = new GameScreen(corebringer);
                     corebringer.setScreen(corebringer.gameScreen);
-                    if (corebringer.gameScreen != null) {
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    }
+                    corebringer.gameScreen.rerollEnemyAndCards();
                 });
             }
         });
