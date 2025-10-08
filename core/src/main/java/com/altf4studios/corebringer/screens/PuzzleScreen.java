@@ -32,6 +32,7 @@ public class PuzzleScreen implements Screen {
     private Label expressionLabel;
     private Image congratulationsImage;
     private TextButton backButton;
+    private TextButton makeOneButton;
 
     // Puzzle state for single expression
     private boolean[] inputs; // 4 inputs
@@ -71,6 +72,40 @@ public class PuzzleScreen implements Screen {
         setupLayout();
     }
 
+    private Texture getOperatorTextureForIndex(int idx) {
+        switch (idx) {
+            case 0: return andTexture;
+            case 1: return orTexture;
+            case 2: return xorTexture;
+            default: return questionMarkTexture;
+        }
+    }
+
+    private void solveForOne() {
+        // Try all 16 combinations to find one that evaluates to true
+        for (int mask = 0; mask < 16; mask++) {
+            // Apply combination to inputs
+            for (int i = 0; i < 4; i++) {
+                boolean bit = ((mask >> i) & 1) == 1;
+                inputs[i] = bit;
+                isQuestionMark[i] = false;
+                inputImages[i].setDrawable(new TextureRegionDrawable(bit ? input1Texture : input0Texture));
+            }
+            boolean result = evaluateExpression();
+            if (result) {
+                updateResult();
+                return;
+            }
+        }
+        // If no solution found (shouldn't happen for OR present), just set all 1s
+        for (int i = 0; i < 4; i++) {
+            inputs[i] = true;
+            isQuestionMark[i] = false;
+            inputImages[i].setDrawable(new TextureRegionDrawable(input1Texture));
+        }
+        updateResult();
+    }
+
     private void loadTextures() {
         input1Texture = new Texture(Utils.getInternalPath("Puzzle/1.png"));
         input0Texture = new Texture(Utils.getInternalPath("Puzzle/0.png"));
@@ -107,17 +142,18 @@ public class PuzzleScreen implements Screen {
             inputImages[i] = new Image(questionMarkTexture);
         }
 
-        // Create operator images (start with question marks)
+        // Create operator images (randomized and non-clickable)
         for (int i = 0; i < 3; i++) {
-            operatorImages[i] = new Image(questionMarkTexture);
-            currentOperators[i] = -1; // Start with question mark (index -1)
+            currentOperators[i] = MathUtils.random(0, 2);
+            operatorImages[i] = new Image(getOperatorTextureForIndex(currentOperators[i]));
+            operatorImages[i].setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
         }
 
         // Create result cube image
         resultCubeImage = new Image(cubePlainTexture);
 
         // Create labels
-        instructionLabel = new Label("Click inputs and operators to solve: ? op ? op ? op ? = Cube", corebringer.testskin);
+        instructionLabel = new Label("Operators randomized. Toggle inputs to reach: ? op ? op ? op ? = Cube (or press Make 1)", corebringer.testskin);
         instructionLabel.setColor(Color.WHITE);
         instructionLabel.setFontScale(1.2f);
 
@@ -135,11 +171,12 @@ public class PuzzleScreen implements Screen {
 
         // Create back button
         backButton = new TextButton("Back to Map", corebringer.testskin);
+        // Create make-one button
+        makeOneButton = new TextButton("Make 1", corebringer.testskin);
 
         // Setup input listeners
         setupInputToggleListeners();
-        // Setup operator listeners
-        setupOperatorToggleListeners();
+        // Operators are randomized and non-clickable; do not attach listeners
         // Add button listeners
         setupButtonListeners();
     }
@@ -149,6 +186,12 @@ public class PuzzleScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 corebringer.setScreen(corebringer.gameMapScreen);
+            }
+        });
+        makeOneButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                solveForOne();
             }
         });
     }
@@ -189,40 +232,7 @@ public class PuzzleScreen implements Screen {
         }
     }
 
-    private void setupOperatorToggleListeners() {
-        // Setup listeners for all 3 operators
-        for (int i = 0; i < 3; i++) {
-            final int currentOperator = i;
-
-            operatorImages[i].addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    // Cycle through operators: ? → && → || → ^ → ?
-                    currentOperators[currentOperator]++;
-                    if (currentOperators[currentOperator] > 2) {
-                        currentOperators[currentOperator] = -1; // back to question mark
-                    }
-                    
-                    // Update operator image
-                    switch (currentOperators[currentOperator]) {
-                        case -1: // ?
-                            operatorImages[currentOperator].setDrawable(new TextureRegionDrawable(questionMarkTexture));
-                            break;
-                        case 0: // &&
-                            operatorImages[currentOperator].setDrawable(new TextureRegionDrawable(andTexture));
-                            break;
-                        case 1: // ||
-                            operatorImages[currentOperator].setDrawable(new TextureRegionDrawable(orTexture));
-                            break;
-                        case 2: // ^
-                            operatorImages[currentOperator].setDrawable(new TextureRegionDrawable(xorTexture));
-                            break;
-                    }
-                    updateResult();
-                }
-            });
-        }
-    }
+    // Operators are randomized; no toggle listeners
 
     private void updateResult() {
         // Check if any input or operator is question mark
@@ -387,7 +397,9 @@ public class PuzzleScreen implements Screen {
         puzzleTable.add(resultLabel).colspan(9).padBottom(20f).row();
 
         // Add puzzle table to main table
-        mainTable.add(puzzleTable).center();
+        mainTable.add(puzzleTable).center().row();
+        // Add Make 1 button below puzzle
+        mainTable.add(makeOneButton).padTop(15f).center();
 
         // Add back button to upper left corner
         backButton.setPosition(20f, puzzleStage.getHeight() - backButton.getHeight() - 20f);
@@ -411,10 +423,11 @@ public class PuzzleScreen implements Screen {
             inputImages[i].setDrawable(new TextureRegionDrawable(questionMarkTexture));
         }
 
-        // Reset all operators to question marks
+        // Randomize and show operators (non-clickable)
         for (int i = 0; i < 3; i++) {
-            currentOperators[i] = -1;
-            operatorImages[i].setDrawable(new TextureRegionDrawable(questionMarkTexture));
+            currentOperators[i] = MathUtils.random(0, 2);
+            operatorImages[i].setDrawable(new TextureRegionDrawable(getOperatorTextureForIndex(currentOperators[i])));
+            operatorImages[i].setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
         }
 
         // Hide congratulations image

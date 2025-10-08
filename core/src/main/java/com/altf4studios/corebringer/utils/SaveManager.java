@@ -25,11 +25,12 @@ public class SaveManager {
         }
     }
 
-    // New API: includes maxEnergy
-    public static void saveStats(int currentHp, int maxHp, int energy, int maxEnergy, String[] cards, int battleWon) {
+    // New API: includes maxEnergy and gold
+    public static void saveStats(int currentHp, int maxHp, int energy, int maxEnergy, String[] cards, int battleWon, int gold) {
         SaveData data = new SaveData(currentHp, maxHp, energy, maxEnergy, cards, battleWon);
         // Also populate deprecated field for compatibility with old readers/tools
         data.hp = currentHp;
+        data.gold = gold;
         Json json = new Json();
         json.setOutputType(JsonWriter.OutputType.json);
         FileHandle file = Gdx.files.external(FILENAME);
@@ -40,12 +41,17 @@ public class SaveManager {
     @Deprecated
     public static void saveStats(int hp, int energy, String[] cards, int battleWon) {
         // Default maxEnergy to 3 for backward compatibility
-        saveStats(hp, hp, energy, 3, cards, battleWon);
+        saveStats(hp, hp, energy, 3, cards, battleWon, 0);
     }
 
     // Backward-compatible overload without maxEnergy, default to 3
     public static void saveStats(int currentHp, int maxHp, int energy, String[] cards, int battleWon) {
-        saveStats(currentHp, maxHp, energy, 3, cards, battleWon);
+        saveStats(currentHp, maxHp, energy, 3, cards, battleWon, 0);
+    }
+
+    // Previous primary signature kept for source compatibility (gold defaults to 0 if not provided)
+    public static void saveStats(int currentHp, int maxHp, int energy, int maxEnergy, String[] cards, int battleWon) {
+        saveStats(currentHp, maxHp, energy, maxEnergy, cards, battleWon, 0);
     }
 
     public static SaveData loadStats() {

@@ -27,6 +27,12 @@ import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.altf4studios.corebringer.utils.SaveManager;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.utils.ObjectMap;
 
 public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
@@ -51,6 +57,7 @@ public class GameScreen implements Screen{
     private CardStageUI cardStageUI;
     // Top submenu HP label to sync with character image HP
     private Label topHpNumLabel;
+    private Label goldLabel;
     // --- End UI Components ---
 
     // --- Energy System ---
@@ -60,9 +67,17 @@ public class GameScreen implements Screen{
     private Stack energyWidget; // label + background
     private Texture energyBgTexture;
     private Window optionsWindow;
+    private Window deckWindow;
     // Persisted deck ids for this run
     private String[] savedDeckIds;
     // --- End Energy System ---
+    // --- Currency ---
+    private int gold = 0;
+    // --- End Currency ---
+    // --- Deck UI helpers ---
+    private TextureAtlas deckCardAtlas;
+    private ObjectMap<String, String> idToAtlasName;
+    // --- End Deck UI helpers ---
     // Track when we've already applied regen for the current player turn
     private boolean playerTurnEnergyApplied = false;
 
@@ -108,6 +123,7 @@ public class GameScreen implements Screen{
             "heal_ultimate_heal_1", "poison_looping_bite_1", "poison_looping_bite_1"
         };
         int battleWon = 0;
+        int goldFromSave = 0;
         String enemyName = "Enemy";
         int enemyHp = 20;
 
@@ -121,6 +137,7 @@ public class GameScreen implements Screen{
                 energyVal = stats.energy;
                 cards = stats.cards;
                 battleWon = stats.battleWon;
+                goldFromSave = stats.gold;
             }
         }
 
@@ -163,6 +180,8 @@ public class GameScreen implements Screen{
         turnManager = battleManager.getTurnManager();
         // Make saved deck available to card UI
         this.savedDeckIds = cards;
+        // Initialize gold from save
+        this.gold = goldFromSave;
         cardStageUI = new CardStageUI(cardStage, corebringer.testskin, cardParser, player, enemy, turnManager, this);
         createUI();
 
@@ -171,7 +190,7 @@ public class GameScreen implements Screen{
             battleStageUI.changeEnemy();
             battleWon = 0;
             // Persist stats with maxEnergy and current deck
-            SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energyVal, getMaxEnergy(), cards, battleWon);
+            SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energyVal, getMaxEnergy(), cards, battleWon, gold);
         }
 
         // Set energy from save
@@ -231,7 +250,7 @@ public class GameScreen implements Screen{
     // Call this after any stat change (hp, energy, cards, battleWon)
     public void saveProgress(int battleWonValue) {
         String[] deck = savedDeckIds != null ? savedDeckIds : new String[]{};
-        SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energy, getMaxEnergy(), deck, battleWonValue);
+        SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energy, getMaxEnergy(), deck, battleWonValue, gold);
     }
 
     private void createUI() {
@@ -249,12 +268,14 @@ public class GameScreen implements Screen{
         Table tblLeftPane = new Table();
         Label lblCharName = new Label("Player", corebringer.testskin);
         topHpNumLabel = new Label("HP: " + player.getHp() + "/" + player.getMaxHealth(), corebringer.testskin);
-        Label lblGold = new Label("Gold: 0", corebringer.testskin);
+        // Load gold before creating UI label
+        this.gold = this.gold == 0 ? 0 : this.gold; // no-op if already set
+        goldLabel = new Label("Gold: " + this.gold, corebringer.testskin);
 
         // Table handler for the right side
         Table tblRightPane = new Table();
         Label lblMenu = new Label("Menu", corebringer.testskin);
-        Label lblDeck = new Label("Deck", corebringer.testskin);
+        TextButton btnDeck = new TextButton("Deck", corebringer.testskin);
         Label lblMap = new Label("Map", corebringer.testskin);
 
         // Filler table
@@ -264,12 +285,12 @@ public class GameScreen implements Screen{
         tblLeftPane.defaults().padLeft(10).padRight(10).uniform();
         tblLeftPane.add(lblCharName);
         tblLeftPane.add(topHpNumLabel);
-        tblLeftPane.add(lblGold);
+        tblLeftPane.add(goldLabel);
 
         // Right Pane placement
         tblRightPane.defaults().padRight(10).padLeft(10).uniform();
         tblRightPane.add(lblMap);
-        tblRightPane.add(lblDeck);
+        tblRightPane.add(btnDeck);
         tblRightPane.add(lblMenu);
 
         // Add content to inner table
@@ -281,6 +302,108 @@ public class GameScreen implements Screen{
         tbltopUI.add(innerTable).growX().height(75);
 
         uiStage.addActor(tbltopUI);
+
+        // Deck button behavior: bring deck window to front and show scrollable grid
+        btnDeck.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                showDeckWindow();
+            }
+        });
+    }
+
+    private void ensureDeckResourcesLoaded() {
+        if (deckCardAtlas == null) {
+            deckCardAtlas = new TextureAtlas("assets/cards/cards_atlas.atlas");
+        }
+        if (idToAtlasName == null) {
+            idToAtlasName = new ObjectMap<>();
+            try {
+                JsonReader reader = new JsonReader();
+                JsonValue root = reader.parse(Gdx.files.internal("assets/cards.json"));
+                for (JsonValue card : root.get("cards")) {
+                    String id = card.getString("id", null);
+                    String atlas = card.getString("atlasName", null);
+                    if (id != null && atlas != null) {
+                        idToAtlasName.put(id, atlas);
+                    }
+                }
+            } catch (Exception e) {
+                Gdx.app.error("GameScreen", "Failed to load cards.json for deck mapping: " + e.getMessage());
+            }
+        }
+    }
+
+    private void showDeckWindow() {
+        ensureDeckResourcesLoaded();
+
+        if (deckWindow != null) {
+            deckWindow.toFront();
+            deckWindow.setVisible(true);
+            return;
+        }
+
+        float windowWidth = Gdx.graphics.getWidth() * 0.8f;
+        float windowHeight = Gdx.graphics.getHeight() * 0.8f;
+        float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
+        float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
+
+        deckWindow = new Window("Deck", corebringer.testskin);
+        deckWindow.setModal(true);
+        deckWindow.setMovable(true);
+        deckWindow.setResizable(false);
+        deckWindow.setSize(windowWidth, windowHeight);
+        deckWindow.setPosition(windowX, windowY);
+
+        Table grid = new Table();
+        grid.defaults().pad(10);
+
+        String[] ids = getSavedDeckIds();
+        int col = 0;
+        for (int i = 0; i < ids.length; i++) {
+            String id = ids[i];
+            String atlasName = idToAtlasName != null ? idToAtlasName.get(id) : null;
+            String region = atlasName != null ? atlasName.replace(" ", "_") : "bck_card";
+            TextureRegionDrawable drawable = new TextureRegionDrawable(deckCardAtlas.findRegion(region));
+            Image img = new Image(drawable);
+            img.setSize(150, 190);
+            grid.add(img).size(150, 190);
+            col++;
+            if (col == 4) {
+                grid.row();
+                col = 0;
+            }
+        }
+
+        ScrollPane scrollPane = new ScrollPane(grid, corebringer.testskin);
+        scrollPane.setScrollingDisabled(true, false); // enable vertical scrolling
+        scrollPane.setFadeScrollBars(false);
+
+        // Controls row
+        Table controls = new Table();
+        TextButton btnClose = new TextButton("Close", corebringer.testskin);
+        btnClose.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (deckWindow != null) {
+                    deckWindow.remove();
+                    deckWindow = null;
+                }
+                // Return input control back to the GameScreen's normal input processors
+                show();
+            }
+        });
+        controls.add(btnClose).right();
+
+        Table content = new Table();
+        content.setFillParent(true);
+        content.add(scrollPane).expand().fill().row();
+        content.add(controls).right().pad(10);
+
+        deckWindow.add(content).expand().fill();
+        uiStage.addActor(deckWindow);
+        deckWindow.toFront();
+        Gdx.input.setInputProcessor(uiStage);
     }
 
     @Override
@@ -698,10 +821,22 @@ public class GameScreen implements Screen{
         victoryMessage.setAlignment(Align.center);
         victoryMessage.setFontScale(2.0f); // Make it larger
 
+        // Gold reward (random 50-100)
+        final int goldReward = MathUtils.random(50, 100);
+        Label goldGainedLabel = new Label("Gold Gained: " + goldReward, corebringer.testskin);
+        goldGainedLabel.setAlignment(Align.center);
+        Label totalGoldPreview = new Label("Total Gold After: " + (this.gold + goldReward), corebringer.testskin);
+        totalGoldPreview.setAlignment(Align.center);
+
         // Proceed button
         TextButton btnProceed = new TextButton("Proceed", corebringer.testskin);
         btnProceed.addListener(new ClickListener() {
             @Override public void clicked(InputEvent event, float x, float y) {
+                // Apply gold reward
+                GameScreen.this.gold += goldReward;
+                if (goldLabel != null) {
+                    goldLabel.setText("Gold: " + GameScreen.this.gold);
+                }
                 // Save progress with battle won = 1
                 saveProgress(1);
                 // Hide victory screen
@@ -725,6 +860,8 @@ public class GameScreen implements Screen{
 
         // Add content to table
         contentTable.add(victoryMessage).expand().center().row();
+        contentTable.add(goldGainedLabel).center().padTop(20f).row();
+        contentTable.add(totalGoldPreview).center().padTop(10f).row();
         contentTable.add(btnProceed).center().padTop(50f);
 
         victoryScreenWindow.add(contentTable).expand().fill();

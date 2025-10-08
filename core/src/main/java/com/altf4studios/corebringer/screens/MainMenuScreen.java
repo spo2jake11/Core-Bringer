@@ -121,10 +121,10 @@ public class MainMenuScreen implements Screen {
                     boolean saveExists = SaveManager.saveExists();
                     String[] defaultCards = new String[]{
                         "basic_variable_slash_1", "basic_variable_slash_1", "basic_variable_slash_1",
-                        "basic_function_slash_1", "basic_function_slash_1", "shield_final_shield_1",
+                        "basic_variable_slash_1", "basic_variable_slash_1", "shield_final_shield_1",
                         "shield_final_shield_1", "shield_final_shield_1", "shield_final_shield_1",
                         "shield_final_shield_1", "heal_heal_package_1", "heal_heal_package_1",
-                        "heal_heal_package_1", "poison_looping_bite_1", "poison_looping_bite_1"
+                        "heal_heal_package_1"
                     };
                     // Initialize save with currentHp=50 and maxHp=50
                     SaveManager.saveStats(50, 50, 0, defaultCards, 0);
