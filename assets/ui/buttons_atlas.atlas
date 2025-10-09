@@ -2,8 +2,10 @@ buttons_atlas.png
 size:2048,256
 repeat:none
 exit_btn
-bounds:1066,12,420,160
+bounds:1518,12,420,160
+run_btn
+bounds:1096,12,420,160
 settings_btn
-bounds:644,12,420,160
+bounds:644,12,450,160
 start_btn
 bounds:2,2,640,170

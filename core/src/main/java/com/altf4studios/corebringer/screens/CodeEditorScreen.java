@@ -284,7 +284,7 @@ public class CodeEditorScreen implements Screen {
         root.setFillParent(true);
 
         // Left column is question (half width), right column is code editor
-        root.add(questionTable).width(Gdx.graphics.getWidth() * 0.5f).growY().pad(10);
+        root.add(questionTable).width(Gdx.graphics.getWidth() * 0.5f).growY().pad(5);
         root.add(right).grow().pad(10);
 
         stage.addActor(root);

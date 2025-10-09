@@ -200,7 +200,7 @@ public class GameScreen implements Screen{
         energyLabel.setAlignment(Align.center);
         // Background image from assets/icons/energy.png
         try {
-            energyBgTexture = new Texture(Gdx.files.internal("assets/icons/energy.png"));
+            energyBgTexture = new Texture(Gdx.files.internal("assets/icons/energy_icon.png"));
             Image bg = new Image(energyBgTexture);
             bg.setSize(100, 100);
             // Build stacked widget: background under, text over
