@@ -9,12 +9,16 @@ import com.altf4studios.corebringer.quiz.QuestionnaireManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
+import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -202,6 +206,7 @@ public class CodeEditorScreen implements Screen {
         // Question panel (top-left half)
         Table questionTable = new Table();
         questionTable.top().left();
+
         questionLabel = new Label("Loading questions...", skin);
         questionLabel.setAlignment(Align.topLeft);
         questionLabel.setWrap(true);
@@ -211,6 +216,8 @@ public class CodeEditorScreen implements Screen {
 
         // Container for question + hints
         Table qContainer = new Table();
+        // Add inner padding so the first glyph of each wrapped line is not clipped by the ScrollPane scissor
+        qContainer.pad(12);
         qContainer.add(questionLabel).expandX().fillX().padBottom(6).row();
         qContainer.add(keyPointsLabel).expandX().fillX();
 
@@ -221,6 +228,37 @@ public class CodeEditorScreen implements Screen {
         // Code editor panel
         codeInputArea = new TextArea("// Type your solution here\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"\");\n    }\n}\n", skin);
         codeInputArea.setPrefRows(20);
+        // Prefer top-left alignment for text rendering
+        codeInputArea.setAlignment(Align.topLeft);
+        // Increase the TextArea's own internal padding by adjusting its style background
+        TextField.TextFieldStyle tfStyle = new TextField.TextFieldStyle(skin.get(TextField.TextFieldStyle.class));
+        // Helper to create a padded drawable (draw-less is fine since container has background)
+        Drawable bg = tfStyle.background != null ? tfStyle.background : skin.getDrawable("textfield");
+        BaseDrawable paddedBg = new BaseDrawable(bg);
+        paddedBg.setLeftWidth(bg.getLeftWidth() + 18f);
+        paddedBg.setRightWidth(bg.getRightWidth() + 10f);
+        paddedBg.setTopHeight(bg.getTopHeight() + 8f);
+        paddedBg.setBottomHeight(bg.getBottomHeight() + 8f);
+        tfStyle.background = paddedBg;
+        if (tfStyle.focusedBackground != null) {
+            Drawable fbg = tfStyle.focusedBackground;
+            BaseDrawable paddedFbg = new BaseDrawable(fbg);
+            paddedFbg.setLeftWidth(fbg.getLeftWidth() + 18f);
+            paddedFbg.setRightWidth(fbg.getRightWidth() + 10f);
+            paddedFbg.setTopHeight(fbg.getTopHeight() + 8f);
+            paddedFbg.setBottomHeight(fbg.getBottomHeight() + 8f);
+            tfStyle.focusedBackground = paddedFbg;
+        }
+        if (tfStyle.disabledBackground != null) {
+            Drawable dbg = tfStyle.disabledBackground;
+            BaseDrawable paddedDbg = new BaseDrawable(dbg);
+            paddedDbg.setLeftWidth(dbg.getLeftWidth() + 18f);
+            paddedDbg.setRightWidth(dbg.getRightWidth() + 10f);
+            paddedDbg.setTopHeight(dbg.getTopHeight() + 8f);
+            paddedDbg.setBottomHeight(dbg.getBottomHeight() + 8f);
+            tfStyle.disabledBackground = paddedDbg;
+        }
+        codeInputArea.setStyle(tfStyle);
         // Tab/Enter behavior (simple)
         codeInputArea.addListener(new InputListener() {
             @Override
@@ -271,21 +309,45 @@ public class CodeEditorScreen implements Screen {
 
         // Removed energy UI and controls from Code Editor screen per request
         Table right = new Table();
-        right.add(new ScrollPane(codeInputArea, skin)).grow().colspan(2).row();
-        right.add(btnRun).padTop(10).left();
+        // Wrap TextArea in a padded container to prevent first-character clipping inside ScrollPane
+        Table codeContainer = new Table();
+        // Increase left padding to offset any glyph left-bearings
+        codeContainer.padTop(12).padBottom(12).padLeft(12).padRight(12);
+        // Outer container white to look like a border
+        codeContainer.setBackground(skin.newDrawable("white", 1f, 1f, 1f, 0.8f));
+        // Inner container with light gray background that holds the TextArea
+        Table codeInner = new Table();
+        codeInner.setBackground(skin.newDrawable("white", Color.DARK_GRAY));
+        codeInner.add(codeInputArea).expand().fill();
+        // Add a fixed left gutter to guarantee space before the text render origin
+        codeContainer.add().width(16f).growY();
+        codeContainer.add(codeInner).expand().fill();
+        ScrollPane codeScroll = new ScrollPane(codeContainer, skin);
+        codeScroll.setFadeScrollBars(false);
+        // Avoid content overscrolling into the left scissor region
+        codeScroll.setOverscroll(false, false);
+        right.add(codeScroll).padLeft(10).padBottom(40).grow().colspan(2).row();
+        right.add(btnRun).padLeft(15).padTop(10).left();
         right.add(btnNextQ).padTop(10).left().row();
-        right.add(btnBack).padTop(10).left();
+        right.add(btnBack).padLeft(15).padTop(10).left();
         right.add(outputLabel).padTop(10).left();
         right.add(btnToggleHints).padTop(10).left().row();
         // Energy gain button removed
 
-        // Layout root
+        // Layout root using a SplitPane to enforce 35% (left) / 65% (right)
         Table root = new Table();
         root.setFillParent(true);
+        SplitPane split = new SplitPane(questionTable, right, false, skin);
+        split.setSplitAmount(0.4f); // 35% left, 65% right
+        split.setMinSplitAmount(0.2f);
+        split.setMaxSplitAmount(0.5f);
+        split.setTouchable(Touchable.disabled);
+        // Make the divider invisible by using a fully transparent handle drawable
+        SplitPane.SplitPaneStyle spStyle = new SplitPane.SplitPaneStyle();
+        spStyle.handle = skin.newDrawable("white", 0f, 0f, 0f, 0f);
+        split.setStyle(spStyle);
 
-        // Left column is question (half width), right column is code editor
-        root.add(questionTable).width(Gdx.graphics.getWidth() * 0.5f).growY().pad(5);
-        root.add(right).grow().pad(10);
+        root.add(split).expand().fill().pad(5);
 
         stage.addActor(root);
 

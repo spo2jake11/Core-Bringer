@@ -58,16 +58,16 @@ public class Main extends Game {
         assetManager.load("startup_bg.png", Texture.class);
 
         ///This is where music plays when the game starts
-        corebringerbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Mortal-Gaming-144000-(GameIntro1).mp3"));
+        corebringerbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Mortal-Gaming-144000-(GameIntro1).ogg"));
         corebringerbgm.setLooping(true);
         corebringerbgm.setVolume(1.0f);
-        corebringerstartmenubgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Mortal-Gaming-144000-(GameIntro1).mp3"));
+        corebringerstartmenubgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Mortal-Gaming-144000-(GameIntro1).ogg"));
         corebringerstartmenubgm.setLooping(true);
         corebringerstartmenubgm.setVolume(1.0f);
-        corebringermapstartbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/To-The-Teath-159171-(NormalBattleMusic1).mp3"));
+        corebringermapstartbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/To-The-Teath-159171-(NormalBattleMusic1).ogg"));
         corebringermapstartbgm.setLooping(true);
         corebringermapstartbgm.setVolume(1.0f);
-        corebringergamescreenbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/0-Top-Battle-Game-BGM-264625-(NormalBattleMusic2).mp3"));
+        corebringergamescreenbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/0-Top-Battle-Game-BGM-264625-(NormalBattleMusic2).ogg"));
         corebringergamescreenbgm.setLooping(true);
         corebringergamescreenbgm.setVolume(1.0f);
 
@@ -146,7 +146,7 @@ public class Main extends Game {
     @Override
     public void render() {
         super.render();
-        Gdx.graphics.setFullscreenMode(Gdx.graphics.getDisplayMode());
+        // Removed continuous fullscreen switching each frame. Use toggleFullscreen() on demand instead.
 
         ///This is to give function to the F11 key
         /*if (Gdx.input.isKeyJustPressed(Input.Keys.F11)) {

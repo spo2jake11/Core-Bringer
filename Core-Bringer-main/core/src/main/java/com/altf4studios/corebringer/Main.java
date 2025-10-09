@@ -8,7 +8,6 @@ import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 
-
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class Main extends Game {
     public Music corebringerbgm;
@@ -26,13 +25,13 @@ public class Main extends Game {
     @Override
     public void create() {
         ///This is where music plays when the game starts
-        corebringerbgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
+        corebringerbgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Pepito Manaloto Background Music [RE-UPLOADED].ogg"));
         corebringerbgm.setLooping(true);
         corebringerbgm.setVolume(1.0f);
-        corebringerstartmenubgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Pepito Manaloto Background Music [RE-UPLOADED].mp3"));
+        corebringerstartmenubgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Pepito Manaloto Background Music [RE-UPLOADED].ogg"));
         corebringerstartmenubgm.setLooping(true);
         corebringerstartmenubgm.setVolume(1.0f);
-        corebringermapstartbgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Drake - Hotline Bling (Lyrics).mp3"));
+        corebringermapstartbgm = Gdx.audio.newMusic(Gdx.files.internal("audio/Drake - Hotline Bling (Lyrics).ogg"));
         corebringermapstartbgm.setLooping(true);
         corebringermapstartbgm.setVolume(1.0f);
 
