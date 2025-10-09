@@ -261,7 +261,7 @@ public class PuzzleScreen implements Screen {
             } else {
                 expressionBuilder.append(inputs[i] ? "1" : "0");
             }
-            
+
             if (i < 3) { // Add operator after first 3 inputs
                 if (currentOperators[i] == -1) {
                     expressionBuilder.append(" ? ");
@@ -282,7 +282,7 @@ public class PuzzleScreen implements Screen {
             // Evaluate expression with proper operator precedence
             // Expression: input[0] op[0] input[1] op[1] input[2] op[2] input[3]
             boolean result = evaluateExpression();
-            
+
             expressionLabel.setText(expressionBuilder.toString() + (result ? "1" : "0"));
             resultLabel.setText("Result: " + (result ? "1" : "0"));
 
@@ -304,13 +304,13 @@ public class PuzzleScreen implements Screen {
         // Evaluate: input[0] op[0] input[1] op[1] input[2] op[2] input[3]
         // Following standard operator precedence: && has higher precedence than ||, ^ has same as &&
         // We'll evaluate left to right for same precedence operators
-        
+
         boolean result = inputs[0];
-        
+
         for (int i = 0; i < 3; i++) {
             String op = operators[currentOperators[i]];
             boolean nextInput = inputs[i + 1];
-            
+
             if (op.equals("&&")) {
                 result = result && nextInput;
             } else if (op.equals("||")) {
@@ -319,7 +319,7 @@ public class PuzzleScreen implements Screen {
                 result = result ^ nextInput;
             }
         }
-        
+
         return result;
     }
 
@@ -340,6 +340,7 @@ public class PuzzleScreen implements Screen {
                                         try { corebringer.gameMapScreen.advanceToNextRank(); } catch (Exception ignored) {}
                                     }
                                     corebringer.setScreen(corebringer.gameMapScreen);
+                                    Gdx.app.postRunnable(PuzzleScreen.this::dispose);
                                 });
                             } catch (InterruptedException e) {
                                 e.printStackTrace();
@@ -362,34 +363,34 @@ public class PuzzleScreen implements Screen {
 
         // Create expression table for horizontal layout: input op input op input op input = cube
         Table expressionTable = new Table();
-        
+
         // Add first input
         expressionTable.add(inputImages[0]).size(120, 84).pad(5f);
-        
+
         // Add operator 1
         expressionTable.add(operatorImages[0]).size(120, 84).pad(5f);
-        
+
         // Add second input
         expressionTable.add(inputImages[1]).size(120, 84).pad(5f);
-        
+
         // Add operator 2
         expressionTable.add(operatorImages[1]).size(120, 84).pad(5f);
-        
+
         // Add third input
         expressionTable.add(inputImages[2]).size(120, 84).pad(5f);
-        
+
         // Add operator 3
         expressionTable.add(operatorImages[2]).size(120, 84).pad(5f);
-        
+
         // Add fourth input
         expressionTable.add(inputImages[3]).size(120, 84).pad(5f);
-        
+
         // Add equals label
         Label equalsLabel = new Label("=", corebringer.testskin);
         equalsLabel.setColor(Color.WHITE);
         equalsLabel.setFontScale(2.0f);
         expressionTable.add(equalsLabel).pad(10f);
-        
+
         // Add result cube
         expressionTable.add(resultCubeImage).size(120, 84).pad(5f);
 
@@ -412,7 +413,7 @@ public class PuzzleScreen implements Screen {
         puzzleStage.addActor(backButton);
 
         // Add congratulations image to center
-        congratulationsImage.setPosition(puzzleStage.getWidth() / 2 - congratulationsImage.getWidth() / 2, 
+        congratulationsImage.setPosition(puzzleStage.getWidth() / 2 - congratulationsImage.getWidth() / 2,
                                        puzzleStage.getHeight() / 2 - congratulationsImage.getHeight() / 2);
         puzzleStage.addActor(congratulationsImage);
 
