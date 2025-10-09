@@ -185,6 +185,9 @@ public class PuzzleScreen implements Screen {
         backButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (corebringer.gameMapScreen != null) {
+                    try { corebringer.gameMapScreen.advanceToNextRank(); } catch (Exception ignored) {}
+                }
                 corebringer.setScreen(corebringer.gameMapScreen);
             }
         });
@@ -333,6 +336,9 @@ public class PuzzleScreen implements Screen {
                             try {
                                 Thread.sleep(3000);
                                 Gdx.app.postRunnable(() -> {
+                                    if (corebringer.gameMapScreen != null) {
+                                        try { corebringer.gameMapScreen.advanceToNextRank(); } catch (Exception ignored) {}
+                                    }
                                     corebringer.setScreen(corebringer.gameMapScreen);
                                 });
                             } catch (InterruptedException e) {

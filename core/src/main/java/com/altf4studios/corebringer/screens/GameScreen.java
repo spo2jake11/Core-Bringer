@@ -848,6 +848,11 @@ public class GameScreen implements Screen{
                 // Return to game map and end this GameScreen's lifecycle
                 corebringer.clearInputProcessors();
                 // Switch to map; LibGDX will call show() on map screen
+                if (corebringer.gameMapScreen != null) {
+                    try {
+                        corebringer.gameMapScreen.advanceToNextRank();
+                    } catch (Exception ignored) {}
+                }
                 corebringer.setScreen(corebringer.gameMapScreen);
                 // Clear stages to cancel actions and detach actors before disposing
                 try { if (battleStage != null) { battleStage.clear(); } } catch (Exception ignored) {}
