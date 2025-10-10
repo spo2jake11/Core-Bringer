@@ -270,10 +270,12 @@ public class TreasurePuzzleScreen implements Screen {
                         try {
                             Thread.sleep(3000);
                             Gdx.app.postRunnable(() -> {
-                                if (corebringer.gameMapScreen != null) {
-                                    try { corebringer.gameMapScreen.advanceToNextRank(); } catch (Exception ignored) {}
-                                }
-                                corebringer.setScreen(corebringer.gameMapScreen);
+                                // After completing treasure puzzle, go to logical operator puzzle
+                                try {
+                                    if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
+                                } catch (Exception ignored) {}
+                                corebringer.puzzleScreen = new PuzzleScreen(corebringer);
+                                corebringer.setScreen(corebringer.puzzleScreen);
                             });
                         } catch (InterruptedException ignored) { }
                     }).start();
