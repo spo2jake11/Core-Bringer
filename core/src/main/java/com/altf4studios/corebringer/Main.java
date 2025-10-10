@@ -44,6 +44,7 @@ public class Main extends Game {
     public CardTestScren cardTestScren;
     public PuzzleScreen puzzleScreen;
     public MerchantScreen merchantScreen;
+    public TreasurePuzzleScreen treasurePuzzleScreen;
     public RestScreen restScreen;
     public SampleCardHandler selecteddebugcard;
     private AssetManager assetManager;
@@ -99,6 +100,7 @@ public class Main extends Game {
         gameScreen = null;
         gameMapScreen = new GameMapScreen(this);
         puzzleScreen = new PuzzleScreen(this);
+        treasurePuzzleScreen = new TreasurePuzzleScreen(this);
         setScreen(mainMenuScreen);
         // Ensure the input multiplexer is always set as the input processor
         Gdx.input.setInputProcessor(globalMultiplexer);

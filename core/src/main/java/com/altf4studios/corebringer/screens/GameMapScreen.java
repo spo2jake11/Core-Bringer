@@ -144,7 +144,7 @@ public class GameMapScreen implements Screen{
             merchantnode.getImage().setScaling(Scaling.stretch);
             searchnode.getImage().setScaling(Scaling.stretch);
 
-            // Add click listener for search node to show puzzle screen
+            // Add click listener for search node to show puzzle screen (first ?)
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
@@ -219,11 +219,11 @@ public class GameMapScreen implements Screen{
             merchantnode.getImage().setScaling(Scaling.stretch);
             searchnode.getImage().setScaling(Scaling.stretch);
 
-            // Add click listener for search node to show puzzle screen
+            // Add click listener for search node to show treasure puzzle (second ?)
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    corebringer.setScreen(corebringer.puzzleScreen);
+                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 }
             });
 
