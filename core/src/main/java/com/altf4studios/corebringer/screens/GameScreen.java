@@ -96,6 +96,9 @@ public class GameScreen implements Screen{
     private GameState gameState = GameState.RUNNING;
     // --- End Game Lifecycle State ---
 
+    // Guard against double-dispose and post-dispose rendering
+    private boolean isDisposed = false;
+
 
     public GameScreen(Main corebringer) {
         this.corebringer = corebringer; /// The Master Key that holds all screens together
@@ -120,7 +123,7 @@ public class GameScreen implements Screen{
             "basic_variable_slash_1", "basic_variable_slash_1", "shield_final_shield_1",
             "shield_final_shield_1", "shield_final_shield_1", "shield_final_shield_1",
             "shield_final_shield_1", "heal_ultimate_heal_1", "heal_ultimate_heal_1",
-            "heal_ultimate_heal_1", "poison_looping_bite_1", "poison_looping_bite_1"
+            "heal_ultimate_heal_1"
         };
         int battleWon = 0;
         int goldFromSave = 0;
@@ -424,6 +427,8 @@ public class GameScreen implements Screen{
         corebringer.addInputProcessor(uiStage);
         corebringer.addInputProcessor(battleStage);
         corebringer.addInputProcessor(cardStage);
+        // Ensure the global multiplexer is the active input processor
+        Gdx.input.setInputProcessor(corebringer.getGlobalMultiplexer());
         corebringer.addInputProcessor(new InputProcessor() {
             @Override public boolean keyDown(int keycode) {
                 if (keycode == Input.Keys.ESCAPE) {
@@ -485,6 +490,7 @@ public class GameScreen implements Screen{
 
     @Override
     public void render(float delta) {
+        if (isDisposed) return; // Prevent rendering with disposed stages
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         // Act only when game is running; always draw so UI remains visible
         if (gameState == GameState.RUNNING) {
@@ -631,13 +637,23 @@ public class GameScreen implements Screen{
 
     @Override
     public void dispose() {
-        uiStage.dispose();
+        if (isDisposed) return;
+        isDisposed = true;
+
+        // Stop ongoing actions to minimize in-flight draws
+        try { if (battleStage != null) battleStage.getRoot().clearActions(); } catch (Exception ignored) {}
+        try { if (cardStage != null) cardStage.getRoot().clearActions(); } catch (Exception ignored) {}
+        try { if (uiStage != null) uiStage.getRoot().clearActions(); } catch (Exception ignored) {}
+
+        // Dispose stages first to stop any rendering using their batches/meshes
+        try { if (battleStage != null) battleStage.dispose(); } catch (Exception ignored) {}
+        try { if (cardStage != null) cardStage.dispose(); } catch (Exception ignored) {}
+        try { if (uiStage != null) uiStage.dispose(); } catch (Exception ignored) {}
+
+        // Then dispose UI helpers/atlases/textures owned by the screen
         if (battleStageUI != null) {
-            battleStageUI.dispose();
+            try { battleStageUI.dispose(); } catch (Exception ignored) {}
         }
-        battleStage.dispose();
-        // Removed: editorStage.dispose();
-        cardStage.dispose();
         // Dispose energy background texture if created
         if (energyBgTexture != null) {
             energyBgTexture.dispose();
@@ -774,7 +790,7 @@ public class GameScreen implements Screen{
                 try { if (battleStage != null) { battleStage.clear(); } } catch (Exception ignored) {}
                 try { if (cardStage != null) { cardStage.clear(); } } catch (Exception ignored) {}
                 try { if (uiStage != null) { uiStage.clear(); } } catch (Exception ignored) {}
-                Gdx.app.postRunnable(() -> GameScreen.this.dispose());
+                Gdx.app.postRunnable(GameScreen.this::dispose);
             }
         });
         Table overlay = new Table();
@@ -859,7 +875,7 @@ public class GameScreen implements Screen{
                 try { if (cardStage != null) { cardStage.clear(); } } catch (Exception ignored) {}
                 try { if (uiStage != null) { uiStage.clear(); } } catch (Exception ignored) {}
                 // Dispose on next frame to ensure no native resources are still in use this tick
-                Gdx.app.postRunnable(() -> GameScreen.this.dispose());
+                Gdx.app.postRunnable(GameScreen.this::dispose);
             }
         });
 

@@ -338,10 +338,10 @@ public class CodeEditorScreen implements Screen {
         Table root = new Table();
         root.setFillParent(true);
         SplitPane split = new SplitPane(questionTable, right, false, skin);
-        split.setSplitAmount(0.4f); // 35% left, 65% right
-        split.setMinSplitAmount(0.2f);
-        split.setMaxSplitAmount(0.5f);
-        split.setTouchable(Touchable.disabled);
+        split.setSplitAmount(0.4f); // 40% left, 60% right
+        // Lock divider without disabling touch so children can receive input
+        split.setMinSplitAmount(0.4f);
+        split.setMaxSplitAmount(0.4f);
         // Make the divider invisible by using a fully transparent handle drawable
         SplitPane.SplitPaneStyle spStyle = new SplitPane.SplitPaneStyle();
         spStyle.handle = skin.newDrawable("white", 0f, 0f, 0f, 0f);
