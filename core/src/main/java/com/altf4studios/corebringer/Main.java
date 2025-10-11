@@ -77,7 +77,7 @@ public class Main extends Game {
 
         ///This is for the Skin to be declared and initialized so Screens can just call it
         //test skin used Utils.getInternalPath
-        testskin = new Skin(Utils.getInternalPath("ui/uiskin.json")); ///Usage of sample skin, can be changed soon
+        testskin = new Skin(Utils.getInternalPath("assets/ui/uiskin.json")); ///Usage of sample skin, can be changed soon
         responsivelabelstyle = new Label.LabelStyle(testskin.getFont("default"), Color.WHITE);
         responsivelabelstyle.font.getData().setScale(2f);
 
