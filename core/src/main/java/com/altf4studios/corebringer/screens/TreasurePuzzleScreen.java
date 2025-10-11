@@ -18,10 +18,13 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 /**
- * Treasure chest arithmetic puzzle: 10 ? 3 ? 5 = 6
+ * Treasure chest arithmetic puzzle with multiple variations:
+ * - 10 ? 3 ? 5 = 6
+ * - 5 ? 6 ? 10 = 3  
+ * - 6 ? 5 ? 10 = 3
  * - Two operator slots, both clickable.
- * - Operators cycle: QuestionMark -> Multiply (x) -> Divide (÷) -> QuestionMark
- * - Chest is closed by default; opens when expression equals 6.
+ * - Operators cycle: QuestionMark -> Multiply (x) -> Divide (÷) -> Add (+) -> Subtract (-) -> QuestionMark
+ * - Chest is closed by default; opens when expression equals target.
  */
 public class TreasurePuzzleScreen implements Screen {
     private final Main corebringer;
@@ -29,36 +32,61 @@ public class TreasurePuzzleScreen implements Screen {
     private final Table root;
     private Table content;
 
-    private Image num10Img;
+    private Image num1Img;
+    private Image num2Img;
     private Image num3Img;
-    private Image num5Img;
-    private Image num6Img;
+    private Image targetImg;
     private Image op1Img;
     private Image op2Img;
     private Image equalsImg;
     private Image chestImg;
     private Image congratulationsImage;
+    private Image subtractionImg;
 
+
+    private Texture subTexture;
     private Texture bgTexture;
     private Texture qTexture;
     private Texture mulTexture;
     private Texture divTexture;
     private Texture plusTexture;
-    private Texture n10Texture;
+    private Texture n1Texture;
+    private Texture n2Texture;
     private Texture n3Texture;
-    private Texture n5Texture;
-    private Texture n6Texture;
+    private Texture targetTexture;
     private Texture equalsTexture;
     private Texture chestClosedTexture;
     private Texture chestOpenTexture;
     private Texture congratulationsTexture;
 
-    private int op1State = 0; // 0 = ?, 1 = x, 2 = ÷, 3 = +
-    private int op2State = 0; // 0 = ?, 1 = x, 2 = ÷, 3 = +
+    private int op1State = 0; // 0 = ?, 1 = x, 2 = ÷, 3 = +, 4 = -
+    private int op2State = 0; // 0 = ?, 1 = x, 2 = ÷, 3 = +, 4 = -
 
     private TextButton backButton;
     private Label titleLabel;
     private boolean puzzleSolved = false;
+    
+    // Puzzle data structure
+    private static class PuzzleData {
+        int num1, num2, num3, target;
+        String description;
+        
+        PuzzleData(int num1, int num2, int num3, int target, String description) {
+            this.num1 = num1;
+            this.num2 = num2;
+            this.num3 = num3;
+            this.target = target;
+            this.description = description;
+        }
+    }
+    
+    private PuzzleData[] puzzles = {
+        new PuzzleData(10, 3, 5, 6, "Choose the operators to make 6"),
+        new PuzzleData(5, 6, 10, 3, "Choose the operators to make 3"),
+        new PuzzleData(6, 5, 10, 3, "Choose the operators to make 3")
+    };
+    
+    private PuzzleData currentPuzzle;
 
     public TreasurePuzzleScreen(Main corebringer) {
         this.corebringer = corebringer;
@@ -67,6 +95,9 @@ public class TreasurePuzzleScreen implements Screen {
         root.setFillParent(true);
         stage.addActor(root);
 
+        // Select a random puzzle
+        currentPuzzle = puzzles[com.badlogic.gdx.math.MathUtils.random(puzzles.length - 1)];
+        
         loadTextures();
         buildUI();
     }
@@ -77,14 +108,17 @@ public class TreasurePuzzleScreen implements Screen {
         mulTexture = new Texture(Utils.getInternalPath("Puzzle/x.png"));
         divTexture = new Texture(Utils.getInternalPath("Puzzle/divisionSign.png"));
         plusTexture = new Texture(Utils.getInternalPath("Puzzle/plusSign.png"));
-        n10Texture = new Texture(Utils.getInternalPath("Puzzle/10.png"));
-        n3Texture = new Texture(Utils.getInternalPath("Puzzle/3.png"));
-        n5Texture = new Texture(Utils.getInternalPath("Puzzle/5.png"));
-        n6Texture = new Texture(Utils.getInternalPath("Puzzle/6.png"));
+        subTexture = new Texture(Utils.getInternalPath("Puzzle/subtractionSign.png"));
         equalsTexture = new Texture(Utils.getInternalPath("Puzzle/equalSign.png"));
         chestClosedTexture = new Texture(Utils.getInternalPath("Puzzle/closedTreasureChest.png"));
         chestOpenTexture = new Texture(Utils.getInternalPath("Puzzle/openTreasureChest.png"));
         congratulationsTexture = new Texture(Utils.getInternalPath("Puzzle/Congratulations.png"));
+        
+        // Load number textures based on current puzzle
+        n1Texture = new Texture(Utils.getInternalPath("Puzzle/" + currentPuzzle.num1 + ".png"));
+        n2Texture = new Texture(Utils.getInternalPath("Puzzle/" + currentPuzzle.num2 + ".png"));
+        n3Texture = new Texture(Utils.getInternalPath("Puzzle/" + currentPuzzle.num3 + ".png"));
+        targetTexture = new Texture(Utils.getInternalPath("Puzzle/" + currentPuzzle.target + ".png"));
     }
 
     private void buildUI() {
@@ -92,7 +126,7 @@ public class TreasurePuzzleScreen implements Screen {
         root.setBackground(new TextureRegionDrawable(bgTexture));
 
         // Title and back
-        titleLabel = new Label("Choose the operators to make 6", corebringer.testskin);
+        titleLabel = new Label(currentPuzzle.description, corebringer.testskin);
         titleLabel.setColor(Color.WHITE);
         titleLabel.setFontScale(1.2f);
         backButton = new TextButton("Back to Map", corebringer.testskin);
@@ -110,11 +144,11 @@ public class TreasurePuzzleScreen implements Screen {
         topBar.add(titleLabel).expandX().left().pad(15f);
         topBar.add(backButton).right().pad(15f);
 
-        // Expression row: 10 op 3 op 5 = 6   [chest]
-        num10Img = new Image(n10Texture);
+        // Expression row: num1 op num2 op num3 = target   [chest]
+        num1Img = new Image(n1Texture);
+        num2Img = new Image(n2Texture);
         num3Img = new Image(n3Texture);
-        num5Img = new Image(n5Texture);
-        num6Img = new Image(n6Texture);
+        targetImg = new Image(targetTexture);
         equalsImg = new Image(equalsTexture);
 
         op1Img = new Image(qTexture);
@@ -122,7 +156,7 @@ public class TreasurePuzzleScreen implements Screen {
         op1Img.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                op1State = (op1State + 1) % 4; // ?, x, ÷, +
+                op1State = (op1State + 1) % 5; // ?, x, ÷, +, -
                 refreshOperator(op1Img, op1State);
                 updateChest();
             }
@@ -130,7 +164,7 @@ public class TreasurePuzzleScreen implements Screen {
         op2Img.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                op2State = (op2State + 1) % 4; // ?, x, ÷, +
+                op2State = (op2State + 1) % 5; // ?, x, ÷, +, -
                 refreshOperator(op2Img, op2State);
                 updateChest();
             }
@@ -141,13 +175,13 @@ public class TreasurePuzzleScreen implements Screen {
         congratulationsImage.setVisible(false);
 
         Table expr = new Table();
-        expr.add(num10Img).size(140, 98).pad(6f);
+        expr.add(num1Img).size(140, 98).pad(6f);
         expr.add(op1Img).size(120, 84).pad(6f);
-        expr.add(num3Img).size(140, 98).pad(6f);
+        expr.add(num2Img).size(140, 98).pad(6f);
         expr.add(op2Img).size(120, 84).pad(6f);
-        expr.add(num5Img).size(140, 98).pad(6f);
+        expr.add(num3Img).size(140, 98).pad(6f);
         expr.add(equalsImg).size(140, 98).pad(6f);
-        expr.add(num6Img).size(140, 98).pad(6f);
+        expr.add(targetImg).size(140, 98).pad(6f);
 
         content = new Table();
         content.add(expr).padTop(30f).row();
@@ -170,6 +204,7 @@ public class TreasurePuzzleScreen implements Screen {
             case 1: drawable = new TextureRegionDrawable(mulTexture); break;
             case 2: drawable = new TextureRegionDrawable(divTexture); break;
             case 3: drawable = new TextureRegionDrawable(plusTexture); break;
+            case 4: drawable = new TextureRegionDrawable(subTexture); break;
             default: drawable = new TextureRegionDrawable(qTexture); break;
         }
         target.setDrawable(drawable);
@@ -177,7 +212,7 @@ public class TreasurePuzzleScreen implements Screen {
 
     private void updateChest() {
         boolean hasQuestion = (op1State == 0) || (op2State == 0);
-        boolean isCorrect = (!hasQuestion) && evaluatesToSix(op1State, op2State);
+        boolean isCorrect = (!hasQuestion) && evaluatesToTarget(op1State, op2State);
         chestImg.setDrawable(new TextureRegionDrawable(isCorrect ? chestOpenTexture : chestClosedTexture));
 
         if (isCorrect && !puzzleSolved) {
@@ -186,11 +221,11 @@ public class TreasurePuzzleScreen implements Screen {
         }
     }
 
-    private boolean evaluatesToSix(int op1, int op2) {
-        // Map: 1 => multiply, 2 => divide, 3 => add
-        float a = 10f;
-        float b = 3f;
-        float c = 5f;
+    private boolean evaluatesToTarget(int op1, int op2) {
+        // Map: 1 => multiply, 2 => divide, 3 => add, 4 => subtract
+        float a = currentPuzzle.num1;
+        float b = currentPuzzle.num2;
+        float c = currentPuzzle.num3;
         float first;
         if (op1 == 1) {
             first = a * b;
@@ -198,6 +233,8 @@ public class TreasurePuzzleScreen implements Screen {
             first = a / b;
         } else if (op1 == 3) {
             first = a + b;
+        } else if (op1 == 4) {
+            first = a - b;
         } else {
             return false; // Invalid operator
         }
@@ -209,11 +246,13 @@ public class TreasurePuzzleScreen implements Screen {
             result = first / c;
         } else if (op2 == 3) {
             result = first + c;
+        } else if (op2 == 4) {
+            result = first - c;
         } else {
             return false; // Invalid operator
         }
 
-        return Math.abs(result - 6f) < 0.0001f;
+        return Math.abs(result - currentPuzzle.target) < 0.0001f;
     }
 
     @Override
@@ -249,10 +288,11 @@ public class TreasurePuzzleScreen implements Screen {
         mulTexture.dispose();
         divTexture.dispose();
         plusTexture.dispose();
-        n10Texture.dispose();
+        n1Texture.dispose();
+        n2Texture.dispose();
         n3Texture.dispose();
-        n5Texture.dispose();
-        n6Texture.dispose();
+        targetTexture.dispose();
+        subTexture.dispose();
         equalsTexture.dispose();
         chestClosedTexture.dispose();
         chestOpenTexture.dispose();
