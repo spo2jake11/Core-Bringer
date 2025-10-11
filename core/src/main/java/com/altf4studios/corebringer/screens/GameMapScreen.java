@@ -21,6 +21,7 @@ import com.badlogic.gdx.utils.Scaling;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -69,6 +70,59 @@ public class GameMapScreen implements Screen{
     private int currentRankIndex;
     private boolean nodeChosenInCurrentRank;
     private ArrayList<Button> selectedNodesPerRank;
+
+    // Choose a random outcome for search node: Treasure Puzzle, PuzzleScreen, or Random Battle (33% each)
+    private void triggerRandomSearchOutcome() {
+        int pick = MathUtils.random(2); // 0..2
+        switch (pick) {
+            case 0: // Treasure Puzzle
+                try { if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose(); } catch (Exception ignored) {}
+                corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
+                corebringer.setScreen(corebringer.treasurePuzzleScreen);
+                break;
+            case 1: // Code Puzzle (PuzzleScreen)
+                try { if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose(); } catch (Exception ignored) {}
+                corebringer.puzzleScreen = new PuzzleScreen(corebringer);
+                corebringer.setScreen(corebringer.puzzleScreen);
+                break;
+            case 2: // Random Battle
+            default:
+                corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
+                    corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+                    corebringer.gameScreen = new GameScreen(corebringer);
+                    corebringer.setScreen(corebringer.gameScreen);
+                    corebringer.gameScreen.rerollEnemyAndCards();
+                });
+                break;
+        }
+    }
+
+    private void triggerRandomBattle(){
+        // Fade out map music, fade in game music
+        corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
+            corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+            // Create a fresh GameScreen instance (previous may have been disposed)
+            corebringer.gameScreen = new GameScreen(corebringer);
+            corebringer.setScreen(corebringer.gameScreen);
+            corebringer.gameScreen.rerollEnemyAndCards();
+        });
+    }
+    private void triggerMerchant(){
+        // Always use a fresh MerchantScreen instance
+        try {
+            if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
+        } catch (Exception ignored) {}
+        corebringer.merchantScreen = new MerchantScreen(corebringer);
+        corebringer.setScreen(corebringer.merchantScreen);
+    }
+    private void triggerRest(){
+        // Always use a fresh RestScreen instance
+        try {
+            if (corebringer.restScreen != null) corebringer.restScreen.dispose();
+        } catch (Exception ignored) {}
+        corebringer.restScreen = new RestScreen(corebringer);
+        corebringer.setScreen(corebringer.restScreen);
+    }
 
     public GameMapScreen(Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
@@ -144,16 +198,11 @@ public class GameMapScreen implements Screen{
             merchantnode.getImage().setScaling(Scaling.stretch);
             searchnode.getImage().setScaling(Scaling.stretch);
 
-            // Add click listener for search node to show treasure puzzle screen
+            // Add click listener for search node with 33% random outcomes
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh TreasurePuzzleScreen instance
-                    try {
-                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
+                    triggerRandomSearchOutcome();
                 }
             });
 
@@ -161,14 +210,7 @@ public class GameMapScreen implements Screen{
             randombattlenode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Fade out map music, fade in game music
-                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                        corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                        // Create a fresh GameScreen instance (previous may have been disposed)
-                        corebringer.gameScreen = new GameScreen(corebringer);
-                        corebringer.setScreen(corebringer.gameScreen);
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    });
+                    triggerRandomBattle();
                 }
             });
 
@@ -176,12 +218,7 @@ public class GameMapScreen implements Screen{
             merchantnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh MerchantScreen instance
-                    try {
-                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.merchantScreen = new MerchantScreen(corebringer);
-                    corebringer.setScreen(corebringer.merchantScreen);
+                    triggerMerchant();
                 }
             });
 
@@ -189,12 +226,7 @@ public class GameMapScreen implements Screen{
             restnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh RestScreen instance
-                    try {
-                        if (corebringer.restScreen != null) corebringer.restScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.restScreen = new RestScreen(corebringer);
-                    corebringer.setScreen(corebringer.restScreen);
+                    triggerRest();
                 }
             });
 
@@ -237,12 +269,7 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh TreasurePuzzleScreen instance
-                    try {
-                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
+                    triggerRandomSearchOutcome();
                 }
             });
 
@@ -250,14 +277,7 @@ public class GameMapScreen implements Screen{
             randombattlenode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Fade out map music, fade in game music
-                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                        corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                        // Create a fresh GameScreen instance (previous may have been disposed)
-                        corebringer.gameScreen = new GameScreen(corebringer);
-                        corebringer.setScreen(corebringer.gameScreen);
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    });
+                    triggerRandomBattle();
                 }
             });
 
@@ -265,12 +285,7 @@ public class GameMapScreen implements Screen{
             merchantnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh MerchantScreen instance
-                    try {
-                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.merchantScreen = new MerchantScreen(corebringer);
-                    corebringer.setScreen(corebringer.merchantScreen);
+                    triggerMerchant();
                 }
             });
 
@@ -278,12 +293,7 @@ public class GameMapScreen implements Screen{
             restnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh RestScreen instance
-                    try {
-                        if (corebringer.restScreen != null) corebringer.restScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.restScreen = new RestScreen(corebringer);
-                    corebringer.setScreen(corebringer.restScreen);
+                    triggerRest();
                 }
             });
 
@@ -326,12 +336,7 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh TreasurePuzzleScreen instance
-                    try {
-                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
+                    triggerRandomSearchOutcome();
                 }
             });
 
@@ -339,14 +344,7 @@ public class GameMapScreen implements Screen{
             randombattlenode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Fade out map music, fade in game music
-                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                        corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                        // Create a fresh GameScreen instance (previous may have been disposed)
-                        corebringer.gameScreen = new GameScreen(corebringer);
-                        corebringer.setScreen(corebringer.gameScreen);
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    });
+                    triggerRandomBattle();
                 }
             });
 
@@ -354,12 +352,7 @@ public class GameMapScreen implements Screen{
             merchantnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh MerchantScreen instance
-                    try {
-                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.merchantScreen = new MerchantScreen(corebringer);
-                    corebringer.setScreen(corebringer.merchantScreen);
+                    triggerMerchant();
                 }
             });
 
@@ -367,12 +360,7 @@ public class GameMapScreen implements Screen{
             restnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh RestScreen instance
-                    try {
-                        if (corebringer.restScreen != null) corebringer.restScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.restScreen = new RestScreen(corebringer);
-                    corebringer.setScreen(corebringer.restScreen);
+                    triggerRest();
                 }
             });
 
@@ -415,12 +403,7 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh TreasurePuzzleScreen instance
-                    try {
-                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
+                    triggerRandomSearchOutcome();
                 }
             });
 
@@ -428,14 +411,7 @@ public class GameMapScreen implements Screen{
             randombattlenode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Fade out map music, fade in game music
-                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                        corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                        // Create a fresh GameScreen instance (previous may have been disposed)
-                        corebringer.gameScreen = new GameScreen(corebringer);
-                        corebringer.setScreen(corebringer.gameScreen);
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    });
+                    triggerRandomBattle();
                 }
             });
 
@@ -443,12 +419,7 @@ public class GameMapScreen implements Screen{
             merchantnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh MerchantScreen instance
-                    try {
-                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.merchantScreen = new MerchantScreen(corebringer);
-                    corebringer.setScreen(corebringer.merchantScreen);
+                    triggerMerchant();
                 }
             });
 
@@ -456,12 +427,7 @@ public class GameMapScreen implements Screen{
             restnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh RestScreen instance
-                    try {
-                        if (corebringer.restScreen != null) corebringer.restScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.restScreen = new RestScreen(corebringer);
-                    corebringer.setScreen(corebringer.restScreen);
+                    triggerRest();
                 }
             });
 
@@ -504,12 +470,7 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh TreasurePuzzleScreen instance
-                    try {
-                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
+                    triggerRandomSearchOutcome();
                 }
             });
 
@@ -517,14 +478,7 @@ public class GameMapScreen implements Screen{
             randombattlenode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Fade out map music, fade in game music
-                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                        corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                        // Create a fresh GameScreen instance (previous may have been disposed)
-                        corebringer.gameScreen = new GameScreen(corebringer);
-                        corebringer.setScreen(corebringer.gameScreen);
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    });
+                    triggerRandomBattle();
                 }
             });
 
@@ -532,12 +486,7 @@ public class GameMapScreen implements Screen{
             merchantnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh MerchantScreen instance
-                    try {
-                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.merchantScreen = new MerchantScreen(corebringer);
-                    corebringer.setScreen(corebringer.merchantScreen);
+                    triggerMerchant();
                 }
             });
 
@@ -545,12 +494,7 @@ public class GameMapScreen implements Screen{
             restnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh RestScreen instance
-                    try {
-                        if (corebringer.restScreen != null) corebringer.restScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.restScreen = new RestScreen(corebringer);
-                    corebringer.setScreen(corebringer.restScreen);
+                    triggerRest();
                 }
             });
 
@@ -593,12 +537,7 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh TreasurePuzzleScreen instance
-                    try {
-                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
+                    triggerRandomSearchOutcome();
                 }
             });
 
@@ -606,14 +545,7 @@ public class GameMapScreen implements Screen{
             randombattlenode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Fade out map music, fade in game music
-                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                        corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                        // Create a fresh GameScreen instance (previous may have been disposed)
-                        corebringer.gameScreen = new GameScreen(corebringer);
-                        corebringer.setScreen(corebringer.gameScreen);
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    });
+                    triggerRandomBattle();
                 }
             });
 
@@ -621,12 +553,7 @@ public class GameMapScreen implements Screen{
             merchantnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh MerchantScreen instance
-                    try {
-                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.merchantScreen = new MerchantScreen(corebringer);
-                    corebringer.setScreen(corebringer.merchantScreen);
+                    triggerMerchant();
                 }
             });
 
@@ -634,12 +561,7 @@ public class GameMapScreen implements Screen{
             restnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh RestScreen instance
-                    try {
-                        if (corebringer.restScreen != null) corebringer.restScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.restScreen = new RestScreen(corebringer);
-                    corebringer.setScreen(corebringer.restScreen);
+                    triggerRest();
                 }
             });
 
@@ -682,12 +604,7 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh TreasurePuzzleScreen instance
-                    try {
-                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
+                    triggerRandomSearchOutcome();
                 }
             });
 
@@ -695,14 +612,7 @@ public class GameMapScreen implements Screen{
             randombattlenode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Fade out map music, fade in game music
-                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                        corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                        // Create a fresh GameScreen instance (previous may have been disposed)
-                        corebringer.gameScreen = new GameScreen(corebringer);
-                        corebringer.setScreen(corebringer.gameScreen);
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    });
+                    triggerRandomBattle();
                 }
             });
 
@@ -710,12 +620,7 @@ public class GameMapScreen implements Screen{
             merchantnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh MerchantScreen instance
-                    try {
-                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.merchantScreen = new MerchantScreen(corebringer);
-                    corebringer.setScreen(corebringer.merchantScreen);
+                    triggerMerchant();
                 }
             });
 
@@ -723,12 +628,7 @@ public class GameMapScreen implements Screen{
             restnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh RestScreen instance
-                    try {
-                        if (corebringer.restScreen != null) corebringer.restScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.restScreen = new RestScreen(corebringer);
-                    corebringer.setScreen(corebringer.restScreen);
+                    triggerRest();
                 }
             });
 
@@ -771,12 +671,7 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh TreasurePuzzleScreen instance
-                    try {
-                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
+                    triggerRandomSearchOutcome();
                 }
             });
 
@@ -784,14 +679,7 @@ public class GameMapScreen implements Screen{
             randombattlenode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Fade out map music, fade in game music
-                    corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                        corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                        // Create a fresh GameScreen instance (previous may have been disposed)
-                        corebringer.gameScreen = new GameScreen(corebringer);
-                        corebringer.setScreen(corebringer.gameScreen);
-                        corebringer.gameScreen.rerollEnemyAndCards();
-                    });
+                    triggerRandomBattle();
                 }
             });
 
@@ -799,12 +687,7 @@ public class GameMapScreen implements Screen{
             merchantnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh MerchantScreen instance
-                    try {
-                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.merchantScreen = new MerchantScreen(corebringer);
-                    corebringer.setScreen(corebringer.merchantScreen);
+                    triggerMerchant();
                 }
             });
 
@@ -812,12 +695,7 @@ public class GameMapScreen implements Screen{
             restnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh RestScreen instance
-                    try {
-                        if (corebringer.restScreen != null) corebringer.restScreen.dispose();
-                    } catch (Exception ignored) {}
-                    corebringer.restScreen = new RestScreen(corebringer);
-                    corebringer.setScreen(corebringer.restScreen);
+                    triggerRest();
                 }
             });
 
@@ -849,49 +727,28 @@ public class GameMapScreen implements Screen{
         staticbattlenodeA.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                // Fade out map music, fade in game music
-                corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                    corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                    corebringer.gameScreen = new GameScreen(corebringer);
-                    corebringer.setScreen(corebringer.gameScreen);
-                    corebringer.gameScreen.rerollEnemyAndCards();
-                });
+                triggerRandomBattle();
             }
         });
 
         staticbattlenodeB.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                    corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                    corebringer.gameScreen = new GameScreen(corebringer);
-                    corebringer.setScreen(corebringer.gameScreen);
-                    corebringer.gameScreen.rerollEnemyAndCards();
-                });
+                triggerRandomBattle();
             }
         });
 
         staticbattlenodeC.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                    corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                    corebringer.gameScreen = new GameScreen(corebringer);
-                    corebringer.setScreen(corebringer.gameScreen);
-                    corebringer.gameScreen.rerollEnemyAndCards();
-                });
+                triggerRandomBattle();
             }
         });
 
         staticbattlenodeD.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
-                    corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                    corebringer.gameScreen = new GameScreen(corebringer);
-                    corebringer.setScreen(corebringer.gameScreen);
-                    corebringer.gameScreen.rerollEnemyAndCards();
-                });
+                triggerRandomBattle();
             }
         });
 

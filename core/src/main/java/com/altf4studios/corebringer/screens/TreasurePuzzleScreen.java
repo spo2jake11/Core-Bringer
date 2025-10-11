@@ -201,7 +201,7 @@ public class TreasurePuzzleScreen implements Screen {
         } else {
             return false; // Invalid operator
         }
-        
+
         float result;
         if (op2 == 1) {
             result = first * c;
@@ -212,7 +212,7 @@ public class TreasurePuzzleScreen implements Screen {
         } else {
             return false; // Invalid operator
         }
-        
+
         return Math.abs(result - 6f) < 0.0001f;
     }
 
@@ -270,12 +270,11 @@ public class TreasurePuzzleScreen implements Screen {
                         try {
                             Thread.sleep(3000);
                             Gdx.app.postRunnable(() -> {
-                                // After completing treasure puzzle, go to logical operator puzzle
-                                try {
-                                    if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
-                                } catch (Exception ignored) {}
-                                corebringer.puzzleScreen = new PuzzleScreen(corebringer);
-                                corebringer.setScreen(corebringer.puzzleScreen);
+                                if (corebringer.gameMapScreen != null) {
+                                    try { corebringer.gameMapScreen.advanceToNextRank(); } catch (Exception ignored) {}
+                                }
+                                corebringer.setScreen(corebringer.gameMapScreen);
+                                Gdx.app.postRunnable(TreasurePuzzleScreen.this::dispose);
                             });
                         } catch (InterruptedException ignored) { }
                     }).start();
