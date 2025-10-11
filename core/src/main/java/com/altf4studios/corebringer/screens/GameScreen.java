@@ -267,6 +267,10 @@ public class GameScreen implements Screen{
         return cardStageUI;
     }
 
+    public Player getPlayer() {
+        return player;
+    }
+
     // Call this after any stat change (hp, energy, cards, battleWon)
     public void saveProgress(int battleWonValue) {
         String[] deck = savedDeckIds != null ? savedDeckIds : new String[]{};
