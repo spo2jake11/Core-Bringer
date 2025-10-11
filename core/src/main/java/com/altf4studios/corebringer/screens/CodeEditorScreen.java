@@ -481,19 +481,24 @@ public class CodeEditorScreen implements Screen {
                 QuestionnaireManager.Question q = currentQ;
                 CodeEvaluationService.EvaluationResult ev = evaluator.evaluate(q, code, actual, null);
 
+                boolean instakillProc = false;
                 if (ev.passed && q != null) {
                     QuestionnaireManager.get().markSolved(q.id);
                     // Overhack proc logic: use question's chance as probability
                     float chance = MathUtils.clamp(q.chance, 0f, 1f);
-                    boolean proc = MathUtils.random() < chance;
-                    Gdx.app.log("CodeEditorScreen", "Overhack roll: chance=" + chance + ", proc=" + proc);
+                    instakillProc = MathUtils.random() < chance;
+                    Gdx.app.log("CodeEditorScreen", "Overhack roll: chance=" + chance + ", proc=" + instakillProc);
                     // Apply battle effect on main thread
+                    final boolean finalProc = instakillProc;
                     Gdx.app.postRunnable(() -> {
                         if (corebringer != null && corebringer.gameScreen != null) {
                             com.altf4studios.corebringer.battle.BattleManager bm = corebringer.gameScreen.getBattleManager();
                             if (bm != null) {
-                                if (proc) {
+                                if (finalProc) {
                                     bm.instakillEnemy();
+                                    // Return to game screen and start delayed victory with tag
+                                    corebringer.setScreen(corebringer.gameScreen);
+                                    corebringer.gameScreen.startInstakillVictory(0.5f, "Instakill!!");
                                 } else {
                                     bm.endPlayerTurnNow();
                                 }
@@ -509,9 +514,32 @@ public class CodeEditorScreen implements Screen {
                 String feedbackBlock = "\n\nFeedback:\n" + fb;
                 final String finalText = result + judgement + feedbackBlock;
 
+                final boolean incorrect = !ev.passed;
+                final boolean suppressUI = (ev.passed && instakillProc) || incorrect;
                 Gdx.app.postRunnable(() -> {
-                    showResult("Code Execution Result", finalText);
-                    outputLabel.setText(ev.passed ? "Correct" : "Incorrect");
+                    if (incorrect) {
+                        // Return to game screen, skip user's turn, and show stun message
+                        if (corebringer != null && corebringer.gameScreen != null) {
+                            corebringer.setScreen(corebringer.gameScreen);
+                            // Mirror the manual End Turn flow (hide cards, flush, enemy turn, redraw)
+                            com.altf4studios.corebringer.screens.gamescreen.CardStageUI csui = corebringer.gameScreen.getCardStageUI();
+                            if (csui != null) {
+                                csui.endTurnProgrammatically();
+                            } else {
+                                // Fallback: just end the turn if UI not ready
+                                com.altf4studios.corebringer.battle.BattleManager bm = corebringer.gameScreen.getBattleManager();
+                                if (bm != null) bm.endPlayerTurnNow();
+                            }
+                            // Show centered red message for a short duration
+                            corebringer.gameScreen.showCenterMessage("Incorrect Overhack. Suffer Stun", Color.RED, 2.0f);
+                        }
+                        // Do not show the result window
+                        return;
+                    }
+                    if (!suppressUI) {
+                        showResult("Code Execution Result", finalText);
+                        outputLabel.setText(ev.passed ? "Correct" : "Incorrect");
+                    }
                 });
             } catch (Exception e) {
                 Gdx.app.postRunnable(() -> {

@@ -247,6 +247,17 @@ public class CardStageUI {
         });
     }
 
+    // Programmatically trigger the same flow as pressing the End Turn button
+    public void endTurnProgrammatically() {
+        hideCards();
+        if (cardHandTable != null) {
+            cardHandTable.flushHand(discardPile);
+        }
+        scheduleCardShow();
+        Gdx.app.log("Discard Cards", discardPile.toString() + " Total: " + discardPile.size);
+        logCounts("After end turn (flushed)");
+    }
+
     private void scheduleCardShow() {
         if (turnManager != null) {
             turnManager.endPlayerTurn();

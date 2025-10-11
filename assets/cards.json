@@ -1,19 +1,15 @@
 {
   "cards": [
-    { "id": "basic_variable_slash_1","level": 1, "name": "Variable Slash 1", "atlasName": "Variable_Slash1", "tag": "BASIC", "target": "ENEMY", "cost": 1, "baseEffect": 3 , "duration": 0},
-    { "id": "basic_variable_slash_2", "level": 2, "name": "Variable Slash 2", "atlasName": "Variable_Slash2", "tag": "BASIC", "target": "ENEMY", "cost": 2, "baseEffect": 6 , "duration": 0},
-    { "id": "basic_variable_slash_3", "level": 3, "name": "Variable Slash 3", "atlasName": "Variable_Slash3", "tag": "BASIC", "target": "ENEMY", "cost": 3, "baseEffect": 9 , "duration": 0},
+    { "id": "basic_variable_slash_1","level": 1, "name": "Variable Slash 1", "atlasName": "Variable_Slash1", "tag": "BASIC", "target": "ENEMY", "cost": 1, "baseEffect": 3 , "duration": 0, "price":  56},
+    { "id": "basic_variable_slash_2", "level": 2, "name": "Variable Slash 2", "atlasName": "Variable_Slash2", "tag": "BASIC", "target": "ENEMY", "cost": 2, "baseEffect": 6 , "duration": 0, "price":  123},
+    { "id": "basic_variable_slash_3", "level": 3, "name": "Variable Slash 3", "atlasName": "Variable_Slash3", "tag": "BASIC", "target": "ENEMY", "cost": 3, "baseEffect": 9 , "duration": 0, "price":  210},
 
-    { "id": "poison_looping_bite_1", "level": 1, "name": "Looping Bite 1", "atlasName": "Looping_Bite1", "tag": "POISON", "target": "ENEMY", "cost": 1, "baseEffect": 3 , "duration": 3},
-    { "id": "poison_looping_bite_2", "level": 2, "name": "Looping Bite 2", "atlasName": "Looping_Bite2", "tag": "POISON", "target": "ENEMY", "cost": 3, "baseEffect": 6 , "duration": 3},
-    { "id": "poison_looping_bite_3", "level": 3, "name": "Looping Bite 3", "atlasName": "Looping_Bite3", "tag": "POISON", "target": "ENEMY", "cost": 5, "baseEffect": 9 , "duration": 3},
+    { "id": "shield_final_shield_1", "level": 1, "name": "Final Shield 1", "atlasName": "Final_Shield1", "tag": "SHIELD", "target": "SELF", "cost": 1, "baseEffect": 3 , "duration": 0, "price":  60},
+    { "id": "shield_final_shield_2", "level": 2, "name": "Final Shield 2", "atlasName": "Final_Shield2", "tag": "SHIELD", "target": "SELF", "cost": 2, "baseEffect": 6 , "duration": 0, "price":  132},
+    { "id": "shield_final_shield_3", "level": 3, "name": "Final Shield 3", "atlasName": "Final_Shield3", "tag": "SHIELD", "target": "SELF", "cost": 3, "baseEffect": 9 , "duration": 0, "price":  215},
 
-    { "id": "shield_final_shield_1", "level": 1, "name": "Final Shield 1", "atlasName": "Final_Shield1", "tag": "SHIELD", "target": "SELF", "cost": 1, "baseEffect": 3 , "duration": 0},
-    { "id": "shield_final_shield_2", "level": 2, "name": "Final Shield 2", "atlasName": "Final_Shield2", "tag": "SHIELD", "target": "SELF", "cost": 2, "baseEffect": 6 , "duration": 0},
-    { "id": "shield_final_shield_3", "level": 3, "name": "Final Shield 3", "atlasName": "Final_Shield3", "tag": "SHIELD", "target": "SELF", "cost": 3, "baseEffect": 9 , "duration": 0},
-
-    { "id": "heal_heal_package_1", "level": 1, "name": "Heal Package 1", "atlasName": "Heal_Package1", "tag": "HEAL", "target": "SELF", "cost": 1, "baseEffect": 3 , "duration": 0},
-    { "id": "heal_heal_package_2", "level": 2, "name": "Heal Package 2", "atlasName": "Heal_Package2", "tag": "HEAL", "target": "SELF", "cost": 2, "baseEffect": 6 , "duration": 0},
-    { "id": "heal_heal_package_3", "level": 3, "name": "Heal Package 3", "atlasName": "Heal_Package3", "tag": "HEAL", "target": "SELF", "cost": 3, "baseEffect": 9 , "duration": 0}
+    { "id": "heal_heal_package_1", "level": 1, "name": "Heal Package 1", "atlasName": "Heal_Package1", "tag": "HEAL", "target": "SELF", "cost": 1, "baseEffect": 3 , "duration": 0, "price":  60},
+    { "id": "heal_heal_package_2", "level": 2, "name": "Heal Package 2", "atlasName": "Heal_Package2", "tag": "HEAL", "target": "SELF", "cost": 2, "baseEffect": 6 , "duration": 0, "price":  132},
+    { "id": "heal_heal_package_3", "level": 3, "name": "Heal Package 3", "atlasName": "Heal_Package3", "tag": "HEAL", "target": "SELF", "cost": 3, "baseEffect": 9 , "duration": 0, "price":  215}
   ]
 }

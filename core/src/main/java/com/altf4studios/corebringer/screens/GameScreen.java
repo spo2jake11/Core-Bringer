@@ -99,6 +99,19 @@ public class GameScreen implements Screen{
     // Guard against double-dispose and post-dispose rendering
     private boolean isDisposed = false;
 
+    // --- Instakill Victory Flow ---
+    // When an instakill happens from CodeEditorScreen, delay victory popup by a short duration and tag it.
+    private boolean instakillFlowActive = false;
+    private float instakillDelay = 0f;
+    private String instakillTag = null; // e.g., "Instakill!!"
+    // Start the delayed victory flow (called by CodeEditorScreen)
+    public void startInstakillVictory(float delaySeconds, String label) {
+        this.instakillFlowActive = true;
+        this.instakillDelay = Math.max(0f, delaySeconds);
+        this.instakillTag = label;
+    }
+    // --- End Instakill Victory Flow ---
+
 
     public GameScreen(Main corebringer) {
         this.corebringer = corebringer; /// The Master Key that holds all screens together
@@ -248,6 +261,10 @@ public class GameScreen implements Screen{
 
     public BattleManager getBattleManager() {
         return battleManager;
+    }
+
+    public com.altf4studios.corebringer.screens.gamescreen.CardStageUI getCardStageUI() {
+        return cardStageUI;
     }
 
     // Call this after any stat change (hp, energy, cards, battleWon)
@@ -544,7 +561,18 @@ public class GameScreen implements Screen{
 
         // --- Victory Screen Trigger ---
         if (!victoryScreenShown && !deathScreenShown && enemy.getHp() <= 0) {
-            showVictoryScreen();
+            if (instakillFlowActive) {
+                // Defer showing victory until delay elapses
+                instakillDelay -= delta;
+                if (instakillDelay <= 0f) {
+                    showVictoryScreen();
+                    // Reset instakill flow
+                    instakillFlowActive = false;
+                    instakillDelay = 0f;
+                }
+            } else {
+                showVictoryScreen();
+            }
         }
         // --- End Victory Screen Trigger ---
     }
@@ -557,6 +585,24 @@ public class GameScreen implements Screen{
             battleStageUI.changeEnemy();
             Gdx.app.log("GameScreen", "Changed enemy to: " + battleStageUI.getCurrentEnemyName());
         }
+    }
+
+    // Show a temporary centered message overlay on the battle stage
+    public void showCenterMessage(String text, Color color, float durationSeconds) {
+        try {
+            Label msg = new Label(text, corebringer.testskin);
+            msg.setAlignment(Align.center);
+            if (color != null) msg.setColor(color);
+            msg.setPosition(
+                Gdx.graphics.getWidth() / 2f - 200f,
+                Gdx.graphics.getHeight() / 2f + 100f
+            );
+            battleStage.addActor(msg);
+            msg.addAction(Actions.sequence(
+                Actions.delay(Math.max(0.1f, durationSeconds)),
+                Actions.removeActor()
+            ));
+        } catch (Exception ignored) {}
     }
 
     public void testChangeToSpecificEnemy(String enemyName) {
@@ -803,6 +849,8 @@ public class GameScreen implements Screen{
         deathScreenWindow.toFront();
         // Block all input except the modal by routing input to uiStage
         Gdx.input.setInputProcessor(uiStage);
+        // Clear the tag so subsequent victories are clean
+        instakillTag = null;
     }
 
     private void showVictoryScreen() {
@@ -836,6 +884,15 @@ public class GameScreen implements Screen{
         Label victoryMessage = new Label("You win!", corebringer.testskin);
         victoryMessage.setAlignment(Align.center);
         victoryMessage.setFontScale(2.0f); // Make it larger
+
+        // Optional instakill tag label
+        Label instakillLabel = null;
+        if (instakillTag != null && !instakillTag.isEmpty()) {
+            instakillLabel = new Label(instakillTag, corebringer.testskin);
+            instakillLabel.setAlignment(Align.center);
+            instakillLabel.setColor(Color.RED);
+            instakillLabel.setFontScale(1.5f);
+        }
 
         // Gold reward (random 50-100)
         final int goldReward = MathUtils.random(50, 100);
@@ -880,6 +937,9 @@ public class GameScreen implements Screen{
         });
 
         // Add content to table
+        if (instakillLabel != null) {
+            contentTable.add(instakillLabel).expand().center().padBottom(10f).row();
+        }
         contentTable.add(victoryMessage).expand().center().row();
         contentTable.add(goldGainedLabel).center().padTop(20f).row();
         contentTable.add(totalGoldPreview).center().padTop(10f).row();

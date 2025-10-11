@@ -474,7 +474,6 @@ public class PuzzleScreen implements Screen {
 
     @Override
     public void dispose() {
-        puzzleStage.dispose();
         input1Texture.dispose();
         input0Texture.dispose();
         questionMarkTexture.dispose();

@@ -12,6 +12,7 @@ buildscript {
 }
 plugins {
   id "application"
+  id "org.beryx.runtime" version "1.13.1"
 }
 apply plugin: 'io.github.fourlastor.construo'
 
@@ -21,6 +22,10 @@ import io.github.fourlastor.construo.Target
 sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.altf4studios.corebringer.lwjgl3.Lwjgl3Launcher'
 application.setMainClass(mainClassName)
+application {
+  // Ensure Gradle Application plugin exposes main class for Badass Runtime
+  mainClass = mainClassName
+}
 eclipse.project.name = appName + '-lwjgl3'
 java.sourceCompatibility = 17
 java.targetCompatibility = 17
@@ -47,6 +52,39 @@ run {
   //setIgnoreExitValue(true)
 
   if (os.contains('mac')) jvmArgs += "-XstartOnFirstThread"
+}
+
+// Ensure all required resources are available under an 'assets/' prefix on the classpath
+// so code paths like Gdx.files.internal("assets/...") resolve when running with Gradle and in packages.
+processResources {
+  // Avoid failing on duplicate files if any other plugin contributes resources
+  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+  // Copy only the root assets/ folder. It already contains backgrounds/, basic-characters/, icons/, ui/, atlas/, nameplates/, and JSONs.
+  from(rootProject.file('assets')) { into 'assets' }
+}
+
+// Badass Runtime: create custom runtime and Windows installer using jpackage
+runtime {
+  // Slim down the runtime image
+  options = ['--strip-debug', '--compress', '2', '--no-header-files', '--no-man-pages']
+  // Build a runnable image
+  imageZip.set(project.layout.buildDirectory.file("image/${appName}-${projectVersion}.zip"))
+  // jpackage settings
+  jpackage {
+    imageName = 'CoreBringer'
+    installerName = "CoreBringer-${projectVersion}"
+    // For Windows, produce an .exe installer; can change to 'app-image' to only build the image
+    installerType = 'app-image'
+    // Show console to surface errors when launching (Windows)
+    installerOptions += ['--win-console']
+    // Optional icon for Windows installer via jpackage option
+    if (project.file('icons/logo.ico').exists()) {
+      installerOptions += ['--icon', project.file('icons/logo.ico').absolutePath]
+    }
+    // JVM args if needed
+    //jvmArgs = ['-Xmx1G']
+    jvmArgs = ['-Dfile.encoding=UTF-8']
+  }
 }
 
 jar {
@@ -148,8 +186,8 @@ construo {
         // Optional: icon for Windows, as a PNG
         icon.set(project.file("icons/logo.png"))
         jdkUrl.set("https://github.com/adoptium/temurin17-binaries/releases/download/jdk-17.0.15%2B6/OpenJDK17U-jdk_x64_windows_hotspot_17.0.15_6.zip")
-        // Uncomment the next line to show a console when the game runs, to print messages.
-        //useConsole.set(true)
+        // Show a console when the game runs to print messages and errors.
+        useConsole.set(true)
       }
     }
 }
