@@ -144,16 +144,16 @@ public class GameMapScreen implements Screen{
             merchantnode.getImage().setScaling(Scaling.stretch);
             searchnode.getImage().setScaling(Scaling.stretch);
 
-            // Add click listener for search node to show puzzle screen
+            // Add click listener for search node to show treasure puzzle screen
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh PuzzleScreen instance
+                    // Always use a fresh TreasurePuzzleScreen instance
                     try {
-                        if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
+                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
                     } catch (Exception ignored) {}
-                    corebringer.puzzleScreen = new PuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.puzzleScreen);
+                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
+                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 }
             });
 
@@ -237,12 +237,12 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh PuzzleScreen instance
+                    // Always use a fresh TreasurePuzzleScreen instance
                     try {
-                        if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
+                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
                     } catch (Exception ignored) {}
-                    corebringer.puzzleScreen = new PuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.puzzleScreen);
+                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
+                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 }
             });
 
@@ -326,12 +326,12 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh PuzzleScreen instance
+                    // Always use a fresh TreasurePuzzleScreen instance
                     try {
-                        if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
+                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
                     } catch (Exception ignored) {}
-                    corebringer.puzzleScreen = new PuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.puzzleScreen);
+                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
+                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 }
             });
 
@@ -415,12 +415,12 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh PuzzleScreen instance
+                    // Always use a fresh TreasurePuzzleScreen instance
                     try {
-                        if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
+                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
                     } catch (Exception ignored) {}
-                    corebringer.puzzleScreen = new PuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.puzzleScreen);
+                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
+                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 }
             });
 
@@ -504,12 +504,12 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh PuzzleScreen instance
+                    // Always use a fresh TreasurePuzzleScreen instance
                     try {
-                        if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
+                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
                     } catch (Exception ignored) {}
-                    corebringer.puzzleScreen = new PuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.puzzleScreen);
+                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
+                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 }
             });
 
@@ -593,12 +593,12 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh PuzzleScreen instance
+                    // Always use a fresh TreasurePuzzleScreen instance
                     try {
-                        if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
+                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
                     } catch (Exception ignored) {}
-                    corebringer.puzzleScreen = new PuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.puzzleScreen);
+                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
+                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 }
             });
 
@@ -682,12 +682,12 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh PuzzleScreen instance
+                    // Always use a fresh TreasurePuzzleScreen instance
                     try {
-                        if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
+                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
                     } catch (Exception ignored) {}
-                    corebringer.puzzleScreen = new PuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.puzzleScreen);
+                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
+                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 }
             });
 
@@ -771,12 +771,12 @@ public class GameMapScreen implements Screen{
             searchnode.addListener(new ClickListener() {
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    // Always use a fresh PuzzleScreen instance
+                    // Always use a fresh TreasurePuzzleScreen instance
                     try {
-                        if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose();
+                        if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose();
                     } catch (Exception ignored) {}
-                    corebringer.puzzleScreen = new PuzzleScreen(corebringer);
-                    corebringer.setScreen(corebringer.puzzleScreen);
+                    corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
+                    corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 }
             });
 

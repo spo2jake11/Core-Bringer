@@ -44,6 +44,7 @@ public class Main extends Game {
     public CardTestScren cardTestScren;
     public PuzzleScreen puzzleScreen;
     public MerchantScreen merchantScreen;
+    public TreasurePuzzleScreen treasurePuzzleScreen;
     public RestScreen restScreen;
     public SampleCardHandler selecteddebugcard;
     private AssetManager assetManager;
@@ -77,7 +78,7 @@ public class Main extends Game {
 
         ///This is for the Skin to be declared and initialized so Screens can just call it
         //test skin used Utils.getInternalPath
-        testskin = new Skin(Utils.getInternalPath("ui/uiskin.json")); ///Usage of sample skin, can be changed soon
+        testskin = new Skin(Utils.getInternalPath("assets/ui/uiskin.json")); ///Usage of sample skin, can be changed soon
         responsivelabelstyle = new Label.LabelStyle(testskin.getFont("default"), Color.WHITE);
         responsivelabelstyle.font.getData().setScale(2f);
 
@@ -99,6 +100,7 @@ public class Main extends Game {
         gameScreen = null;
         gameMapScreen = new GameMapScreen(this);
         puzzleScreen = new PuzzleScreen(this);
+        treasurePuzzleScreen = new TreasurePuzzleScreen(this);
         setScreen(mainMenuScreen);
         // Ensure the input multiplexer is always set as the input processor
         Gdx.input.setInputProcessor(globalMultiplexer);
