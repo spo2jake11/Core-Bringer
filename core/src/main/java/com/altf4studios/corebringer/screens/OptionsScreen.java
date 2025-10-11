@@ -1,6 +1,8 @@
 package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.utils.SettingsData;
+import com.altf4studios.corebringer.utils.SettingsManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -47,6 +49,16 @@ public class OptionsScreen implements Screen {
         returnbutton = new TextButton("Back", corebringer.testskin);
         ///For the Volume Slider
         volumeslider = new Slider(0f, 100f, 1f, false, corebringer.testskin);
+        // Load settings to initialize UI and app state
+        SettingsData settings = SettingsManager.loadSettings();
+        if (settings != null) {
+            float vol = Math.max(0f, Math.min(1f, settings.volume));
+            corebringer.isMusicMuted = settings.muted;
+            corebringer.corebringerstartmenubgm.setVolume(vol);
+            corebringer.corebringermapstartbgm.setVolume(vol);
+            if (corebringer.corebringerbgm != null) corebringer.corebringerbgm.setVolume(vol);
+            if (corebringer.corebringergamescreenbgm != null) corebringer.corebringergamescreenbgm.setVolume(vol);
+        }
         float currentvolume = corebringer.corebringerstartmenubgm.getVolume() * 100f;
         volumeslider.setValue(currentvolume);
         volumelabel = new Label("Volume: " + (int) currentvolume + "%", corebringer.responsivelabelstyle);
@@ -64,6 +76,8 @@ public class OptionsScreen implements Screen {
             @Override
             public void changed(ChangeEvent changeEvent, Actor actor) {
                 updateVolumeUI();
+                // Persist settings on every change
+                SettingsManager.saveSettings(volumeslider.getValue() / 100f, volumemutecheckbox.isChecked());
             }
         });
 
@@ -74,6 +88,8 @@ public class OptionsScreen implements Screen {
                 corebringer.isMusicMuted = volumemutecheckbox.isChecked();
                 volumeslider.setDisabled(corebringer.isMusicMuted);
                 updateVolumeUI();
+                // Persist settings whenever mute toggles
+                SettingsManager.saveSettings(volumeslider.getValue() / 100f, volumemutecheckbox.isChecked());
             }
         });
 
@@ -101,13 +117,19 @@ public class OptionsScreen implements Screen {
     private void updateVolumeUI() {
         if (corebringer.isMusicMuted) {
             volumelabel.setText("Volume is Muted.");
+            // Pause all known music instances
             corebringer.corebringerstartmenubgm.pause();
             corebringer.corebringermapstartbgm.pause();
+            if (corebringer.corebringerbgm != null) corebringer.corebringerbgm.pause();
+            if (corebringer.corebringergamescreenbgm != null) corebringer.corebringergamescreenbgm.pause();
         } else {
             float volume = volumeslider.getValue() / 100f;
             volumelabel.setText("Volume: " + (int) volumeslider.getValue() + "%");
+            // Apply volume to all music instances
             corebringer.corebringerstartmenubgm.setVolume(volume);
             corebringer.corebringermapstartbgm.setVolume(volume);
+            if (corebringer.corebringerbgm != null) corebringer.corebringerbgm.setVolume(volume);
+            if (corebringer.corebringergamescreenbgm != null) corebringer.corebringergamescreenbgm.setVolume(volume);
 
             if (corebringer.getScreen() == corebringer.mainMenuScreen && !corebringer.corebringerstartmenubgm.isPlaying()) {
                 corebringer.corebringerstartmenubgm.play();

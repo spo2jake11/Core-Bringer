@@ -4,6 +4,8 @@ import com.altf4studios.corebringer.Main;
 import com.altf4studios.corebringer.Utils;
 import com.altf4studios.corebringer.utils.LoggingUtils;
 import com.altf4studios.corebringer.utils.SaveManager;
+import com.altf4studios.corebringer.utils.SettingsData;
+import com.altf4studios.corebringer.utils.SettingsManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
@@ -789,8 +791,13 @@ public class GameMapScreen implements Screen{
                 ///This can be the cause of bugs or memory leak
                 ///This is only a WORKAROUND AND NOT A SOLUTION on the problem of the background music not properly stopping
                 corebringer.corebringermapstartbgm.stop();
-                corebringer.corebringerstartmenubgm.setVolume(1.0f);
-                corebringer.corebringerstartmenubgm.play();
+                // Apply global settings volume and respect mute
+                SettingsData s = SettingsManager.loadSettings();
+                float vol = (s != null) ? Math.max(0f, Math.min(1f, s.volume)) : corebringer.corebringerstartmenubgm.getVolume();
+                corebringer.corebringerstartmenubgm.setVolume(vol);
+                if (!corebringer.isMusicMuted) {
+                    corebringer.corebringerstartmenubgm.play();
+                }
                 corebringer.setScreen(corebringer.mainMenuScreen);
             }
         });

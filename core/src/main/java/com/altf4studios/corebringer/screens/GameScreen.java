@@ -750,6 +750,15 @@ public class GameScreen implements Screen{
                 } else {
                     corebringer.fadeInMusic(corebringer.corebringerstartmenubgm, 1f);
                 }
+                // Delete current run save file
+                SaveManager.deleteSave();
+                // Dispose and clear the existing GameMapScreen so a new run starts fresh
+                try {
+                    if (corebringer.gameMapScreen != null) {
+                        corebringer.gameMapScreen.dispose();
+                        corebringer.gameMapScreen = null;
+                    }
+                } catch (Exception ignored) {}
                 corebringer.setScreen(corebringer.mainMenuScreen);
                 optionsWindow.setVisible(false);
                 optionsWindow.remove();

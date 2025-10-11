@@ -2,6 +2,8 @@ package com.altf4studios.corebringer;
 
 import com.altf4studios.corebringer.screens.*;
 import com.altf4studios.corebringer.screens.gamescreen.SampleCardHandler;
+import com.altf4studios.corebringer.utils.SettingsData;
+import com.altf4studios.corebringer.utils.SettingsManager;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -72,9 +74,23 @@ public class Main extends Game {
         corebringergamescreenbgm.setLooping(true);
         corebringergamescreenbgm.setVolume(1.0f);
 
-        isMusicMuted = false;
-        //corebringerbgm.play();
-        corebringerstartmenubgm.play();
+        // Load global audio settings
+        SettingsData settings = SettingsManager.loadSettings();
+        if (settings != null) {
+            float vol = Math.max(0f, Math.min(1f, settings.volume));
+            isMusicMuted = settings.muted;
+            corebringerbgm.setVolume(vol);
+            corebringerstartmenubgm.setVolume(vol);
+            corebringermapstartbgm.setVolume(vol);
+            corebringergamescreenbgm.setVolume(vol);
+        } else {
+            isMusicMuted = false;
+        }
+
+        // Only auto-play if not muted
+        if (!isMusicMuted) {
+            corebringerstartmenubgm.play();
+        }
 
         ///This is for the Skin to be declared and initialized so Screens can just call it
         //test skin used Utils.getInternalPath
@@ -186,7 +202,10 @@ public class Main extends Game {
                 music.setVolume(Math.max(newVolume, 0f));
                 if (currentStep >= steps) {
                     music.stop();
-                    music.setVolume(initialVolume); // Reset for next play
+                    // Reset to settings volume (not the pre-fade initial), so future play uses global volume
+                    SettingsData s = SettingsManager.loadSettings();
+                    float target = (s != null) ? Math.max(0f, Math.min(1f, s.volume)) : 1.0f;
+                    music.setVolume(target);
                     if (afterFade != null) afterFade.run();
                     this.cancel();
                 }
@@ -197,7 +216,9 @@ public class Main extends Game {
     // Fade in the given music over duration (seconds)
     public void fadeInMusic(final Music music, final float duration) {
         if (music == null) return;
-        final float targetVolume = 1.0f;
+        if (isMusicMuted) return; // honor global mute
+        SettingsData s = SettingsManager.loadSettings();
+        final float targetVolume = (s != null) ? Math.max(0f, Math.min(1f, s.volume)) : music.getVolume();
         music.setVolume(0f);
         music.play();
         final int steps = 20;

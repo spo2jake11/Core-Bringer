@@ -1,6 +1,8 @@
 package com.altf4studios.corebringer.screens.gamescreen;
 
 import com.altf4studios.corebringer.Main;
+import com.altf4studios.corebringer.utils.SettingsData;
+import com.altf4studios.corebringer.utils.SettingsManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -67,8 +69,13 @@ public class OptionsWindow extends Window {
                 if (titleCallback != null) titleCallback.onGoToTitle();
                 ///Remove this if necessary or has any other ideas for placement
                 corebringer.corebringergamescreenbgm.stop();
-                corebringer.corebringerstartmenubgm.setVolume(1.0f);
-                corebringer.corebringerstartmenubgm.play();
+                // Apply global settings volume and respect mute
+                SettingsData s = SettingsManager.loadSettings();
+                float vol = (s != null) ? Math.max(0f, Math.min(1f, s.volume)) : corebringer.corebringerstartmenubgm.getVolume();
+                corebringer.corebringerstartmenubgm.setVolume(vol);
+                if (!corebringer.isMusicMuted) {
+                    corebringer.corebringerstartmenubgm.play();
+                }
                 OptionsWindow.this.setVisible(false);
                 OptionsWindow.this.remove();
 
