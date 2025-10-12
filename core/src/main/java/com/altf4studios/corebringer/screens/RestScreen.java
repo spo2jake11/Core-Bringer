@@ -51,8 +51,10 @@ public class RestScreen implements Screen{
     private TextureAtlas cardAtlas;
     private ObjectMap<String, String> idToAtlasName;
     private int cardsSelected = 0;
-    private final int MAX_UPGRADES = 3;
+    private final int MAX_UPGRADES = 1;
     private Array<String> upgradedCardIds; // Track upgraded cards for saving
+    private int selectedCardDeckIndex = -1; // Track the deck index of the selected card
+    private Array<Integer> upgradeableCardDeckIndices; // Track deck indices of upgradeable cards
 
     public RestScreen(Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
@@ -79,7 +81,7 @@ public class RestScreen implements Screen{
         restlabel.setAlignment(Align.center);
         
         healLabel = new Label("", corebringer.testskin);
-        upgradeLabel = new Label("Select up to 3 cards to upgrade:", corebringer.testskin);
+        upgradeLabel = new Label("Select 1 card to upgrade:", corebringer.testskin);
         upgradeLabel.setAlignment(Align.center);
 
         backtomapbutton = new TextButton("Continue to Next Node", corebringer.testskin);
@@ -88,6 +90,7 @@ public class RestScreen implements Screen{
         upgradeableCardIds = new Array<>();
         cardButtons = new Array<>();
         upgradedCardIds = new Array<>();
+        upgradeableCardDeckIndices = new Array<>();
 
         // Perform healing
         performHealing();
@@ -190,23 +193,29 @@ public class RestScreen implements Screen{
         String[] playerDeck = corebringer.gameScreen != null ? 
             corebringer.gameScreen.getSavedDeckIds() : new String[]{};
         
-        // Filter to only level 1 cards (can be upgraded)
-        Array<String> upgradeableCardIds = new Array<>();
-        for (String cardId : playerDeck) {
+        // Filter to only level 1 cards (can be upgraded) and track their deck indices
+        Array<String> tempUpgradeableCardIds = new Array<>();
+        Array<Integer> tempUpgradeableCardDeckIndices = new Array<>();
+        
+        for (int i = 0; i < playerDeck.length; i++) {
+            String cardId = playerDeck[i];
             if (cardId != null && cardId.endsWith("_1")) {
-                upgradeableCardIds.add(cardId);
+                tempUpgradeableCardIds.add(cardId);
+                tempUpgradeableCardDeckIndices.add(i);
             }
         }
         
         // Select 3 random cards from the player's level 1 cards
         Random random = new Random();
-        int cardsToShow = Math.min(3, upgradeableCardIds.size);
+        int cardsToShow = Math.min(3, tempUpgradeableCardIds.size);
         
         for (int i = 0; i < cardsToShow; i++) {
-            if (upgradeableCardIds.size > 0) {
-                int randomIndex = random.nextInt(upgradeableCardIds.size);
-                this.upgradeableCardIds.add(upgradeableCardIds.get(randomIndex));
-                upgradeableCardIds.removeIndex(randomIndex);
+            if (tempUpgradeableCardIds.size > 0) {
+                int randomIndex = random.nextInt(tempUpgradeableCardIds.size);
+                this.upgradeableCardIds.add(tempUpgradeableCardIds.get(randomIndex));
+                this.upgradeableCardDeckIndices.add(tempUpgradeableCardDeckIndices.get(randomIndex));
+                tempUpgradeableCardIds.removeIndex(randomIndex);
+                tempUpgradeableCardDeckIndices.removeIndex(randomIndex);
             }
         }
     }
@@ -242,8 +251,15 @@ public class RestScreen implements Screen{
                         cardsSelected++;
                         updateUpgradeLabel();
                         
-                        // Show card back cover and disable interaction
+                        // Show card back cover and disable interaction for ALL cards
                         showCardBackCover(cardButton);
+                        
+                        // Show back covers for all other cards
+                        for (int j = 0; j < cardButtons.size; j++) {
+                            if (j != cardIndex) {
+                                showCardBackCover(cardButtons.get(j));
+                            }
+                        }
                         
                         // Update the label to show the upgrade
                         updateCardDisplay(cardIndex);
@@ -296,6 +312,9 @@ public class RestScreen implements Screen{
         
         String currentId = upgradeableCardIds.get(cardIndex);
         
+        // Store the deck index of the selected card
+        selectedCardDeckIndex = upgradeableCardDeckIndices.get(cardIndex);
+        
         // Upgrade the card to next level
         String nextLevelId = getNextLevelCardId(currentId);
         if (nextLevelId != null) {
@@ -303,7 +322,7 @@ public class RestScreen implements Screen{
             upgradedCardIds.add(nextLevelId); // Track upgraded card for saving
             SampleCardHandler upgradedCard = getCardInfo(nextLevelId);
             if (upgradedCard != null) {
-                LoggingUtils.log("RestScreen", "Upgraded card to " + upgradedCard.name);
+                LoggingUtils.log("RestScreen", "Upgraded card to " + upgradedCard.name + " at deck index " + selectedCardDeckIndex);
             }
         }
     }
@@ -323,15 +342,15 @@ public class RestScreen implements Screen{
     private void updateUpgradeLabel() {
         int remaining = MAX_UPGRADES - cardsSelected;
         if (remaining > 0) {
-            upgradeLabel.setText("Select " + remaining + " more card" + (remaining > 1 ? "s" : "") + " to upgrade:");
+            upgradeLabel.setText("Select 1 card to upgrade:");
         } else {
-            upgradeLabel.setText("All upgrades selected! Ready to continue.");
+            upgradeLabel.setText("Card upgrade selected! Ready to continue.");
             upgradeLabel.setColor(Color.GREEN);
         }
     }
 
     private void saveUpgradedCards() {
-        if (upgradedCardIds.size == 0) return; // No upgrades to save
+        // Always save HP synchronization, even if no cards were upgraded
         
         // Get current save data
         SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
@@ -347,24 +366,21 @@ public class RestScreen implements Screen{
         String[] newDeck = new String[currentDeck.length];
         System.arraycopy(currentDeck, 0, newDeck, 0, currentDeck.length);
         
-        // Replace old card IDs with upgraded versions
-        for (int i = 0; i < newDeck.length; i++) {
-            String cardId = newDeck[i];
-            // Check if this card was upgraded
-            for (String upgradedId : upgradedCardIds) {
-                String originalId = getOriginalCardId(upgradedId);
-                if (originalId != null && cardId.equals(originalId)) {
-                    newDeck[i] = upgradedId;
-                    LoggingUtils.log("RestScreen", "Replaced " + originalId + " with " + upgradedId + " in deck");
-                    break;
-                }
-            }
+        // Replace only the specific card at the selected deck index (if any cards were upgraded)
+        if (selectedCardDeckIndex >= 0 && selectedCardDeckIndex < newDeck.length && upgradedCardIds.size > 0) {
+            String upgradedId = upgradedCardIds.get(0); // Should only be one upgrade
+            String originalId = newDeck[selectedCardDeckIndex];
+            newDeck[selectedCardDeckIndex] = upgradedId;
+            LoggingUtils.log("RestScreen", "Replaced " + originalId + " with " + upgradedId + " at deck index " + selectedCardDeckIndex);
         }
         
-        // Save the updated deck
+        // Save the updated deck with current player HP (after healing)
+        int currentPlayerHp = player != null ? player.getHp() : (stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20));
+        int currentPlayerMaxHp = player != null ? player.getMaxHealth() : (stats.maxHp > 0 ? stats.maxHp : 20);
+        
         SaveManager.saveStats(
-            stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20),
-            stats.maxHp > 0 ? stats.maxHp : 20,
+            currentPlayerHp,
+            currentPlayerMaxHp,
             stats.energy,
             stats.maxEnergy > 0 ? stats.maxEnergy : 3,
             newDeck,
@@ -372,7 +388,11 @@ public class RestScreen implements Screen{
             stats.gold
         );
         
-        LoggingUtils.log("RestScreen", "Saved " + upgradedCardIds.size + " card upgrades to player deck");
+        if (upgradedCardIds.size > 0) {
+            LoggingUtils.log("RestScreen", "Saved 1 card upgrade to player deck at index " + selectedCardDeckIndex + " and synchronized player HP: " + currentPlayerHp + "/" + currentPlayerMaxHp);
+        } else {
+            LoggingUtils.log("RestScreen", "Synchronized player HP after healing: " + currentPlayerHp + "/" + currentPlayerMaxHp);
+        }
     }
 
     private String getOriginalCardId(String upgradedId) {
