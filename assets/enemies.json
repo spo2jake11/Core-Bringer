@@ -1,10 +1,21 @@
-[
-  { "name": "Experiment", "hp": 22 },
-  { "name": "Probe", "hp": 25 },
-  { "name": "Shock_slime", "hp": 28 },
-  { "name": "duckling_gun", "hp": 21 },
-  { "name": "liquid_metal", "hp": 30 },
-  { "name": "nanite", "hp": 24 },
-  { "name": "standard_slime", "hp": 27 }
-]
+{
+  "levels": [
+    {
+      "level": 1,
+      "common": [
+        { "name": "Experiment", "hp": 22 },
+        { "name": "Probe", "hp": 25 },
+        { "name": "Shock_slime", "hp": 28 },
+        { "name": "duckling_gun", "hp": 21 },
+        { "name": "liquid_metal", "hp": 30 },
+        { "name": "nanite", "hp": 24 },
+        { "name": "standard_slime", "hp": 27 }
+      ],
+      "boss": [
+        { "name": "Core_Sentinel", "hp": 80 },
+        { "name": "Overclocked_Golem", "hp": 90 }
+      ]
+    }
+  ]
+}
 

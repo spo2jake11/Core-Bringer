@@ -128,6 +128,12 @@ public class MainMenuScreen implements Screen {
                     };
                     // Initialize save with currentHp=50 and maxHp=50
                     SaveManager.saveStats(50, 50, 0, defaultCards, 0);
+//                    // Always use a fresh MerchantScreen instance
+//                    try {
+//                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();
+//                    } catch (Exception ignored) {}
+//                    corebringer.merchantScreen = new MerchantScreen(corebringer);
+//                    corebringer.setScreen(corebringer.merchantScreen);
                     // Recreate GameMapScreen if needed (after return-to-title disposal)
                     if (corebringer.gameMapScreen == null) {
                         corebringer.gameMapScreen = new GameMapScreen(corebringer);

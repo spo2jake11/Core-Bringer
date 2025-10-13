@@ -109,6 +109,16 @@ public class GameMapScreen implements Screen{
             corebringer.gameScreen.rerollEnemyAndCards();
         });
     }
+    private void triggerBossBattle(){
+        // Fade out map music, fade in game music
+        corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
+            corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
+            // Create a fresh GameScreen instance for boss battle (boss-only pool)
+            corebringer.gameScreen = new GameScreen(corebringer, true);
+            corebringer.setScreen(corebringer.gameScreen);
+            corebringer.gameScreen.rerollEnemyAndCards();
+        });
+    }
     private void triggerMerchant(){
         // Always use a fresh MerchantScreen instance
         try {
@@ -183,6 +193,12 @@ public class GameMapScreen implements Screen{
         rank10table = new Table();
         bossnodeA = createAtlasButton("boss_node");
         bossnodeA.getImage().setScaling(Scaling.fit);
+        bossnodeA.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                triggerBossBattle();
+            }
+        });
 
         /*bossnodeB = new TextButton("BF", corebringer.testskin);
         bossnodeC = new TextButton("BF", corebringer.testskin);
@@ -764,6 +780,8 @@ public class GameMapScreen implements Screen{
         ///For Rank 10
         rank10table.add(bossnodeA).padBottom(20f).row();
 
+
+
         /*rank10table.add(bossnodeB).padBottom(20f).row();
         rank10table.add(bossnodeC).padBottom(20f).row();
         rank10table.add(bossnodeD).padBottom(20f).row();*/
@@ -780,27 +798,27 @@ public class GameMapScreen implements Screen{
 
         ///This is where the navigation buttons will go (Going back to title to forfeit the game etc.)
         gamemapbuttonstable = new Table();
-        returnbutton = new TextButton("Return to Main Menu", corebringer.testskin);
-
-        ///This is where the functionality of the buttons is located
-        returnbutton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                ///WARNING: Possible causes of memory leaks, stop() method isn't working for some reason
-                ///pause() method doesn't work too, only the reduction of volume does
-                ///This can be the cause of bugs or memory leak
-                ///This is only a WORKAROUND AND NOT A SOLUTION on the problem of the background music not properly stopping
-                corebringer.corebringermapstartbgm.stop();
-                // Apply global settings volume and respect mute
-                SettingsData s = SettingsManager.loadSettings();
-                float vol = (s != null) ? Math.max(0f, Math.min(1f, s.volume)) : corebringer.corebringerstartmenubgm.getVolume();
-                corebringer.corebringerstartmenubgm.setVolume(vol);
-                if (!corebringer.isMusicMuted) {
-                    corebringer.corebringerstartmenubgm.play();
-                }
-                corebringer.setScreen(corebringer.mainMenuScreen);
-            }
-        });
+//        returnbutton = new TextButton("Return to Main Menu", corebringer.testskin);
+//
+//        ///This is where the functionality of the buttons is located
+//        returnbutton.addListener(new ClickListener() {
+//            @Override
+//            public void clicked(InputEvent event, float x, float y) {
+//                ///WARNING: Possible causes of memory leaks, stop() method isn't working for some reason
+//                ///pause() method doesn't work too, only the reduction of volume does
+//                ///This can be the cause of bugs or memory leak
+//                ///This is only a WORKAROUND AND NOT A SOLUTION on the problem of the background music not properly stopping
+//                corebringer.corebringermapstartbgm.stop();
+//                // Apply global settings volume and respect mute
+//                SettingsData s = SettingsManager.loadSettings();
+//                float vol = (s != null) ? Math.max(0f, Math.min(1f, s.volume)) : corebringer.corebringerstartmenubgm.getVolume();
+//                corebringer.corebringerstartmenubgm.setVolume(vol);
+//                if (!corebringer.isMusicMuted) {
+//                    corebringer.corebringerstartmenubgm.play();
+//                }
+//                corebringer.setScreen(corebringer.mainMenuScreen);
+//            }
+//        });
 
         ///Placement of the messages in the Game Map Messages Table
         /*gamemapmessagetable.add(gamemapmessages2).row();
@@ -808,7 +826,7 @@ public class GameMapScreen implements Screen{
         gamemapmessagetable.add(gamemapmessages3).row();*/
 
         ///Placement of the buttons in the Game Map Buttons Table
-        gamemapbuttonstable.add(returnbutton);
+//        gamemapbuttonstable.add(returnbutton);
 
         ///Placement of Ranks to the Game Map Node Table (Not the Core Game Map Table, but the separate one)
         gamemapnodetable.add(rank1table).padLeft(40f);

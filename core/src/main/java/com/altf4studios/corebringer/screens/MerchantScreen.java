@@ -29,6 +29,7 @@ import java.util.Random;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.altf4studios.corebringer.utils.SaveData;
+import com.badlogic.gdx.utils.ObjectMap;
 
 
 public class MerchantScreen implements Screen{
@@ -41,6 +42,9 @@ public class MerchantScreen implements Screen{
     private Window shopWindow;
     private Table shopGrid;
     private final Random rng = new Random();
+    // Remove-card flow resources
+    private Window removeWindow;
+    private ObjectMap<String, String> idToAtlasName;
 
     public MerchantScreen (Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
@@ -182,12 +186,12 @@ public class MerchantScreen implements Screen{
     }
 
     private void createShopWindow() {
-        float windowWidth = Gdx.graphics.getWidth() * 0.6f;
-        float windowHeight = Gdx.graphics.getHeight() * 0.6f;
-        float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
-        float windowY = (Gdx.graphics.getHeight());
+        float windowWidth = Gdx.graphics.getWidth() * 0.4f;
+        float windowHeight = Gdx.graphics.getHeight() * 0.57f;
+        float windowX = (Gdx.graphics.getWidth() - windowWidth) * 0.2f;
+        float windowY = 10f;
 
-        shopWindow = new Window("Merchant", corebringer.testskin);
+        shopWindow = new Window("", corebringer.testskin);
         shopWindow.setModal(false);
         shopWindow.setMovable(false);
         shopWindow.setResizable(false);
@@ -199,22 +203,247 @@ public class MerchantScreen implements Screen{
 
         // 2x2 grid of random cards
         shopGrid = new Table();
-        shopGrid.defaults().pad(10).center();
+        shopGrid.defaults().center();
         populateRandomCardsGrid(shopGrid);
 
         // Bottom-right controls: Remove card button and price label 150
         Table controls = new Table();
         controls.defaults().pad(5);
         TextButton removeBtn = new TextButton("Remove card", corebringer.testskin);
+        removeBtn.setSize(150, 50);
         Label removePrice = new Label("150", corebringer.testskin);
-        controls.add(removeBtn);
+        controls.add(removeBtn).row();
         controls.add(removePrice).padLeft(10);
+
+        // Remove card behavior
+        removeBtn.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Load current gold
+                SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+                int currentGold = (stats != null) ? stats.gold : 0;
+                if (currentGold < 150) {
+                    showInsufficientGold();
+                    return;
+                }
+                // Ensure player has cards
+                String[] ids = (stats != null && stats.cards != null) ? stats.cards : new String[]{};
+                if (ids.length == 0) {
+                    Dialog dlg = new Dialog("", corebringer.testskin);
+                    dlg.text("You have no cards to remove.");
+                    dlg.button("OK");
+                    dlg.show(coremerchantscreenstage);
+                    return;
+                }
+                // Open selection window
+                showRemoveCardWindow();
+            }
+        });
 
         content.add(shopGrid).grow().row();
         content.add(controls).right();
 
         shopWindow.add(content).grow();
         coremerchantscreenstage.addActor(shopWindow);
+
+        // Proceed button outside the window at the right side
+        final TextButton proceedBtn = new TextButton("Proceed", corebringer.testskin);
+        // Give it a reasonable fixed size so we can position it reliably
+        proceedBtn.setSize(140f, 45f);
+        // Position strictly outside the shop window on the right, with padding
+        float desiredX = windowX + windowWidth + 20f; // 20px to the right of window
+        float maxX = Gdx.graphics.getWidth() - proceedBtn.getWidth() - 20f; // keep inside screen
+        float btnX = windowX + windowWidth + 20f;
+        float btnY = windowY + (windowHeight - proceedBtn.getHeight()) / 2f;
+        proceedBtn.setPosition(btnX, btnY);
+        coremerchantscreenstage.addActor(proceedBtn);
+
+        proceedBtn.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Navigate back to Game Map Screen
+                if (corebringer.gameMapScreen != null) {
+                    try {
+                        corebringer.gameMapScreen.advanceToNextRank();
+                    } catch (Exception ignored) {}
+                }
+                corebringer.setScreen(corebringer.gameMapScreen);
+                Gdx.app.postRunnable(MerchantScreen.this::dispose);
+            }
+        });
+    }
+
+    private void ensureDeckMappingLoaded() {
+        if (idToAtlasName != null) return;
+        idToAtlasName = new ObjectMap<>();
+        try {
+            JsonReader reader = new JsonReader();
+            JsonValue root = reader.parse(Gdx.files.internal("assets/cards.json"));
+            for (JsonValue card : root.get("cards")) {
+                String id = card.getString("id", null);
+                String atlas = card.getString("atlasName", null);
+                if (id != null && atlas != null) {
+                    idToAtlasName.put(id, atlas);
+                }
+            }
+        } catch (Exception e) {
+            Gdx.app.error("MerchantScreen", "Failed to load cards.json for mapping: " + e.getMessage());
+        }
+    }
+
+    private void showRemoveCardWindow() {
+        ensureDeckMappingLoaded();
+
+        if (removeWindow != null) {
+            removeWindow.toFront();
+            removeWindow.setVisible(true);
+            return;
+        }
+
+        float windowWidth = Gdx.graphics.getWidth() * 0.8f;
+        float windowHeight = Gdx.graphics.getHeight() * 0.75f;
+        float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
+        float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
+
+        removeWindow = new Window("", corebringer.testskin);
+        removeWindow.setModal(true);
+        removeWindow.setMovable(true);
+        removeWindow.setResizable(false);
+        float rw = Math.min(Gdx.graphics.getWidth() * 0.55f, 900f);
+        float rh = Math.min(Gdx.graphics.getHeight() * 0.73f, 600f);
+        removeWindow.setSize(rw, rh);
+        // Center the remove window on screen
+        float posX = (Gdx.graphics.getWidth() - rw) * 0.2f;
+        float posY = 20f;
+        removeWindow.setPosition(posX, posY);
+
+        Table grid = new Table();
+        grid.defaults().pad(10);
+        grid.top().left();
+
+        // Build from saved deck ids
+        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        String[] ids = (stats != null && stats.cards != null) ? stats.cards : new String[]{};
+
+        int col = 0;
+        for (String id : ids) {
+            String atlasName = idToAtlasName != null ? idToAtlasName.get(id) : null;
+            String region = atlasName != null ? atlasName.replace(" ", "_") : "bck_card";
+            TextureRegionDrawable drawable = new TextureRegionDrawable(cardAtlas.findRegion(region) != null ? cardAtlas.findRegion(region) : cardAtlas.findRegion("bck_card"));
+            Image img = new Image(drawable);
+            img.setSize(150, 190);
+            // Store the id on the actor's name for retrieval
+            img.setName(id);
+            img.addListener(new ClickListener(){
+                private boolean handled = false;
+                @Override
+                public void clicked(InputEvent event, float x, float y) {
+                    if (handled) return; // ensure only once
+                    handled = true;
+                    performCardRemoval(img.getName());
+                }
+            });
+            grid.add(img).size(150, 190);
+            col++;
+            if (col == 4) { grid.row(); col = 0; }
+        }
+
+        ScrollPane scroll = new ScrollPane(grid, corebringer.testskin);
+        scroll.setFadeScrollBars(false);
+        scroll.setScrollbarsOnTop(true);
+        scroll.setForceScroll(false, true); // always allow vertical scrolling
+        scroll.setScrollingDisabled(false, false);
+
+        Table content = new Table();
+        content.defaults().pad(10);
+        content.add(scroll).grow().row();
+        // Buttons row
+        Table buttons = new Table();
+        TextButton btnCancel = new TextButton("Cancel", corebringer.testskin);
+        btnCancel.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (removeWindow != null) {
+                    removeWindow.remove();
+                    removeWindow = null;
+                }
+            }
+        });
+        buttons.add(btnCancel).right();
+        content.add(buttons).right();
+        removeWindow.add(content).grow();
+        coremerchantscreenstage.addActor(removeWindow);
+    }
+
+    private void performCardRemoval(String idToRemove) {
+        // Re-validate gold and deck
+        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        if (stats == null) {
+            showInsufficientGold();
+            return;
+        }
+        if (stats.gold < 150) {
+            showInsufficientGold();
+            return;
+        }
+        String[] curr = stats.cards != null ? stats.cards : new String[]{};
+        if (curr.length == 0) {
+            Dialog dlg = new Dialog("", corebringer.testskin);
+            dlg.text("You have no cards to remove.");
+            dlg.button("OK");
+            dlg.show(coremerchantscreenstage);
+            return;
+        }
+
+        // Remove first occurrence
+        int idxRemove = -1;
+        for (int i = 0; i < curr.length; i++) {
+            if (curr[i] != null && curr[i].equals(idToRemove)) { idxRemove = i; break; }
+        }
+        if (idxRemove == -1) {
+            Dialog dlg = new Dialog("", corebringer.testskin);
+            dlg.text("Selected card not found.");
+            dlg.button("OK");
+            dlg.show(coremerchantscreenstage);
+            return;
+        }
+
+        String[] updated = new String[curr.length - 1];
+        for (int i = 0, j = 0; i < curr.length; i++) {
+            if (i == idxRemove) continue;
+            updated[j++] = curr[i];
+        }
+
+        int newGold = stats.gold - 150;
+        // Persist
+        SaveManager.saveStats(
+            stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20),
+            stats.maxHp > 0 ? stats.maxHp : 20,
+            stats.energy,
+            stats.maxEnergy > 0 ? stats.maxEnergy : 3,
+            updated,
+            stats.battleWon,
+            newGold
+        );
+
+        // Update UI
+        updateTopGoldAndHp(
+            stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20),
+            stats.maxHp > 0 ? stats.maxHp : 20,
+            newGold
+        );
+
+        // Close selection window to enforce single removal per transaction
+        if (removeWindow != null) {
+            removeWindow.remove();
+            removeWindow = null;
+        }
+
+        // Feedback
+        Dialog dlg = new Dialog("", corebringer.testskin);
+        dlg.text("Card removed. -150 Gold");
+        dlg.button("OK");
+        dlg.show(coremerchantscreenstage);
     }
 
     private void populateRandomCardsGrid(Table grid) {
@@ -249,7 +478,7 @@ public class MerchantScreen implements Screen{
             Table itemTable = new Table();
             Image img = new Image(drawable);
             img.setScaling(Scaling.fit);
-            itemTable.add(img).size(180, 220).row();
+            itemTable.add(img).size(126, 154).row();
             Label priceLbl = new Label(String.valueOf(price), corebringer.testskin);
             itemTable.add(priceLbl).padTop(5);
 

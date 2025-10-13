@@ -113,8 +113,16 @@ public class GameScreen implements Screen{
     // --- End Instakill Victory Flow ---
 
 
+    // Whether this battle should use only boss enemies
+    private boolean bossOnlyBattle = false;
+
     public GameScreen(Main corebringer) {
+        this(corebringer, false);
+    }
+
+    public GameScreen(Main corebringer, boolean bossOnly) {
         this.corebringer = corebringer; /// The Master Key that holds all screens together
+        this.bossOnlyBattle = bossOnly;
 
         // Initialize CardParser
         cardParser = CardParser.getInstance();
@@ -157,17 +165,23 @@ public class GameScreen implements Screen{
             }
         }
 
-        // Load random enemy from JSON
+        // Load enemy from new JSON format: level -> common/boss pools
         try {
             com.badlogic.gdx.files.FileHandle file = Gdx.files.internal("assets/enemies.json");
             String json = file.readString();
             com.badlogic.gdx.utils.JsonReader jsonReader = new com.badlogic.gdx.utils.JsonReader();
-            com.badlogic.gdx.utils.JsonValue enemies = jsonReader.parse(json);
-            if (enemies != null && enemies.size > 0) {
-                int idx = com.badlogic.gdx.math.MathUtils.random(enemies.size - 1);
-                com.badlogic.gdx.utils.JsonValue enemyData = enemies.get(idx);
-                enemyName = enemyData.getString("name");
-                enemyHp = enemyData.getInt("hp");
+            com.badlogic.gdx.utils.JsonValue root = jsonReader.parse(json);
+            // For now, pick from first level; can be extended to use current map level
+            com.badlogic.gdx.utils.JsonValue levels = root.get("levels");
+            if (levels != null && levels.size > 0) {
+                com.badlogic.gdx.utils.JsonValue level = levels.get(0);
+                com.badlogic.gdx.utils.JsonValue pool = bossOnlyBattle ? level.get("boss") : level.get("common");
+                if (pool != null && pool.size > 0) {
+                    int idx = com.badlogic.gdx.math.MathUtils.random(pool.size - 1);
+                    com.badlogic.gdx.utils.JsonValue enemyData = pool.get(idx);
+                    enemyName = enemyData.getString("name");
+                    enemyHp = enemyData.getInt("hp");
+                }
             }
         } catch (Exception e) {
             Gdx.app.error("GameScreen", "Failed to load enemy from JSON: " + e.getMessage());
