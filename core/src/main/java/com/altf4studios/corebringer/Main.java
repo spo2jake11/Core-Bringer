@@ -105,20 +105,20 @@ public class Main extends Game {
         ///This is for initalizing JShell
         initJShell();
 
-        mainMenuScreen = new MainMenuScreen(this);
-        optionsScreen = new OptionsScreen(this);
-        startGameMapScreen = new StartGameMapScreen(this);
-        codeEditorScreen = new CodeEditorScreen(this);
-        debugScreen = new DebugScreen(this);
-        cardTestScren = new CardTestScren(this);
-        merchantScreen = new MerchantScreen(this);
-        restScreen = new RestScreen(this);
+        mainMenuScreen = null;
+        optionsScreen = null;
+        startGameMapScreen = null;
+        codeEditorScreen = null;
+        debugScreen = null;
+        cardTestScren = null;
+        merchantScreen = null;
+        restScreen = null;
         // Lazily create GameScreen when a map node is clicked
         gameScreen = null;
-        gameMapScreen = new GameMapScreen(this);
-        puzzleScreen = new PuzzleScreen(this);
-        treasurePuzzleScreen = new TreasurePuzzleScreen(this);
-        setScreen(mainMenuScreen);
+        gameMapScreen = null;
+        puzzleScreen = null;
+        treasurePuzzleScreen = null;
+        showMainMenu();
         // Ensure the input multiplexer is always set as the input processor
         Gdx.input.setInputProcessor(globalMultiplexer);
     }
@@ -264,15 +264,10 @@ public class Main extends Game {
 
     @Override
     public void dispose() {
-//        if (corebringerbgm != null) {
-//            corebringerbgm.dispose();
-//        }
-//        if (corebringerstartmenubgm != null) {
-//            corebringerstartmenubgm.dispose();
-//        }
-//        if (corebringermapstartbgm != null) {
-//            corebringermapstartbgm.dispose();
-//        }
+        try { if (corebringerbgm != null) corebringerbgm.dispose(); } catch (Exception ignored) {}
+        try { if (corebringerstartmenubgm != null) corebringerstartmenubgm.dispose(); } catch (Exception ignored) {}
+        try { if (corebringermapstartbgm != null) corebringermapstartbgm.dispose(); } catch (Exception ignored) {}
+        try { if (corebringergamescreenbgm != null) corebringergamescreenbgm.dispose(); } catch (Exception ignored) {}
 
     }
     @Override public void resize(int width, int height) {
@@ -302,5 +297,83 @@ public class Main extends Game {
     }
     public InputMultiplexer getGlobalMultiplexer() {
         return globalMultiplexer;
+    }
+
+    // --- Lazy screen helpers ---
+    public void showMainMenu() {
+        if (mainMenuScreen == null) {
+            mainMenuScreen = new MainMenuScreen(this);
+        }
+        setScreen(mainMenuScreen);
+    }
+
+    public void showOptions() {
+        if (optionsScreen == null) {
+            optionsScreen = new OptionsScreen(this);
+        }
+        setScreen(optionsScreen);
+    }
+
+    public void showStartGameMap() {
+        if (startGameMapScreen == null) {
+            startGameMapScreen = new StartGameMapScreen(this);
+        }
+        setScreen(startGameMapScreen);
+    }
+
+    public void showCodeEditor() {
+        if (codeEditorScreen == null) {
+            codeEditorScreen = new CodeEditorScreen(this);
+        }
+        setScreen(codeEditorScreen);
+    }
+
+    public void showDebug() {
+        if (debugScreen == null) {
+            debugScreen = new DebugScreen(this);
+        }
+        setScreen(debugScreen);
+    }
+
+    public void showCardTest() {
+        if (cardTestScren == null) {
+            cardTestScren = new CardTestScren(this);
+        }
+        setScreen(cardTestScren);
+    }
+
+    public void showMerchant() {
+        if (merchantScreen == null) {
+            merchantScreen = new MerchantScreen(this);
+        }
+        setScreen(merchantScreen);
+    }
+
+    public void showRest() {
+        if (restScreen == null) {
+            restScreen = new RestScreen(this);
+        }
+        setScreen(restScreen);
+    }
+
+    public void showGameMap() {
+        if (gameMapScreen == null) {
+            gameMapScreen = new GameMapScreen(this);
+        }
+        setScreen(gameMapScreen);
+    }
+
+    public void showPuzzle() {
+        if (puzzleScreen == null) {
+            puzzleScreen = new PuzzleScreen(this);
+        }
+        setScreen(puzzleScreen);
+    }
+
+    public void showTreasurePuzzle() {
+        if (treasurePuzzleScreen == null) {
+            treasurePuzzleScreen = new TreasurePuzzleScreen(this);
+        }
+        setScreen(treasurePuzzleScreen);
     }
 }

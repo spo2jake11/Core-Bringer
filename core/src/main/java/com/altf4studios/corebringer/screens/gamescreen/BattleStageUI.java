@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.Drawable;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Scaling;
 
 public class BattleStageUI {
@@ -44,6 +45,11 @@ public class BattleStageUI {
 	private Label enemyPoisonNum;
 	private Label enemyBleedNum;
 	private Label enemyStunNum;
+
+    // Cached textures to avoid repeated allocations
+    private Texture bgTexture;
+    private Texture playerTexture;
+    private ObjectMap<String, Texture> statusTextures = new ObjectMap<>();
 
     public BattleStageUI(Stage battleStage, Skin skin) {
         this.battleStage = battleStage;
@@ -105,8 +111,10 @@ public class BattleStageUI {
     }
 
     private void setupBattleUI() {
-        Texture bg = new Texture(Gdx.files.internal("assets/backgrounds/stg1_bg.png"));
-        Drawable bgDraw = new TextureRegionDrawable(new TextureRegion(bg));
+        if (bgTexture == null) {
+            bgTexture = new Texture(Gdx.files.internal("assets/backgrounds/stg1_bg.png"));
+        }
+        Drawable bgDraw = new TextureRegionDrawable(new TextureRegion(bgTexture));
 
         Table actionTable = new Table();
         actionTable.top();
@@ -150,7 +158,9 @@ public class BattleStageUI {
         enemyTemplate.setAlignment(Align.center);
 
         // Character images
-        Texture playerTexture = new Texture(Gdx.files.internal("assets/basic-characters/hero.png"));
+        if (playerTexture == null) {
+            playerTexture = new Texture(Gdx.files.internal("assets/basic-characters/hero.png"));
+        }
         Image userImageBG = new Image(playerTexture);
         userImageBG.setScaling(Scaling.contain);
         userImageBG.setAlign(Align.center);
@@ -228,7 +238,6 @@ public class BattleStageUI {
     }
 
 	private Stack createStatusBadge(String name) {
-
         String imgPath = null;
         switch (name){
             case "Shield":
@@ -246,14 +255,18 @@ public class BattleStageUI {
             default:
                 imgPath = null;
         }
-		// Colored square with centered status name
-		Texture status = new Texture(Gdx.files.internal(imgPath));
-		Image img = new Image(status);
+        // Cached status textures
+        Texture status = statusTextures.get(imgPath);
+        if (status == null) {
+            status = new Texture(Gdx.files.internal(imgPath));
+            statusTextures.put(imgPath, status);
+        }
+        Image img = new Image(status);
         img.setSize(20, 20);
-		Stack stack = new Stack();
-		stack.add(img);
-		return stack;
-	}
+        Stack stack = new Stack();
+        stack.add(img);
+        return stack;
+    }
 
 	private Label createBadgeNumberOverlay(Stack badgeStack) {
 		Label num = new Label("", skin);
@@ -409,6 +422,14 @@ public class BattleStageUI {
     public void dispose() {
         if (enemyAtlas != null) {
             enemyAtlas.dispose();
+        }
+        if (bgTexture != null) { bgTexture.dispose(); bgTexture = null; }
+        if (playerTexture != null) { playerTexture.dispose(); playerTexture = null; }
+        if (statusTextures != null) {
+            for (Texture t : statusTextures.values()) {
+                if (t != null) t.dispose();
+            }
+            statusTextures.clear();
         }
     }
 

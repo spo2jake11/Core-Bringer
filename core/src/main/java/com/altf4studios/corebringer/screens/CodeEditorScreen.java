@@ -481,27 +481,15 @@ public class CodeEditorScreen implements Screen {
                 QuestionnaireManager.Question q = currentQ;
                 CodeEvaluationService.EvaluationResult ev = evaluator.evaluate(q, code, actual, null);
 
-                boolean instakillProc = false;
                 if (ev.passed && q != null) {
                     QuestionnaireManager.get().markSolved(q.id);
-                    // Overhack proc logic: use question's chance as probability
-                    float chance = MathUtils.clamp(q.chance, 0f, 1f);
-                    instakillProc = MathUtils.random() < chance;
-                    Gdx.app.log("CodeEditorScreen", "Overhack roll: chance=" + chance + ", proc=" + instakillProc);
-                    // Apply battle effect on main thread
-                    final boolean finalProc = instakillProc;
                     Gdx.app.postRunnable(() -> {
                         if (corebringer != null && corebringer.gameScreen != null) {
                             com.altf4studios.corebringer.battle.BattleManager bm = corebringer.gameScreen.getBattleManager();
                             if (bm != null) {
-                                if (finalProc) {
-                                    bm.instakillEnemy();
-                                    // Return to game screen and start delayed victory with tag
-                                    corebringer.setScreen(corebringer.gameScreen);
-                                    corebringer.gameScreen.startInstakillVictory(0.5f, "Instakill!!");
-                                } else {
-                                    bm.endPlayerTurnNow();
-                                }
+                                // Activate 1-turn card effect buff x1.5 and return to game
+                                corebringer.gameScreen.activateOneTurnBuff(1.5f);
+                                corebringer.setScreen(corebringer.gameScreen);
                             }
                         }
                     });
@@ -515,7 +503,7 @@ public class CodeEditorScreen implements Screen {
                 final String finalText = result + judgement + feedbackBlock;
 
                 final boolean incorrect = !ev.passed;
-                final boolean suppressUI = (ev.passed && instakillProc) || incorrect;
+                final boolean suppressUI = incorrect; // no instakill UI path anymore
                 Gdx.app.postRunnable(() -> {
                     if (incorrect) {
                         // Return to game screen, skip user's turn, and show stun message

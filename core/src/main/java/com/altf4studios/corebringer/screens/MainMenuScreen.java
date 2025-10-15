@@ -98,7 +98,7 @@ public class MainMenuScreen implements Screen {
         optionsbutton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(corebringer.optionsScreen);
+                corebringer.showOptions();
             }
         });
 
@@ -135,10 +135,11 @@ public class MainMenuScreen implements Screen {
 //                    corebringer.merchantScreen = new MerchantScreen(corebringer);
 //                    corebringer.setScreen(corebringer.merchantScreen);
                     // Recreate GameMapScreen if needed (after return-to-title disposal)
-                    if (corebringer.gameMapScreen == null) {
-                        corebringer.gameMapScreen = new GameMapScreen(corebringer);
-                    }
-                    corebringer.setScreen(corebringer.gameMapScreen);
+//                    if (corebringer.gameMapScreen == null) {
+//                        corebringer.gameMapScreen = new GameMapScreen(corebringer);
+//                    }
+//                    corebringer.setScreen(corebringer.gameMapScreen);
+                    corebringer.showGameMap();
                 });
             }
         });
@@ -152,7 +153,7 @@ public class MainMenuScreen implements Screen {
                     /// Message and Duration insie the parameter, this is only a test message
                     showthemagicword("Exited Debug!!! ", 2.5f);
                     debugclickingcount = 0; ///This will reset the count so not everytime you can go to Debug
-                    corebringer.setScreen(corebringer.debugScreen);
+                    corebringer.showDebug();
                 }
             }
         });

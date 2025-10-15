@@ -142,6 +142,66 @@ public class GameMapScreen implements Screen{
         corebringer.setScreen(corebringer.restScreen);
     }
 
+    // Add nodes to a rank table with weighted chances and allow duplicates per column
+    // Weights: random battle = 50%, rest = 15%, merchant = 15%, search = 15% (sum=95%, remaining 5% goes to battle)
+    private void addNodesWithWeights(Table rankTable, int nodesPerColumn) {
+        for (int i = 0; i < nodesPerColumn; i++) {
+            int roll = MathUtils.random(0, 99); // 0..99
+            String type;
+            if (roll < 50) type = "battle";           // 0-49 (50%)
+            else if (roll < 65) type = "rest";        // 50-64 (15%)
+            else if (roll < 80) type = "merchant";    // 65-79 (15%)
+            else if (roll < 95) type = "search";      // 80-94 (15%)
+            else type = "battle";                     // 95-99 (5%) fallback to battle
+
+            ImageButton btn;
+            switch (type) {
+                case "battle":
+                    btn = createAtlasButton("combat_node");
+                    btn.getImage().setScaling(Scaling.stretch);
+                    btn.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            triggerRandomBattle();
+                        }
+                    });
+                    break;
+                case "rest":
+                    btn = createAtlasButton("rest_node");
+                    btn.getImage().setScaling(Scaling.stretch);
+                    btn.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            triggerRest();
+                        }
+                    });
+                    break;
+                case "merchant":
+                    btn = createAtlasButton("shop_node");
+                    btn.getImage().setScaling(Scaling.stretch);
+                    btn.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            triggerMerchant();
+                        }
+                    });
+                    break;
+                case "search":
+                default:
+                    btn = createAtlasButton("search_node");
+                    btn.getImage().setScaling(Scaling.stretch);
+                    btn.addListener(new ClickListener() {
+                        @Override
+                        public void clicked(InputEvent event, float x, float y) {
+                            triggerRandomSearchOutcome();
+                        }
+                    });
+                    break;
+            }
+            rankTable.add(btn).padBottom(20f).row();
+        }
+    }
+
     public GameMapScreen(Main corebringer) {
         ///Here's all the things that will initiate upon Option button being clicked
         this.corebringer = corebringer; /// The Master Key that holds all screens together
@@ -192,8 +252,8 @@ public class GameMapScreen implements Screen{
         ///Initialization of the Random Counter to help with the Random Node Generator
         counter = new Random();
 
-        ///Initialization of the counter for Total Nodes to help with the Random Node Generator
-        totalnodescounter = 4;
+        ///Initialization of the counter for Total Nodes per column (random 1..5)
+        totalnodescounter = MathUtils.random(1, 5);
 
         ///Tenth row (RANK 10)
         rank10table = new Table();
@@ -212,537 +272,65 @@ public class GameMapScreen implements Screen{
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank2table.getChildren().size == 0) {
-            ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = createAtlasButton("combat_node");
-            restnode = createAtlasButton("rest_node");
-            merchantnode = createAtlasButton("shop_node");
-            searchnode = createAtlasButton("search_node");
-            randombattlenode.getImage().setScaling(Scaling.stretch);
-            restnode.getImage().setScaling(Scaling.stretch);
-            merchantnode.getImage().setScaling(Scaling.stretch);
-            searchnode.getImage().setScaling(Scaling.stretch);
-
-            // Add click listener for search node with 33% random outcomes
-            searchnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomSearchOutcome();
-                }
-            });
-
-            ///Functionalities for the Randomized Nodes
-            randombattlenode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomBattle();
-                }
-            });
-
-            ///Functionality for the Merchant Node
-            merchantnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerMerchant();
-                }
-            });
-
-            ///Functionality for the Rest Node
-            restnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRest();
-                }
-            });
-
-            for (int x = 0; x < totalnodescounter; x++) {
-                int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
-                switch (nodeselection) {
-                    case 1:
-                        rank2table.add(randombattlenode).padBottom(20f).row();
-                        break;
-                    case 2:
-                        rank2table.add(restnode).padBottom(20f).row();
-                        break;
-                    case 3:
-                        rank2table.add(merchantnode).padBottom(20f).row();
-                        break;
-                    case 4:
-                        rank2table.add(cardsmithnode).padBottom(20f).row();
-                        break;
-                    case 5:
-                        rank2table.add(searchnode).padBottom(20f).row();
-                        break;
-                }
-            }
+            totalnodescounter = MathUtils.random(1, 5);
+            // Weighted generation per column with duplicates allowed
+            addNodesWithWeights(rank2table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 2 has nodes already or has problems.");
         }
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank3table.getChildren().size == 0) {
-            ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = createAtlasButton("combat_node");
-            restnode = createAtlasButton("rest_node");
-            merchantnode = createAtlasButton("shop_node");
-            searchnode = createAtlasButton("search_node");
-            randombattlenode.getImage().setScaling(Scaling.stretch);
-            restnode.getImage().setScaling(Scaling.stretch);
-            merchantnode.getImage().setScaling(Scaling.stretch);
-            searchnode.getImage().setScaling(Scaling.stretch);
-
-            searchnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomSearchOutcome();
-                }
-            });
-
-            ///Functionalities for the Randomized Nodes
-            randombattlenode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomBattle();
-                }
-            });
-
-            ///Functionality for the Merchant Node
-            merchantnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerMerchant();
-                }
-            });
-
-            ///Functionality for the Rest Node
-            restnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRest();
-                }
-            });
-
-            for (int x = 0; x < totalnodescounter; x++) {
-                int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
-                switch (nodeselection) {
-                    case 1:
-                        rank3table.add(randombattlenode).padBottom(20f).row();
-                        break;
-                    case 2:
-                        rank3table.add(restnode).padBottom(20f).row();
-                        break;
-                    case 3:
-                        rank3table.add(merchantnode).padBottom(20f).row();
-                        break;
-                    case 4:
-                        rank3table.add(cardsmithnode).padBottom(20f).row();
-                        break;
-                    case 5:
-                        rank3table.add(searchnode).padBottom(20f).row();
-                        break;
-                }
-            }
+            totalnodescounter = MathUtils.random(1, 5);
+            addNodesWithWeights(rank3table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 3 has nodes already or has problems.");
         }
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank4table.getChildren().size == 0) {
-            ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = createAtlasButton("combat_node");
-            restnode = createAtlasButton("rest_node");
-            merchantnode = createAtlasButton("shop_node");
-            searchnode = createAtlasButton("search_node");
-            randombattlenode.getImage().setScaling(Scaling.stretch);
-            restnode.getImage().setScaling(Scaling.stretch);
-            merchantnode.getImage().setScaling(Scaling.stretch);
-            searchnode.getImage().setScaling(Scaling.stretch);
-
-            searchnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomSearchOutcome();
-                }
-            });
-
-            ///Functionalities for the Randomized Nodes
-            randombattlenode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomBattle();
-                }
-            });
-
-            ///Functionality for the Merchant Node
-            merchantnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerMerchant();
-                }
-            });
-
-            ///Functionality for the Rest Node
-            restnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRest();
-                }
-            });
-
-            for (int x = 0; x < totalnodescounter; x++) {
-                int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
-                switch (nodeselection) {
-                    case 1:
-                        rank4table.add(randombattlenode).padBottom(20f).row();
-                        break;
-                    case 2:
-                        rank4table.add(restnode).padBottom(20f).row();
-                        break;
-                    case 3:
-                        rank4table.add(merchantnode).padBottom(20f).row();
-                        break;
-                    case 4:
-                        rank4table.add(cardsmithnode).padBottom(20f).row();
-                        break;
-                    case 5:
-                        rank4table.add(searchnode).padBottom(20f).row();
-                        break;
-                }
-            }
+            totalnodescounter = MathUtils.random(1, 5);
+            addNodesWithWeights(rank4table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 4 has nodes already or has problems.");
         }
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank5table.getChildren().size == 0) {
-            ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = createAtlasButton("combat_node");
-            restnode = createAtlasButton("rest_node");
-            merchantnode = createAtlasButton("shop_node");
-            searchnode = createAtlasButton("search_node");
-            randombattlenode.getImage().setScaling(Scaling.stretch);
-            restnode.getImage().setScaling(Scaling.stretch);
-            merchantnode.getImage().setScaling(Scaling.stretch);
-            searchnode.getImage().setScaling(Scaling.stretch);
-
-            searchnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomSearchOutcome();
-                }
-            });
-
-            ///Functionalities for the Randomized Nodes
-            randombattlenode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomBattle();
-                }
-            });
-
-            ///Functionality for the Merchant Node
-            merchantnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerMerchant();
-                }
-            });
-
-            ///Functionality for the Rest Node
-            restnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRest();
-                }
-            });
-
-            for (int x = 0; x < totalnodescounter; x++) {
-                int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
-                switch (nodeselection) {
-                    case 1:
-                        rank5table.add(randombattlenode).padBottom(20f).row();
-                        break;
-                    case 2:
-                        rank5table.add(restnode).padBottom(20f).row();
-                        break;
-                    case 3:
-                        rank5table.add(merchantnode).padBottom(20f).row();
-                        break;
-                    case 4:
-                        rank5table.add(cardsmithnode).padBottom(20f).row();
-                        break;
-                    case 5:
-                        rank5table.add(searchnode).padBottom(20f).row();
-                        break;
-                }
-            }
+            totalnodescounter = MathUtils.random(1, 5);
+            addNodesWithWeights(rank5table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 5 has nodes already or has problems.");
         }
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank6table.getChildren().size == 0) {
-            ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = createAtlasButton("combat_node");
-            restnode = createAtlasButton("rest_node");
-            merchantnode = createAtlasButton("shop_node");
-            searchnode = createAtlasButton("search_node");
-            randombattlenode.getImage().setScaling(Scaling.stretch);
-            restnode.getImage().setScaling(Scaling.stretch);
-            merchantnode.getImage().setScaling(Scaling.stretch);
-            searchnode.getImage().setScaling(Scaling.stretch);
-
-            searchnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomSearchOutcome();
-                }
-            });
-
-            ///Functionalities for the Randomized Nodes
-            randombattlenode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomBattle();
-                }
-            });
-
-            ///Functionality for the Merchant Node
-            merchantnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerMerchant();
-                }
-            });
-
-            ///Functionality for the Rest Node
-            restnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRest();
-                }
-            });
-
-            for (int x = 0; x < totalnodescounter; x++) {
-                int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
-                switch (nodeselection) {
-                    case 1:
-                        rank6table.add(randombattlenode).padBottom(20f).row();
-                        break;
-                    case 2:
-                        rank6table.add(restnode).padBottom(20f).row();
-                        break;
-                    case 3:
-                        rank6table.add(merchantnode).padBottom(20f).row();
-                        break;
-                    case 4:
-                        rank6table.add(cardsmithnode).padBottom(20f).row();
-                        break;
-                    case 5:
-                        rank6table.add(searchnode).padBottom(20f).row();
-                        break;
-                }
-            }
+            totalnodescounter = MathUtils.random(1, 5);
+            addNodesWithWeights(rank6table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 6 has nodes already or has problems.");
         }
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank7table.getChildren().size == 0) {
-            ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = createAtlasButton("combat_node");
-            restnode = createAtlasButton("rest_node");
-            merchantnode = createAtlasButton("shop_node");
-            searchnode = createAtlasButton("search_node");
-            randombattlenode.getImage().setScaling(Scaling.stretch);
-            restnode.getImage().setScaling(Scaling.stretch);
-            merchantnode.getImage().setScaling(Scaling.stretch);
-            searchnode.getImage().setScaling(Scaling.stretch);
-
-            searchnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomSearchOutcome();
-                }
-            });
-
-            ///Functionalities for the Randomized Nodes
-            randombattlenode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomBattle();
-                }
-            });
-
-            ///Functionality for the Merchant Node
-            merchantnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerMerchant();
-                }
-            });
-
-            ///Functionality for the Rest Node
-            restnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRest();
-                }
-            });
-
-            for (int x = 0; x < totalnodescounter; x++) {
-                int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
-                switch (nodeselection) {
-                    case 1:
-                        rank7table.add(randombattlenode).padBottom(20f).row();
-                        break;
-                    case 2:
-                        rank7table.add(restnode).padBottom(20f).row();
-                        break;
-                    case 3:
-                        rank7table.add(merchantnode).padBottom(20f).row();
-                        break;
-                    case 4:
-                        rank7table.add(cardsmithnode).padBottom(20f).row();
-                        break;
-                    case 5:
-                        rank7table.add(searchnode).padBottom(20f).row();
-                        break;
-                }
-            }
+            totalnodescounter = MathUtils.random(1, 5);
+            addNodesWithWeights(rank7table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 7 has nodes already or has problems.");
         }
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank8table.getChildren().size == 0) {
-            ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = createAtlasButton("combat_node");
-            restnode = createAtlasButton("rest_node");
-            merchantnode = createAtlasButton("shop_node");
-            searchnode = createAtlasButton("search_node");
-            randombattlenode.getImage().setScaling(Scaling.stretch);
-            restnode.getImage().setScaling(Scaling.stretch);
-            merchantnode.getImage().setScaling(Scaling.stretch);
-            searchnode.getImage().setScaling(Scaling.stretch);
-
-            searchnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomSearchOutcome();
-                }
-            });
-
-            ///Functionalities for the Randomized Nodes
-            randombattlenode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomBattle();
-                }
-            });
-
-            ///Functionality for the Merchant Node
-            merchantnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerMerchant();
-                }
-            });
-
-            ///Functionality for the Rest Node
-            restnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRest();
-                }
-            });
-
-            for (int x = 0; x < totalnodescounter; x++) {
-                int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
-                switch (nodeselection) {
-                    case 1:
-                        rank8table.add(randombattlenode).padBottom(20f).row();
-                        break;
-                    case 2:
-                        rank8table.add(restnode).padBottom(20f).row();
-                        break;
-                    case 3:
-                        rank8table.add(merchantnode).padBottom(20f).row();
-                        break;
-                    case 4:
-                        rank8table.add(cardsmithnode).padBottom(20f).row();
-                        break;
-                    case 5:
-                        rank8table.add(searchnode).padBottom(20f).row();
-                        break;
-                }
-            }
+            totalnodescounter = MathUtils.random(1, 5);
+            addNodesWithWeights(rank8table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 8 has nodes already or has problems.");
         }
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank9table.getChildren().size == 0) {
-            ///Nodes to be Randomized between RANK 2 and RANK 9
-            randombattlenode = createAtlasButton("combat_node");
-            restnode = createAtlasButton("rest_node");
-            merchantnode = createAtlasButton("shop_node");
-            searchnode = createAtlasButton("search_node");
-            randombattlenode.getImage().setScaling(Scaling.stretch);
-            restnode.getImage().setScaling(Scaling.stretch);
-            merchantnode.getImage().setScaling(Scaling.stretch);
-            searchnode.getImage().setScaling(Scaling.stretch);
-
-            searchnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomSearchOutcome();
-                }
-            });
-
-            ///Functionalities for the Randomized Nodes
-            randombattlenode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRandomBattle();
-                }
-            });
-
-            ///Functionality for the Merchant Node
-            merchantnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerMerchant();
-                }
-            });
-
-            ///Functionality for the Rest Node
-            restnode.addListener(new ClickListener() {
-                @Override
-                public void clicked(InputEvent event, float x, float y) {
-                    triggerRest();
-                }
-            });
-
-            for (int x = 0; x < totalnodescounter; x++) {
-                int nodeselection = counter.nextInt(5) + 1; /// rolls between 1 to 5
-                switch (nodeselection) {
-                    case 1:
-                        rank9table.add(randombattlenode).padBottom(20f).row();
-                        break;
-                    case 2:
-                        rank9table.add(restnode).padBottom(20f).row();
-                        break;
-                    case 3:
-                        rank9table.add(merchantnode).padBottom(20f).row();
-                        break;
-                    case 4:
-                        rank9table.add(cardsmithnode).padBottom(20f).row();
-                        break;
-                    case 5:
-                        rank9table.add(searchnode).padBottom(20f).row();
-                        break;
-                }
-            }
+            totalnodescounter = MathUtils.random(1, 5);
+            addNodesWithWeights(rank9table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 9 has nodes already or has problems.");
         }

@@ -13,6 +13,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
@@ -99,6 +100,16 @@ public class GameScreen implements Screen{
     // Guard against double-dispose and post-dispose rendering
     private boolean isDisposed = false;
 
+    // --- One-turn Card Effect Buff ---
+    // Multiplier applied to card effects for the current player turn. Defaults to 1.0f.
+    private float cardEffectMultiplier = 1.0f;
+
+    // --- Perf HUD ---
+    private GLProfiler glProfiler;
+    private Label perfLabel;
+    private float perfTimer = 0f;
+    private boolean perfHudEnabled = true; // toggle with F3
+
     // --- Instakill Victory Flow ---
     // When an instakill happens from CodeEditorScreen, delay victory popup by a short duration and tag it.
     private boolean instakillFlowActive = false;
@@ -109,6 +120,18 @@ public class GameScreen implements Screen{
         this.instakillFlowActive = true;
         this.instakillDelay = Math.max(0f, delaySeconds);
         this.instakillTag = label;
+    }
+
+    // --- Card effect multiplier API ---
+    public void activateOneTurnBuff(float multiplier) {
+        cardEffectMultiplier = Math.max(1.0f, multiplier);
+        showCenterMessage("Overhack Buff: x" + String.format("%.2f", cardEffectMultiplier) + " this turn", Color.GREEN, 2.0f);
+    }
+    public float getCardEffectMultiplier() {
+        return cardEffectMultiplier;
+    }
+    public void clearCardEffectMultiplier() {
+        cardEffectMultiplier = 1.0f;
     }
     // --- End Instakill Victory Flow ---
 
@@ -476,6 +499,11 @@ public class GameScreen implements Screen{
                     }
                     return true;
                 }
+                if (keycode == Input.Keys.F3) {
+                    perfHudEnabled = !perfHudEnabled;
+                    if (perfLabel != null) perfLabel.setVisible(perfHudEnabled);
+                    return true;
+                }
                 return false;
             }
             @Override public boolean keyUp(int keycode) { return false; }
@@ -493,6 +521,24 @@ public class GameScreen implements Screen{
         // --- Ensure viewport is updated to current window size ---
         battleStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         cardStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+
+        // Perf HUD label (top-left)
+        try {
+            if (perfLabel == null) {
+                perfLabel = new Label("", corebringer.testskin);
+                perfLabel.setColor(Color.LIGHT_GRAY);
+                perfLabel.setAlignment(Align.topLeft);
+                perfLabel.setPosition(10, Gdx.graphics.getHeight() - 10);
+                uiStage.addActor(perfLabel);
+                perfLabel.setVisible(perfHudEnabled);
+            }
+        } catch (Exception ignored) {}
+
+        // Enable profiler when screen shows
+        if (glProfiler == null) {
+            glProfiler = new GLProfiler(Gdx.graphics);
+        }
+        glProfiler.enable();
     }
 
     private void addOverhackButtonToBottom() {
@@ -510,7 +556,7 @@ public class GameScreen implements Screen{
         btnRecharge.setPosition((Gdx.graphics.getWidth() / btnRecharge.getWidth()) + 50, 100);
         btnRecharge.addListener(new ClickListener() {
             @Override public void clicked(InputEvent event, float x, float y) {
-                corebringer.setScreen(corebringer.codeEditorScreen);
+                corebringer.showCodeEditor();
             }
         });
         battleStage.addActor(btnRecharge);
@@ -538,6 +584,25 @@ public class GameScreen implements Screen{
         uiStage.draw();
         // Removed: editorStage.act(delta); editorStage.draw();
 
+        // Perf HUD update (once per second)
+        perfTimer += delta;
+        if (perfHudEnabled && perfLabel != null && glProfiler != null && perfTimer >= 1f) {
+            int fps = Gdx.graphics.getFramesPerSecond();
+            long javaHeap = Gdx.app.getJavaHeap() / (1024 * 1024);
+            long nativeHeap = Gdx.app.getNativeHeap() / (1024 * 1024);
+            int draws = glProfiler.getDrawCalls();
+            int texBinds = glProfiler.getTextureBindings();
+            int shaders = glProfiler.getShaderSwitches();
+            perfLabel.setText("FPS:" + fps +
+                    "  Heap(M):" + javaHeap + "/" + nativeHeap +
+                    "  Draws:" + draws +
+                    "  Tex:" + texBinds +
+                    "  Shaders:" + shaders);
+            // Reset counters for next second
+            glProfiler.reset();
+            perfTimer = 0f;
+        }
+
         // --- BattleManager: process turn phases, enemy AI, and UI indicator ---
         if (gameState == GameState.RUNNING) {
             battleManager.update(delta);
@@ -554,6 +619,7 @@ public class GameScreen implements Screen{
             } else if (turnManager.isEnemyTurn()) {
                 // Reset flag so next player turn will regen again
                 playerTurnEnergyApplied = false;
+                // Do not auto-clear buff here; CardStageUI will clear it when End Turn is pressed
             }
         }
 
@@ -664,6 +730,17 @@ public class GameScreen implements Screen{
         showRandomSelectionMessage();
     }
 
+    /** Debug helper: log actor counts across stages to detect buildup */
+    public void logStageActorCounts(String label) {
+        int battleCount = (battleStage != null) ? battleStage.getActors().size : -1;
+        int cardCount = (cardStage != null) ? cardStage.getActors().size : -1;
+        int uiCount = (uiStage != null) ? uiStage.getActors().size : -1;
+        Gdx.app.log("Actors", label + 
+                " | battleStage=" + battleCount +
+                " cardStage=" + cardCount +
+                " uiStage=" + uiCount);
+    }
+
     private void showRandomSelectionMessage() {
         // Create a temporary label to show random selection message
         Label randomMessage = new Label("Random Selection Complete!", corebringer.testskin);
@@ -703,6 +780,9 @@ public class GameScreen implements Screen{
     public void dispose() {
         if (isDisposed) return;
         isDisposed = true;
+
+        // Disable profiler
+        try { if (glProfiler != null) glProfiler.disable(); } catch (Exception ignored) {}
 
         // Stop ongoing actions to minimize in-flight draws
         try { if (battleStage != null) battleStage.getRoot().clearActions(); } catch (Exception ignored) {}
@@ -777,7 +857,7 @@ public class GameScreen implements Screen{
                         corebringer.gameMapScreen = null;
                     }
                 } catch (Exception ignored) {}
-                corebringer.setScreen(corebringer.mainMenuScreen);
+                corebringer.showMainMenu();
                 optionsWindow.setVisible(false);
                 optionsWindow.remove();
                 // Re-register input processors for the new screen
@@ -852,7 +932,7 @@ public class GameScreen implements Screen{
                 // Transfer input ownership to the next screen before disposing
                 corebringer.clearInputProcessors();
                 // Switch screen; LibGDX will call show() on the next screen automatically
-                corebringer.setScreen(corebringer.mainMenuScreen);
+                corebringer.showMainMenu();
                 // Optionally reset death screen state
                 if (deathScreenWindow != null) {
                     deathScreenWindow.remove();
@@ -991,25 +1071,30 @@ public class GameScreen implements Screen{
             com.badlogic.gdx.files.FileHandle file = Gdx.files.internal("assets/enemies.json");
             String json = file.readString();
             com.badlogic.gdx.utils.JsonReader jsonReader = new com.badlogic.gdx.utils.JsonReader();
-            com.badlogic.gdx.utils.JsonValue enemies = jsonReader.parse(json);
-            if (enemies != null && enemies.size > 0) {
-                int idx = com.badlogic.gdx.math.MathUtils.random(enemies.size - 1);
-                com.badlogic.gdx.utils.JsonValue enemyData = enemies.get(idx);
-                String name = enemyData.getString("name");
-                int hp = enemyData.getInt("hp");
-                // Update Enemy object
-                if (enemy != null) {
-                    enemy.setName(name);
-                    // Ensure enemy max health is updated so setHp isn't clamped to an old max
-                    enemy.setMaxHealth(hp);
-                    enemy.setHp(hp);
-                }
-                // Update UI
-                if (battleStageUI != null) {
-                    battleStageUI.changeEnemy(name);
-                    // Update UI HP bars using current player/enemy values
-                    battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
-                    battleStageUI.setEnemyHp(hp);
+            com.badlogic.gdx.utils.JsonValue root = jsonReader.parse(json);
+            // Navigate: levels -> first level -> common or boss
+            com.badlogic.gdx.utils.JsonValue levels = root.get("levels");
+            if (levels != null && levels.size > 0) {
+                com.badlogic.gdx.utils.JsonValue level = levels.get(0);
+                com.badlogic.gdx.utils.JsonValue pool = bossOnlyBattle ? level.get("boss") : level.get("common");
+                if (pool != null && pool.size > 0) {
+                    int idx = com.badlogic.gdx.math.MathUtils.random(pool.size - 1);
+                    com.badlogic.gdx.utils.JsonValue enemyData = pool.get(idx);
+                    String name = enemyData.getString("name");
+                    int hp = enemyData.getInt("hp");
+                    // Update Enemy object
+                    if (enemy != null) {
+                        enemy.setName(name);
+                        // Ensure enemy max health is updated so setHp isn't clamped to an old max
+                        enemy.setMaxHealth(hp);
+                        enemy.setHp(hp);
+                    }
+                    // Update UI
+                    if (battleStageUI != null) {
+                        battleStageUI.changeEnemy(name);
+                        // Update UI HP bars using current player/enemy values
+                        battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
+                    }
                 }
             }
         } catch (Exception e) {

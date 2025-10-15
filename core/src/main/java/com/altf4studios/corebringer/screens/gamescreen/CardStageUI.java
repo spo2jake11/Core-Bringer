@@ -33,6 +33,9 @@ public class CardStageUI {
     private GameScreen gameScreen;
     private Array<String> discardPile;
     private float cardWidth, cardHeight;
+    // Optional resources created by the Deck UI
+    private com.badlogic.gdx.graphics.g2d.TextureAtlas deckCardAtlas;
+    private com.badlogic.gdx.utils.ObjectMap<String, String> idToAtlasName;
 
     public CardStageUI(Stage cardStage, Skin skin, CardParser cardParser, Player player, Enemy enemy, TurnManager turnManager, GameScreen gameScreen) {
         this.cardStage = cardStage;
@@ -86,6 +89,10 @@ public class CardStageUI {
     }
 
     private void createNewHand() {
+        // Remove previous hand group to avoid actor buildup and memory growth
+        if (cardHandTable != null && cardHandTable.cardGroup != null) {
+            try { cardHandTable.cardGroup.remove(); } catch (Exception ignored) {}
+        }
         String[] cardNames = getCardNames();
         int[] cardCosts = getCardCosts(cardNames);
         cardHandTable = new CardHandTable(skin, cardWidth, cardHeight, cardNames, cardCosts);
@@ -192,7 +199,12 @@ public class CardStageUI {
             card.addListener(new ClickListener(){
                 @Override
                 public void clicked(InputEvent event, float x, float y) {
-                    handleCardClick(card);
+                    // Disable this card and resolve after 0.3s
+                    card.setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
+                    card.addAction(Actions.sequence(
+                        Actions.delay(0.3f),
+                        Actions.run(() -> handleCardClick(card))
+                    ));
                 }
             });
         }
@@ -238,6 +250,11 @@ public class CardStageUI {
         drawButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                // Clear any active one-turn buff when the player ends their turn
+                if (gameScreen != null) {
+                    gameScreen.clearCardEffectMultiplier();
+                    gameScreen.showCenterMessage("Buff ended", Color.GRAY, 1.0f);
+                }
                 hideCards();
                 cardHandTable.flushHand(discardPile);
                 scheduleCardShow();
@@ -249,6 +266,11 @@ public class CardStageUI {
 
     // Programmatically trigger the same flow as pressing the End Turn button
     public void endTurnProgrammatically() {
+        // Clear any active one-turn buff when turn is ended programmatically (e.g., incorrect code)
+        if (gameScreen != null) {
+            gameScreen.clearCardEffectMultiplier();
+            gameScreen.showCenterMessage("Buff ended", Color.GRAY, 1.0f);
+        }
         hideCards();
         if (cardHandTable != null) {
             cardHandTable.flushHand(discardPile);
@@ -259,19 +281,26 @@ public class CardStageUI {
     }
 
     private void scheduleCardShow() {
-        if (turnManager != null) {
-            turnManager.endPlayerTurn();
-        }
-
-        // Sequence: 2s delay -> enemy acts -> 2s delay -> draw new hand & player's turn visuals
+        // New timing:
+        // 0.5s span (still Player's Turn text) -> endPlayerTurn -> 0.5s -> enemy acts -> 0.5s -> draw new hand
         cardStage.addAction(Actions.sequence(
-            Actions.delay(2.0f),
+            // First 0.5s span (keep Player's Turn text)
+            Actions.delay(0.5f),
+            // Now end player's turn to switch to Enemy Turn
+            Actions.run(() -> {
+                if (turnManager != null && turnManager.isPlayerTurn()) {
+                    turnManager.endPlayerTurn();
+                }
+            }),
+            // Another 0.5s before enemy acts
+            Actions.delay(0.5f),
             Actions.run(() -> {
                 if (gameScreen != null && gameScreen.getBattleManager() != null) {
                     gameScreen.getBattleManager().executeEnemyTurn();
                 }
             }),
-            Actions.delay(2.0f),
+            // 0.5s after enemy action before drawing new hand
+            Actions.delay(0.5f),
             Actions.run(() -> {
                 createNewHand();
                 showCards();
@@ -342,6 +371,13 @@ public class CardStageUI {
 
     private void handleAttack(SampleCardHandler card) {
         int damage = card.baseEffect;
+        // Apply one-turn buff multiplier if active
+        if (gameScreen != null) {
+            float mult = gameScreen.getCardEffectMultiplier();
+            if (mult > 1.0f) {
+                damage = Math.round(damage * mult);
+            }
+        }
         if (enemy != null && enemy.isAlive()) {
             enemy.takeDamage(damage);
         }
@@ -357,12 +393,24 @@ public class CardStageUI {
     private void handleDefense(SampleCardHandler card) {
         int shieldFromDesc = parseShieldFromDescription(card.description);
         int block = shieldFromDesc > 0 ? shieldFromDesc : card.baseEffect;
+        if (gameScreen != null) {
+            float mult = gameScreen.getCardEffectMultiplier();
+            if (mult > 1.0f) {
+                block = Math.round(block * mult);
+            }
+        }
         if (player != null && player.isAlive()) {
             player.gainBlock(block);
         }
         // Hybrid: defense + attack from description
         if (hasKeyword(card.description, "deal") || hasKeyword(card.description, "damage")) {
             int damage = card.baseEffect;
+            if (gameScreen != null) {
+                float mult = gameScreen.getCardEffectMultiplier();
+                if (mult > 1.0f) {
+                    damage = Math.round(damage * mult);
+                }
+            }
             if (damage > 0 && enemy != null && enemy.isAlive()) {
                 enemy.takeDamage(damage);
             }
@@ -377,6 +425,12 @@ public class CardStageUI {
         } else if (hasKeyword(card.description, "heal")) {
             int healAmount = parseNumberBeforeKeyword(card.description, "heal");
             if (healAmount <= 0) healAmount = Math.max(0, card.baseEffect);
+            if (gameScreen != null) {
+                float mult = gameScreen.getCardEffectMultiplier();
+                if (mult > 1.0f) {
+                    healAmount = Math.round(healAmount * mult);
+                }
+            }
             Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Heal: " + healAmount + " HP");
         } else {
             Gdx.app.log("CardEffect", "Card '" + card.name + "' used! Generic buff effect: " + card.baseEffect);
@@ -489,6 +543,11 @@ public class CardStageUI {
     }
 
     public void dispose() {
+
+        try { if (deckCardAtlas != null) deckCardAtlas.dispose(); } catch (Exception ignored) {}
+        deckCardAtlas = null;
+        if (idToAtlasName != null) idToAtlasName.clear();
+
         try {
             if (cardStage != null) {
                 cardStage.clear();
@@ -507,4 +566,6 @@ public class CardStageUI {
         gameScreen = null;
         drawButton = null;
     }
+
+
 }

@@ -37,13 +37,9 @@ public class BattleManager {
         // Reflect current turn state on the UI
         if (battleStageUI != null) {
             if (turnManager.isPlayerTurn()) {
-                battleStageUI.updateTurnIndicator("Your Turn - Play cards or end turn");
+                battleStageUI.updateTurnIndicator("Player's Turn");
             } else {
-                if (enemy.hasStatus("Stun")) {
-                    battleStageUI.updateTurnIndicator("Enemy Turn (Stunned)");
-                } else {
-                    battleStageUI.updateTurnIndicator("Enemy Turn - Enemy is acting...");
-                }
+                battleStageUI.updateTurnIndicator("Enemy Turn");
             }
 
             // Update status badges visibility
