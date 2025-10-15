@@ -73,9 +73,9 @@ public class GameMapScreen implements Screen{
     private boolean nodeChosenInCurrentRank;
     private ArrayList<Button> selectedNodesPerRank;
 
-    // Choose a random outcome for search node: Acid Event, Treasure Puzzle, PuzzleScreen, or Random Battle
+    // Choose a random outcome for search node: Acid Event, Phoenix Event, Treasure Puzzle, PuzzleScreen, or Random Battle
     private void triggerRandomSearchOutcome() {
-        int pick = MathUtils.random(3); // 0..3
+        int pick = MathUtils.random(4); // 0..4
         switch (pick) {
             case 0: // Acid Floor Event
                 try { if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose(); } catch (Exception ignored) {}
@@ -83,17 +83,23 @@ public class GameMapScreen implements Screen{
                 try { if (corebringer.restScreen != null) {} } catch (Exception ignored) {}
                 corebringer.setScreen(new AcidFloorEventScreen(corebringer));
                 break;
-            case 1: // Treasure Puzzle
+            case 1: // Phoenix Event
+                try { if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose(); } catch (Exception ignored) {}
+                try { if (corebringer.merchantScreen != null) {} } catch (Exception ignored) {}
+                try { if (corebringer.restScreen != null) {} } catch (Exception ignored) {}
+                corebringer.setScreen(new PhoenixEventScreen(corebringer));
+                break;
+            case 2: // Treasure Puzzle
                 try { if (corebringer.treasurePuzzleScreen != null) corebringer.treasurePuzzleScreen.dispose(); } catch (Exception ignored) {}
                 corebringer.treasurePuzzleScreen = new TreasurePuzzleScreen(corebringer);
                 corebringer.setScreen(corebringer.treasurePuzzleScreen);
                 break;
-            case 2: // Code Puzzle (PuzzleScreen)
+            case 3: // Code Puzzle (PuzzleScreen)
                 try { if (corebringer.puzzleScreen != null) corebringer.puzzleScreen.dispose(); } catch (Exception ignored) {}
                 corebringer.puzzleScreen = new PuzzleScreen(corebringer);
                 corebringer.setScreen(corebringer.puzzleScreen);
                 break;
-            case 3: // Random Battle
+            case 4: // Random Battle
             default:
                 corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                     corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
