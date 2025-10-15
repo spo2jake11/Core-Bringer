@@ -48,6 +48,7 @@ public class Main extends Game {
     public MerchantScreen merchantScreen;
     public TreasurePuzzleScreen treasurePuzzleScreen;
     public RestScreen restScreen;
+    public AcidFloorEventScreen acidFloorEventScreen;
     public SampleCardHandler selecteddebugcard;
     private AssetManager assetManager;
     public JShell jshell;
