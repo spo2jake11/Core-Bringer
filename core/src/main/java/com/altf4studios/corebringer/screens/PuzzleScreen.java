@@ -2,6 +2,8 @@ package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
 import com.altf4studios.corebringer.Utils;
+import com.altf4studios.corebringer.utils.SaveData;
+import com.altf4studios.corebringer.utils.SaveManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
@@ -30,7 +32,9 @@ public class PuzzleScreen implements Screen {
     private Label instructionLabel;
     private Label resultLabel;
     private Label expressionLabel;
+    private Label legendLabel;
     private Image congratulationsImage;
+    private Label rewardLabel;
     private TextButton backButton;
     private TextButton makeOneButton;
 
@@ -164,6 +168,17 @@ public class PuzzleScreen implements Screen {
         resultLabel = new Label("Result: ?", corebringer.testskin);
         resultLabel.setColor(Color.WHITE);
         resultLabel.setFontScale(1.0f);
+
+        // Create legend label
+        legendLabel = new Label("Legend: ^ = XOR, || = OR, && = AND", corebringer.testskin);
+        legendLabel.setColor(Color.CYAN);
+        legendLabel.setFontScale(1.0f);
+
+        // Create reward label
+        rewardLabel = new Label("Reward: +40 Gold, +15 HP", corebringer.testskin);
+        rewardLabel.setColor(Color.GOLD);
+        rewardLabel.setFontScale(1.5f);
+        rewardLabel.setVisible(false);
 
         // Create congratulations image
         congratulationsImage = new Image(congratulationsTexture);
@@ -325,12 +340,16 @@ public class PuzzleScreen implements Screen {
 
     private void checkPuzzleSolved() {
         if (puzzleSolved) {
-            // Show congratulations after 2 seconds delay
+            // Give rewards immediately
+            giveRewards();
+            
+            // Show reward after 2 seconds delay
             new Thread(() -> {
                 try {
                     Thread.sleep(2000);
                     Gdx.app.postRunnable(() -> {
-                        congratulationsImage.setVisible(true);
+                        congratulationsImage.setVisible(false); // Hide congratulations
+                        rewardLabel.setVisible(true); // Show reward instead
                         // Auto-return to map after another 3 seconds
                         new Thread(() -> {
                             try {
@@ -352,6 +371,28 @@ public class PuzzleScreen implements Screen {
                 }
             }).start();
         }
+    }
+
+    private void giveRewards() {
+        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        if (stats == null) {
+            return; // No save found, skip rewards
+        }
+        
+        int currentHp = stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20);
+        int maxHp = stats.maxHp > 0 ? stats.maxHp : 20;
+        int newHp = Math.min(maxHp, currentHp + 15);
+        int newGold = stats.gold + 40;
+        
+        SaveManager.saveStats(
+            newHp,
+            maxHp,
+            stats.energy,
+            stats.maxEnergy > 0 ? stats.maxEnergy : 3,
+            stats.cards,
+            stats.battleWon,
+            newGold
+        );
     }
 
     private void setupLayout() {
@@ -401,7 +442,10 @@ public class PuzzleScreen implements Screen {
         puzzleTable.add(expressionLabel).colspan(9).padBottom(10f).row();
 
         // Add result label
-        puzzleTable.add(resultLabel).colspan(9).padBottom(20f).row();
+        puzzleTable.add(resultLabel).colspan(9).padBottom(10f).row();
+
+        // Add legend label
+        puzzleTable.add(legendLabel).colspan(9).padBottom(20f).row();
 
         // Add puzzle table to main table
         mainTable.add(puzzleTable).center().row();
@@ -416,6 +460,11 @@ public class PuzzleScreen implements Screen {
         congratulationsImage.setPosition(puzzleStage.getWidth() / 2 - congratulationsImage.getWidth() / 2,
                                        puzzleStage.getHeight() / 2 - congratulationsImage.getHeight() / 2);
         puzzleStage.addActor(congratulationsImage);
+
+        // Add reward label to center (initially hidden)
+        rewardLabel.setPosition(puzzleStage.getWidth() / 2 - rewardLabel.getWidth() / 2,
+                               puzzleStage.getHeight() / 2 - rewardLabel.getHeight() / 2);
+        puzzleStage.addActor(rewardLabel);
 
         // Initialize result
         updateResult();
@@ -437,8 +486,9 @@ public class PuzzleScreen implements Screen {
             operatorImages[i].setTouchable(com.badlogic.gdx.scenes.scene2d.Touchable.disabled);
         }
 
-        // Hide congratulations image
+        // Hide congratulations image and reward label
         congratulationsImage.setVisible(false);
+        rewardLabel.setVisible(false);
         puzzleSolved = false;
 
         // Update result

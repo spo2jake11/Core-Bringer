@@ -2,6 +2,8 @@ package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
 import com.altf4studios.corebringer.Utils;
+import com.altf4studios.corebringer.utils.SaveData;
+import com.altf4studios.corebringer.utils.SaveManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
@@ -42,6 +44,7 @@ public class TreasurePuzzleScreen implements Screen {
     private Image chestImg;
     private Image congratulationsImage;
     private Image subtractionImg;
+    private Label rewardLabel;
 
 
     private Texture subTexture;
@@ -173,6 +176,12 @@ public class TreasurePuzzleScreen implements Screen {
         chestImg = new Image(chestClosedTexture);
         congratulationsImage = new Image(congratulationsTexture);
         congratulationsImage.setVisible(false);
+        
+        // Create reward label
+        rewardLabel = new Label("Reward: +40 Gold, +15 HP", corebringer.testskin);
+        rewardLabel.setColor(Color.GOLD);
+        rewardLabel.setFontScale(1.5f);
+        rewardLabel.setVisible(false);
 
         Table expr = new Table();
         expr.add(num1Img).size(140, 98).pad(6f);
@@ -186,10 +195,14 @@ public class TreasurePuzzleScreen implements Screen {
         content = new Table();
         content.add(expr).padTop(30f).row();
         content.add(chestImg).size(256, 192).padTop(20f).row();
-        // Center congratulations image over content
+        // Center congratulations image and reward label over content
         root.addActor(congratulationsImage);
         congratulationsImage.setPosition(stage.getWidth() / 2f - congratulationsImage.getWidth() / 2f,
             stage.getHeight() / 2f - congratulationsImage.getHeight() / 2f);
+        
+        root.addActor(rewardLabel);
+        rewardLabel.setPosition(stage.getWidth() / 2f - rewardLabel.getWidth() / 2f,
+            stage.getHeight() / 2f - rewardLabel.getHeight() / 2f);
 
         root.top();
         root.add(topBar).growX().row();
@@ -262,6 +275,7 @@ public class TreasurePuzzleScreen implements Screen {
         op2State = 0;
         puzzleSolved = false;
         congratulationsImage.setVisible(false);
+        rewardLabel.setVisible(false);
         refreshOperator(op1Img, op1State);
         refreshOperator(op2Img, op2State);
         updateChest();
@@ -300,12 +314,16 @@ public class TreasurePuzzleScreen implements Screen {
     }
 
     private void triggerCongratulationsAndReturn() {
+        // Give rewards immediately
+        giveRewards();
+        
         new Thread(() -> {
             try {
                 Thread.sleep(2000);
                 Gdx.app.postRunnable(() -> {
                     if (content != null) content.setVisible(false);
-                    congratulationsImage.setVisible(true);
+                    congratulationsImage.setVisible(false); // Hide congratulations
+                    rewardLabel.setVisible(true); // Show reward instead
                     new Thread(() -> {
                         try {
                             Thread.sleep(3000);
@@ -321,6 +339,28 @@ public class TreasurePuzzleScreen implements Screen {
                 });
             } catch (InterruptedException ignored) { }
         }).start();
+    }
+
+    private void giveRewards() {
+        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        if (stats == null) {
+            return; // No save found, skip rewards
+        }
+        
+        int currentHp = stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20);
+        int maxHp = stats.maxHp > 0 ? stats.maxHp : 20;
+        int newHp = Math.min(maxHp, currentHp + 15);
+        int newGold = stats.gold + 40;
+        
+        SaveManager.saveStats(
+            newHp,
+            maxHp,
+            stats.energy,
+            stats.maxEnergy > 0 ? stats.maxEnergy : 3,
+            stats.cards,
+            stats.battleWon,
+            newGold
+        );
     }
 }
 
