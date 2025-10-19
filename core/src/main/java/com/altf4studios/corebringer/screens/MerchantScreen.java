@@ -201,12 +201,17 @@ public class MerchantScreen implements Screen{
         Table content = new Table();
         content.defaults().pad(10);
 
-        // 2x2 grid of random cards
+        // 2x2 grid of random cards (left)
         shopGrid = new Table();
         shopGrid.defaults().center();
         populateRandomCardsGrid(shopGrid);
 
-        // Bottom-right controls: Remove card button and price label 150
+        // Right-side stat items column
+        Table rightCol = new Table();
+        rightCol.top();
+        addStatItems(rightCol);
+
+        // Bottom controls: Remove card button and price label 150
         Table controls = new Table();
         controls.defaults().pad(5);
         TextButton removeBtn = new TextButton("Remove card", corebringer.testskin);
@@ -240,8 +245,11 @@ public class MerchantScreen implements Screen{
             }
         });
 
-        content.add(shopGrid).grow().row();
-        content.add(controls).right();
+        // Layout: cards on left, stat items on right, then controls row under them
+        content.add(shopGrid).expand().fill();
+        content.add(rightCol).top().padLeft(10);
+        content.row();
+        content.add(controls).colspan(2).right();
 
         shopWindow.add(content).grow();
         coremerchantscreenstage.addActor(shopWindow);
@@ -271,6 +279,93 @@ public class MerchantScreen implements Screen{
                 Gdx.app.postRunnable(MerchantScreen.this::dispose);
             }
         });
+    }
+
+    private void addStatItems(Table rightCol) {
+        // Common style
+        rightCol.defaults().pad(6);
+
+        // +10 Max HP for 150 gold
+        Table hpItem = new Table();
+        Label hpLabel = new Label("+10 Max HP", corebringer.testskin);
+        Label hpPrice = new Label("150", corebringer.testskin);
+        TextButton hpBuyArea = new TextButton("Buy", corebringer.testskin);
+        hpItem.add(hpLabel).row();
+        hpItem.add(hpPrice).padTop(4).row();
+        hpItem.add(hpBuyArea).size(120, 36).padTop(4);
+        final ClickListener[] hpListenerHolder = new ClickListener[1];
+        ClickListener hpListener = new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                tryPurchaseStat("maxhp", 150, hpLabel, hpPrice, hpBuyArea, hpListenerHolder);
+            }
+        };
+        hpListenerHolder[0] = hpListener;
+        hpBuyArea.addListener(hpListener);
+
+        // +1 Max Energy for 200 gold
+        Table energyItem = new Table();
+        Label energyLabel = new Label("+1 Max Energy", corebringer.testskin);
+        Label energyPrice = new Label("200", corebringer.testskin);
+        TextButton energyBuyArea = new TextButton("Buy", corebringer.testskin);
+        energyItem.add(energyLabel).row();
+        energyItem.add(energyPrice).padTop(4).row();
+        energyItem.add(energyBuyArea).size(120, 36).padTop(4);
+        final ClickListener[] energyListenerHolder = new ClickListener[1];
+        ClickListener energyListener = new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                tryPurchaseStat("maxenergy", 200, energyLabel, energyPrice, energyBuyArea, energyListenerHolder);
+            }
+        };
+        energyListenerHolder[0] = energyListener;
+        energyBuyArea.addListener(energyListener);
+
+        rightCol.add(hpItem).size(180, 120).row();
+        rightCol.add(energyItem).size(180, 120).row();
+    }
+
+    private void tryPurchaseStat(String type, int price, Label titleLbl, Label priceLbl, Button buyBtn, ClickListener[] listenerHolder) {
+        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        if (stats == null || stats.gold < price) {
+            showInsufficientGold();
+            return;
+        }
+
+        int hp = stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20);
+        int maxHp = stats.maxHp > 0 ? stats.maxHp : 20;
+        int energy = stats.energy;
+        int maxEnergy = stats.maxEnergy > 0 ? stats.maxEnergy : 3;
+
+        if ("maxhp".equals(type)) {
+            maxHp += 10;
+            // heal up to new max by +10 as QoL
+            hp = Math.min(maxHp, hp + 10);
+        } else if ("maxenergy".equals(type)) {
+            maxEnergy += 1;
+            // do not change current energy here; game flow can refill elsewhere
+        }
+
+        int newGold = stats.gold - price;
+
+        SaveManager.saveStats(
+            hp,
+            maxHp,
+            energy,
+            maxEnergy,
+            stats.cards,
+            stats.battleWon,
+            newGold
+        );
+
+        updateTopGoldAndHp(hp, maxHp, newGold);
+
+        if (titleLbl != null) titleLbl.setText("Sold out");
+        if (buyBtn != null) {
+            buyBtn.setDisabled(true);
+            buyBtn.setTouchable(Touchable.disabled);
+        }
+        if (listenerHolder != null && listenerHolder[0] != null) buyBtn.removeListener(listenerHolder[0]);
     }
 
     private void ensureDeckMappingLoaded() {

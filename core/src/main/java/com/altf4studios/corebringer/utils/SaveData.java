@@ -11,6 +11,8 @@ public class SaveData {
     public String[] cards;
     public int battleWon;
     public int gold;
+    // New: stage progression (controls GameScreen background and map regeneration)
+    public int stageLevel = 1;
 
     public SaveData() {}
 
@@ -22,6 +24,7 @@ public class SaveData {
         this.maxEnergy = maxEnergy;
         this.cards = cards;
         this.battleWon = battleWon;
+        this.stageLevel = 1;
     }
 }
 

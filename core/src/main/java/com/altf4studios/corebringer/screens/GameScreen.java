@@ -13,6 +13,7 @@ import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.profiling.GLProfiler;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -63,7 +64,7 @@ public class GameScreen implements Screen{
 
     // --- Energy System ---
     private int energy = 0;
-    private final int MAX_ENERGY = 3;
+    private int MAX_ENERGY = 3;
     private Label energyLabel;
     private Stack energyWidget; // label + background
     private Texture energyBgTexture;
@@ -74,6 +75,8 @@ public class GameScreen implements Screen{
     // --- End Energy System ---
     // --- Currency ---
     private int gold = 0;
+    // Transition guard to avoid GL calls during screen switch
+    private boolean transitioning = false;
     // --- End Currency ---
     // --- Deck UI helpers ---
     private TextureAtlas deckCardAtlas;
@@ -91,6 +94,9 @@ public class GameScreen implements Screen{
     private Window victoryScreenWindow = null;
     private boolean victoryScreenShown = false;
     // --- End Victory Screen ---
+
+    // Death/Victory screen textures owned by this screen
+    private Texture deathScreenTexture = null;
 
     // --- Game Lifecycle State ---
     private enum GameState { RUNNING, VICTORY, DEFEAT }
@@ -144,7 +150,13 @@ public class GameScreen implements Screen{
     }
 
     public GameScreen(Main corebringer, boolean bossOnly) {
-        this.corebringer = corebringer; /// The Master Key that holds all screens together
+        // Load stageLevel from save file if available
+        int stageFromSave = 1;
+        try {
+            com.altf4studios.corebringer.utils.SaveData sd = SaveManager.loadStats();
+            if (sd != null && sd.stageLevel > 0) stageFromSave = sd.stageLevel;
+        } catch (Exception ignored) {}
+        this.corebringer = corebringer;
         this.bossOnlyBattle = bossOnly;
 
         // Initialize CardParser
@@ -182,6 +194,8 @@ public class GameScreen implements Screen{
                 hp = (stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : hp));
                 maxHpFromSave = (stats.maxHp > 0 ? stats.maxHp : Math.max(hp, maxHpFromSave));
                 energyVal = stats.energy;
+                // Apply max energy from save with fallback to 3
+                MAX_ENERGY = (stats.maxEnergy > 0 ? stats.maxEnergy : 3);
                 cards = stats.cards;
                 battleWon = stats.battleWon;
                 goldFromSave = stats.gold;
@@ -227,7 +241,10 @@ public class GameScreen implements Screen{
 
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
-        battleStageUI = new BattleStageUI(battleStage, corebringer.testskin);
+        battleStageUI = new BattleStageUI(battleStage, corebringer.testskin, corebringer.getAssets());
+        // Apply stage-specific background (clamped 1..5)
+        int bgStage = Math.max(1, Math.min(5, stageFromSave));
+        battleStageUI.setBackgroundStage(bgStage);
         // Initialize BattleManager now that UI exists and replace turnManager reference for other systems
         battleManager = new BattleManager(player, enemy, battleStageUI);
         turnManager = battleManager.getTurnManager();
@@ -251,9 +268,19 @@ public class GameScreen implements Screen{
         // Create energy label with background icon (text like 0/3)
         energyLabel = new Label(energy + "/" + MAX_ENERGY, corebringer.testskin);
         energyLabel.setAlignment(Align.center);
-        // Background image from assets/icons/energy.png
+        // Background image from assets/icons/energy.png (via AssetManager)
         try {
-            energyBgTexture = new Texture(Gdx.files.internal("assets/icons/energy_icon.png"));
+            AssetManager assets = corebringer.getAssets();
+            String energyPath = "assets/icons/energy_icon.png";
+            if (assets != null) {
+                if (!assets.isLoaded(energyPath, Texture.class)) {
+                    assets.load(energyPath, Texture.class);
+                    assets.finishLoadingAsset(energyPath);
+                }
+                energyBgTexture = assets.get(energyPath, Texture.class);
+            } else {
+                energyBgTexture = new Texture(Gdx.files.internal(energyPath));
+            }
             Image bg = new Image(energyBgTexture);
             bg.setSize(100, 100);
             // Build stacked widget: background under, text over
@@ -320,7 +347,6 @@ public class GameScreen implements Screen{
         tbltopUI.setFillParent(true);
         tbltopUI.top();
 
-        // Inner table for the gray background
         Table innerTable = new Table();
         innerTable.setBackground(corebringer.testskin.newDrawable("white", new Color(0.5f, 0.5f, 0.5f, 1)));
         innerTable.defaults().padTop(10).padBottom(10);
@@ -375,7 +401,17 @@ public class GameScreen implements Screen{
 
     private void ensureDeckResourcesLoaded() {
         if (deckCardAtlas == null) {
-            deckCardAtlas = new TextureAtlas("assets/cards/cards_atlas.atlas");
+            AssetManager assets = corebringer.getAssets();
+            String cardsAtlasPath = "assets/cards/cards_atlas.atlas";
+            if (assets != null) {
+                if (!assets.isLoaded(cardsAtlasPath, TextureAtlas.class)) {
+                    assets.load(cardsAtlasPath, TextureAtlas.class);
+                    assets.finishLoadingAsset(cardsAtlasPath);
+                }
+                deckCardAtlas = assets.get(cardsAtlasPath, TextureAtlas.class);
+            } else {
+                deckCardAtlas = new TextureAtlas(cardsAtlasPath);
+            }
         }
         if (idToAtlasName == null) {
             idToAtlasName = new ObjectMap<>();
@@ -571,7 +607,7 @@ public class GameScreen implements Screen{
 
     @Override
     public void render(float delta) {
-        if (isDisposed) return; // Prevent rendering with disposed stages
+        if (isDisposed || transitioning) return; // Prevent rendering during transition or after dispose
         ScreenUtils.clear(0.15f, 0.15f, 0.2f, 1f);
         // Act only when game is running; always draw so UI remains visible
         if (gameState == GameState.RUNNING) {
@@ -735,7 +771,7 @@ public class GameScreen implements Screen{
         int battleCount = (battleStage != null) ? battleStage.getActors().size : -1;
         int cardCount = (cardStage != null) ? cardStage.getActors().size : -1;
         int uiCount = (uiStage != null) ? uiStage.getActors().size : -1;
-        Gdx.app.log("Actors", label + 
+        Gdx.app.log("Actors", label +
                 " | battleStage=" + battleCount +
                 " cardStage=" + cardCount +
                 " uiStage=" + uiCount);
@@ -798,10 +834,30 @@ public class GameScreen implements Screen{
         if (battleStageUI != null) {
             try { battleStageUI.dispose(); } catch (Exception ignored) {}
         }
-        // Dispose energy background texture if created
-        if (energyBgTexture != null) {
-            energyBgTexture.dispose();
-            energyBgTexture = null;
+        // If using AssetManager, unload screen-specific assets
+        try {
+            AssetManager assets = corebringer.getAssets();
+            if (assets != null) {
+                String energyPath = "assets/icons/energy_icon.png";
+                String cardsAtlasPath = "assets/cards/cards_atlas.atlas";
+                String battleBgAtlas = "assets/backgrounds/backgrounds_atlas.atlas";
+                String enemyAtlasPath = "basic-characters/normal_mob/normal_mobs.atlas";
+                if (assets.isLoaded(energyPath)) assets.unload(energyPath);
+                if (assets.isLoaded(cardsAtlasPath)) assets.unload(cardsAtlasPath);
+                if (assets.isLoaded(battleBgAtlas)) assets.unload(battleBgAtlas);
+                if (assets.isLoaded(enemyAtlasPath)) assets.unload(enemyAtlasPath);
+            } else {
+                // Fallback if not using AssetManager: dispose directly
+                try { if (deckCardAtlas != null) { deckCardAtlas.dispose(); } } catch (Exception ignored) {}
+                try { if (energyBgTexture != null) { energyBgTexture.dispose(); } } catch (Exception ignored) {}
+            }
+        } catch (Exception ignored) {}
+        deckCardAtlas = null;
+        energyBgTexture = null;
+        // Dispose death screen texture if created
+        if (deathScreenTexture != null) {
+            try { deathScreenTexture.dispose(); } catch (Exception ignored) {}
+            deathScreenTexture = null;
         }
         // Clean up victory screen
         if (victoryScreenWindow != null) {
@@ -904,8 +960,8 @@ public class GameScreen implements Screen{
         deathScreenShown = true;
         gameState = GameState.DEFEAT;
         // Load the death screen texture
-        Texture deathTexture = new Texture(Gdx.files.internal("assets/nameplates/death_scrn.png"));
-        Image deathImage = new Image(deathTexture);
+        deathScreenTexture = new Texture(Gdx.files.internal("assets/nameplates/death_scrn.png"));
+        Image deathImage = new Image(deathScreenTexture);
         deathImage.getColor().a = 0f;
         deathImage.addAction(Actions.fadeIn(1.5f)); // 1.5 seconds fade in
         // Calculate window size (60% width, 90% height) and center
@@ -1026,14 +1082,39 @@ public class GameScreen implements Screen{
                     victoryScreenShown = false;
                 }
                 // Return to game map and end this GameScreen's lifecycle
+                transitioning = true;
                 corebringer.clearInputProcessors();
-                // Switch to map; LibGDX will call show() on map screen
-                if (corebringer.gameMapScreen != null) {
+                // If boss battle was won, dispose current map and recreate with next stage
+                if (bossOnlyBattle) {
+                    int currentStage = 1;
                     try {
-                        corebringer.gameMapScreen.advanceToNextRank();
+                        com.altf4studios.corebringer.utils.SaveData s = SaveManager.loadStats();
+                        if (s != null && s.stageLevel > 0) currentStage = s.stageLevel;
                     } catch (Exception ignored) {}
+                    int nextStage = Math.max(1, Math.min(5, currentStage + 1));
+                    // Disable profiler before transition
+                    try { if (glProfiler != null) glProfiler.disable(); } catch (Exception ignored) {}
+                    // Dispose existing map (if any)
+                    try { if (corebringer.gameMapScreen != null) corebringer.gameMapScreen.dispose(); } catch (Exception ignored) {}
+                    // Persist the new stage level along with current stats
+                    try {
+                        String[] deck = savedDeckIds != null ? savedDeckIds : new String[]{};
+                        SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energy, getMaxEnergy(), deck, 0, gold, nextStage);
+                    } catch (Exception ignored) {}
+                    // Ensure a fresh map screen exists and switch to it
+                    corebringer.gameMapScreen = new GameMapScreen(corebringer);
+                    corebringer.setScreen(corebringer.gameMapScreen);
+                } else {
+                    // Non-boss: maintain current map and advance rank
+                    if (corebringer.gameMapScreen != null) {
+                        try { corebringer.gameMapScreen.advanceToNextRank(); } catch (Exception ignored) {}
+                    } else {
+                        corebringer.gameMapScreen = new GameMapScreen(corebringer);
+                    }
+                    // Disable profiler before transition
+                    try { if (glProfiler != null) glProfiler.disable(); } catch (Exception ignored) {}
+                    corebringer.setScreen(corebringer.gameMapScreen);
                 }
-                corebringer.setScreen(corebringer.gameMapScreen);
                 // Clear stages to cancel actions and detach actors before disposing
                 try { if (battleStage != null) { battleStage.clear(); } } catch (Exception ignored) {}
                 try { if (cardStage != null) { cardStage.clear(); } } catch (Exception ignored) {}

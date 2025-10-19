@@ -2,6 +2,7 @@ package com.altf4studios.corebringer.screens.gamescreen;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
@@ -48,12 +49,25 @@ public class BattleStageUI {
 
     // Cached textures to avoid repeated allocations
     private Texture bgTexture;
+    private TextureAtlas bgAtlas;
+    private Table actionTableRef;
     private Texture playerTexture;
     private ObjectMap<String, Texture> statusTextures = new ObjectMap<>();
+    // Cache fallback merchant texture to avoid repeated allocations
+    private Texture merchantTexture;
+    // Asset manager reference (optional)
+    private final AssetManager assets;
+    private boolean enemyAtlasOwned = true;
+    private boolean bgAtlasOwned = true;
 
     public BattleStageUI(Stage battleStage, Skin skin) {
+        this(battleStage, skin, null);
+    }
+
+    public BattleStageUI(Stage battleStage, Skin skin, AssetManager assets) {
         this.battleStage = battleStage;
         this.skin = skin;
+        this.assets = assets;
         loadEnemyAtlas();
         setupBattleUI();
         Gdx.app.log("BattleStageUI", "Battle stage UI initialized successfully");
@@ -61,7 +75,18 @@ public class BattleStageUI {
 
     private void loadEnemyAtlas() {
         try {
-            enemyAtlas = new TextureAtlas(Gdx.files.internal("basic-characters/normal_mob/normal_mobs.atlas"));
+            if (assets != null) {
+                String path = "basic-characters/normal_mob/normal_mobs.atlas";
+                if (!assets.isLoaded(path, TextureAtlas.class)) {
+                    assets.load(path, TextureAtlas.class);
+                    assets.finishLoadingAsset(path);
+                }
+                enemyAtlas = assets.get(path, TextureAtlas.class);
+                enemyAtlasOwned = false;
+            } else {
+                enemyAtlas = new TextureAtlas(Gdx.files.internal("basic-characters/normal_mob/normal_mobs.atlas"));
+                enemyAtlasOwned = true;
+            }
             enemyNames = new Array<>();
 
             // Add all enemy names from the atlas
@@ -98,9 +123,11 @@ public class BattleStageUI {
             enemyImage = new Image(enemyRegion);
             Gdx.app.log("BattleStageUI", "Using enemy from atlas: " + enemyName);
         } else {
-            // Fallback to merchant texture
-            Texture enemyTexture = new Texture(Gdx.files.internal("basic-characters/merchant.png"));
-            enemyImage = new Image(enemyTexture);
+            // Fallback to cached merchant texture
+            if (merchantTexture == null) {
+                merchantTexture = new Texture(Gdx.files.internal("basic-characters/merchant.png"));
+            }
+            enemyImage = new Image(merchantTexture);
             Gdx.app.log("BattleStageUI", "Using fallback enemy texture for: " + enemyName);
         }
 
@@ -111,16 +138,39 @@ public class BattleStageUI {
     }
 
     private void setupBattleUI() {
-        if (bgTexture == null) {
-            bgTexture = new Texture(Gdx.files.internal("assets/backgrounds/stg1_bg.png"));
+        // Load background atlas (stg1_bg..stg5_bg)
+        if (bgAtlas == null) {
+            try {
+                if (assets != null) {
+                    String bgPath = "assets/backgrounds/backgrounds_atlas.atlas";
+                    if (!assets.isLoaded(bgPath, TextureAtlas.class)) {
+                        assets.load(bgPath, TextureAtlas.class);
+                        assets.finishLoadingAsset(bgPath);
+                    }
+                    bgAtlas = assets.get(bgPath, TextureAtlas.class);
+                    bgAtlasOwned = false;
+                } else {
+                    bgAtlas = new TextureAtlas(Gdx.files.internal("assets/backgrounds/backgrounds_atlas.atlas"));
+                    bgAtlasOwned = true;
+                }
+            } catch (Exception e) {
+                Gdx.app.error("BattleStageUI", "Failed to load backgrounds atlas: " + e.getMessage());
+            }
         }
-        Drawable bgDraw = new TextureRegionDrawable(new TextureRegion(bgTexture));
+        Drawable bgDraw;
+        if (bgAtlas != null && bgAtlas.findRegion("stg1_bg") != null) {
+            bgDraw = new TextureRegionDrawable(bgAtlas.findRegion("stg1_bg"));
+        } else {
+            if (bgTexture == null) bgTexture = new Texture(Gdx.files.internal("assets/backgrounds/stg1_bg.png"));
+            bgDraw = new TextureRegionDrawable(new TextureRegion(bgTexture));
+        }
 
         Table actionTable = new Table();
         actionTable.top();
         actionTable.setBackground(bgDraw);
         actionTable.setFillParent(true);
         actionTable.padTop(200);
+        this.actionTableRef = actionTable;
 
 		// HP Labels
 		userHpLabel = new Label("20", skin);
@@ -235,6 +285,17 @@ public class BattleStageUI {
         actionTable.add(rightColumn).expandX().fillX().right();
 
         battleStage.addActor(actionTable);
+    }
+
+    // Change background by stage using backgrounds_atlas regions (stg{n}_bg)
+    public void setBackgroundStage(int stageLevel) {
+        if (stageLevel < 1) stageLevel = 1;
+        if (stageLevel > 5) stageLevel = 5;
+        if (bgAtlas == null) return;
+        String regionName = "stg" + stageLevel + "_bg";
+        if (bgAtlas.findRegion(regionName) == null) return;
+        Drawable bgDraw = new TextureRegionDrawable(bgAtlas.findRegion(regionName));
+        if (actionTableRef != null) actionTableRef.setBackground(bgDraw);
     }
 
 	private Stack createStatusBadge(String name) {
@@ -398,11 +459,9 @@ public class BattleStageUI {
             // Remove old enemy image
             enemyTemplateStack.clear();
 
-            // Create new enemy image
-            enemyImageBG = createEnemyImage(enemyName);
-
-            // Add new enemy image and template label
-            enemyTemplateStack.add(enemyImageBG);
+            // Create new enemy image and add with a new empty template label
+            Image newEnemy = createEnemyImage(enemyName);
+            enemyTemplateStack.add(newEnemy);
             Label enemyTemplate = new Label("", skin);
             enemyTemplate.setAlignment(Align.center);
             enemyTemplateStack.add(enemyTemplate);
@@ -420,22 +479,17 @@ public class BattleStageUI {
     }
 
     public void dispose() {
-        if (enemyAtlas != null) {
+        if (enemyAtlasOwned && enemyAtlas != null) {
             enemyAtlas.dispose();
         }
         if (bgTexture != null) { bgTexture.dispose(); bgTexture = null; }
         if (playerTexture != null) { playerTexture.dispose(); playerTexture = null; }
+        if (bgAtlasOwned && bgAtlas != null) { bgAtlas.dispose(); bgAtlas = null; }
         if (statusTextures != null) {
             for (Texture t : statusTextures.values()) {
                 if (t != null) t.dispose();
             }
             statusTextures.clear();
-        }
-    }
-
-    public void setEnemyHp(int hp) {
-        if (enemyHpLabel != null) {
-            enemyHpLabel.setText(String.valueOf(hp));
         }
     }
 }

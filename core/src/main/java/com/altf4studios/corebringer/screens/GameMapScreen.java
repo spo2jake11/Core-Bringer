@@ -11,6 +11,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -48,6 +49,9 @@ public class GameMapScreen implements Screen{
     private Table rank9table;
     private Table rank10table;
     private Image mapbackgroundimg;
+    // Strong references for textures to dispose later
+    private Texture mapBgTex;
+    private Texture nodesAtlasPreviewTex;
     private ImageButton staticbattlenodeA;
     private ImageButton staticbattlenodeB;
     private ImageButton staticbattlenodeC;
@@ -72,6 +76,8 @@ public class GameMapScreen implements Screen{
     private int currentRankIndex;
     private boolean nodeChosenInCurrentRank;
     private ArrayList<Button> selectedNodesPerRank;
+    // Track which stage's nodes are currently applied to the map
+    private int appliedStageLevel = 0;
 
     // Choose a random outcome for search node: Acid Event, Phoenix Event, Riddle Master, Treasure Puzzle, PuzzleScreen, or Random Battle
     private void triggerRandomSearchOutcome() {
@@ -109,7 +115,7 @@ public class GameMapScreen implements Screen{
             default:
                 corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
                     corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
-                    corebringer.gameScreen = new GameScreen(corebringer);
+                    corebringer.gameScreen = new GameScreen(corebringer, false);
                     corebringer.setScreen(corebringer.gameScreen);
                     corebringer.gameScreen.rerollEnemyAndCards();
                 });
@@ -122,10 +128,74 @@ public class GameMapScreen implements Screen{
         corebringer.fadeOutMusic(corebringer.corebringermapstartbgm, 1f, () -> {
             corebringer.fadeInMusic(corebringer.corebringergamescreenbgm, 1f);
             // Create a fresh GameScreen instance (previous may have been disposed)
-            corebringer.gameScreen = new GameScreen(corebringer);
+            corebringer.gameScreen = new GameScreen(corebringer, false);
             corebringer.setScreen(corebringer.gameScreen);
             corebringer.gameScreen.rerollEnemyAndCards();
         });
+    }
+
+    // Flush all node columns and rebuild them for the given stage level
+    // Note: stage currently does not affect generation weights; this is a structural refresh hook.
+    private void flushAndRecreateNodesForStage(int stageLevel) {
+        // Clear all ranks
+        rank1table.clearChildren();
+        rank2table.clearChildren();
+        rank3table.clearChildren();
+        rank4table.clearChildren();
+        rank5table.clearChildren();
+        rank6table.clearChildren();
+        rank7table.clearChildren();
+        rank8table.clearChildren();
+        rank9table.clearChildren();
+        rank10table.clearChildren();
+
+        // Rebuild rank 1 static battles
+        staticbattlenodeA = createAtlasButton("combat_node");
+        staticbattlenodeB = createAtlasButton("combat_node");
+        staticbattlenodeC = createAtlasButton("combat_node");
+        staticbattlenodeD = createAtlasButton("combat_node");
+        staticbattlenodeA.getImage().setScaling(Scaling.stretch);
+        staticbattlenodeB.getImage().setScaling(Scaling.stretch);
+        staticbattlenodeC.getImage().setScaling(Scaling.stretch);
+        staticbattlenodeD.getImage().setScaling(Scaling.stretch);
+        staticbattlenodeA.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){ triggerRandomBattle(); }});
+        staticbattlenodeB.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){ triggerRandomBattle(); }});
+        staticbattlenodeC.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){ triggerRandomBattle(); }});
+        staticbattlenodeD.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){ triggerRandomBattle(); }});
+        rank1table.add(staticbattlenodeA).padBottom(20f).row();
+        rank1table.add(staticbattlenodeB).padBottom(20f).row();
+        rank1table.add(staticbattlenodeC).padBottom(20f).row();
+        rank1table.add(staticbattlenodeD).padBottom(20f).row();
+
+        // Rebuild ranks 2..9 via weighted generation (stage reserved for future balancing)
+        for (Table r : new Table[]{rank2table, rank3table, rank4table, rank5table, rank6table, rank7table, rank8table, rank9table}) {
+            int count = MathUtils.random(1, 4);
+            addNodesWithWeights(r, count);
+        }
+
+        // Rebuild boss rank
+        bossnodeA = createAtlasButton("boss_node");
+        bossnodeA.getImage().setScaling(Scaling.fit);
+        bossnodeA.addListener(new ClickListener(){
+            @Override public void clicked(InputEvent event, float x, float y) { triggerBossBattle(); }
+        });
+        rank10table.add(bossnodeA).padBottom(20f).row();
+
+        // Reset traversal state and reattach lock listeners
+        currentRankIndex = 0;
+        nodeChosenInCurrentRank = false;
+        selectedNodesPerRank.clear();
+        for (int i = 0; i < rankTables.size(); i++) selectedNodesPerRank.add(null);
+        for (int i = 0; i < rankTables.size(); i++) {
+            Table r = rankTables.get(i);
+            int rankIdx = i;
+            for (Actor child : r.getChildren()) {
+                if (child instanceof Button) {
+                    addLockOnClick((Button) child, rankIdx);
+                }
+            }
+        }
+        updateRankInteractivity();
     }
     private void triggerBossBattle(){
         // Fade out map music, fade in game music
@@ -219,8 +289,25 @@ public class GameMapScreen implements Screen{
         this.corebringer = corebringer; /// The Master Key that holds all screens together
         coregamemapstage = new Stage(new FitViewport(1280, 720));
         coregamemaptable = new Table();
-        gamemapatlas = new TextureAtlas(Utils.getInternalPath("assets/icons/nodes/200node_atlas.atlas")); ///Change to 200 or 300node_atlas.atlas if needed
-        gamemapbackgroundatlas = new TextureAtlas(Utils.getInternalPath("assets/icons/nodes/100node_atlas.atlas"));
+        // Load node atlases via AssetManager if available
+        AssetManager assets = corebringer != null ? corebringer.getAssets() : null;
+        if (assets != null) {
+            String nodeAtlasPath = "assets/icons/nodes/200node_atlas.atlas";
+            String nodeBgAtlasPath = "assets/icons/nodes/100node_atlas.atlas";
+            if (!assets.isLoaded(nodeAtlasPath, TextureAtlas.class)) {
+                assets.load(nodeAtlasPath, TextureAtlas.class);
+                assets.finishLoadingAsset(nodeAtlasPath);
+            }
+            if (!assets.isLoaded(nodeBgAtlasPath, TextureAtlas.class)) {
+                assets.load(nodeBgAtlasPath, TextureAtlas.class);
+                assets.finishLoadingAsset(nodeBgAtlasPath);
+            }
+            gamemapatlas = assets.get(nodeAtlasPath, TextureAtlas.class);
+            gamemapbackgroundatlas = assets.get(nodeBgAtlasPath, TextureAtlas.class);
+        } else {
+            gamemapatlas = new TextureAtlas(Utils.getInternalPath("assets/icons/nodes/200node_atlas.atlas")); ///Change to 200 or 300node_atlas.atlas if needed
+            gamemapbackgroundatlas = new TextureAtlas(Utils.getInternalPath("assets/icons/nodes/100node_atlas.atlas"));
+        }
         coregamemaptable.setFillParent(true);
         coregamemapstage.addActor(coregamemaptable);
         shapeRenderer = new ShapeRenderer();
@@ -229,7 +316,18 @@ public class GameMapScreen implements Screen{
         nodeChosenInCurrentRank = false;
 
         ///Core Table Parameters
-        mapbackgroundimg = new Image(new Texture("backgrounds/map_table.png"));
+        // Create a single background texture instance via AssetManager; dispose/unload in dispose()
+        if (assets != null) {
+            String mapBgPath = "backgrounds/map_table.png";
+            if (!assets.isLoaded(mapBgPath, Texture.class)) {
+                assets.load(mapBgPath, Texture.class);
+                assets.finishLoadingAsset(mapBgPath);
+            }
+            mapBgTex = assets.get(mapBgPath, Texture.class);
+        } else {
+            mapBgTex = new Texture(Gdx.files.internal("backgrounds/map_table.png"));
+        }
+        mapbackgroundimg = new Image(mapBgTex);
         mapbackgroundimg.setFillParent(true);
         coregamemaptable.addActor(mapbackgroundimg);
 
@@ -284,7 +382,7 @@ public class GameMapScreen implements Screen{
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank2table.getChildren().size == 0) {
-            totalnodescounter = MathUtils.random(1, 5);
+            totalnodescounter = MathUtils.random(1, 4);
             // Weighted generation per column with duplicates allowed
             addNodesWithWeights(rank2table, totalnodescounter);
         } else {
@@ -293,7 +391,7 @@ public class GameMapScreen implements Screen{
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank3table.getChildren().size == 0) {
-            totalnodescounter = MathUtils.random(1, 5);
+            totalnodescounter = MathUtils.random(1, 4);
             addNodesWithWeights(rank3table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 3 has nodes already or has problems.");
@@ -301,7 +399,7 @@ public class GameMapScreen implements Screen{
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank4table.getChildren().size == 0) {
-            totalnodescounter = MathUtils.random(1, 5);
+            totalnodescounter = MathUtils.random(1, 4);
             addNodesWithWeights(rank4table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 4 has nodes already or has problems.");
@@ -309,7 +407,7 @@ public class GameMapScreen implements Screen{
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank5table.getChildren().size == 0) {
-            totalnodescounter = MathUtils.random(1, 5);
+            totalnodescounter = MathUtils.random(1, 4);
             addNodesWithWeights(rank5table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 5 has nodes already or has problems.");
@@ -317,7 +415,7 @@ public class GameMapScreen implements Screen{
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank6table.getChildren().size == 0) {
-            totalnodescounter = MathUtils.random(1, 5);
+            totalnodescounter = MathUtils.random(1, 4);
             addNodesWithWeights(rank6table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 6 has nodes already or has problems.");
@@ -325,7 +423,7 @@ public class GameMapScreen implements Screen{
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank7table.getChildren().size == 0) {
-            totalnodescounter = MathUtils.random(1, 5);
+            totalnodescounter = MathUtils.random(1, 4);
             addNodesWithWeights(rank7table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 7 has nodes already or has problems.");
@@ -333,7 +431,7 @@ public class GameMapScreen implements Screen{
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank8table.getChildren().size == 0) {
-            totalnodescounter = MathUtils.random(1, 5);
+            totalnodescounter = MathUtils.random(1, 4);
             addNodesWithWeights(rank8table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 8 has nodes already or has problems.");
@@ -341,7 +439,7 @@ public class GameMapScreen implements Screen{
 
         ///This is for the Node Map Generator for Random Nodes at RANK 2 and RANK 9
         if (rank9table.getChildren().size == 0) {
-            totalnodescounter = MathUtils.random(1, 5);
+            totalnodescounter = MathUtils.random(1, 4);
             addNodesWithWeights(rank9table, totalnodescounter);
         } else {
             LoggingUtils.log("NodeGeneration","Rank 9 has nodes already or has problems.");
@@ -398,7 +496,18 @@ public class GameMapScreen implements Screen{
 
         gamemapmessages = new Label("Did you know?: Dying in this game is permanent. :D", corebringer.testskin);
         gamemapmessages2 = new Label("Here's what the nodes mean: ", corebringer.testskin);
-        gamemapmessagesdisplay = new Image(new Texture("assets/icons/nodes/100node_atlas.png"));
+        // Preview image uses a cached texture; load via AssetManager if available
+        if (assets != null) {
+            String previewPath = "assets/icons/nodes/100node_atlas.png";
+            if (!assets.isLoaded(previewPath, Texture.class)) {
+                assets.load(previewPath, Texture.class);
+                assets.finishLoadingAsset(previewPath);
+            }
+            nodesAtlasPreviewTex = assets.get(previewPath, Texture.class);
+        } else {
+            nodesAtlasPreviewTex = new Texture(Gdx.files.internal("assets/icons/nodes/100node_atlas.png"));
+        }
+        gamemapmessagesdisplay = new Image(nodesAtlasPreviewTex);
         gamemapmessagesdisplay.setSize(20f, 20f);
         gamemapmessages3 = new Label("Boss, Battle, Search, Rest, Merchant", corebringer.testskin);
 
@@ -494,6 +603,18 @@ public class GameMapScreen implements Screen{
     @Override
     public void show() {
         Gdx.input.setInputProcessor(coregamemapstage);
+        // When the map becomes active, check if the saved stage changed (e.g., after boss victory)
+        try {
+            // Ensure stage is initialized to 1 for new runs
+            SaveManager.ensureStageLevelInitialized(1);
+            com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+            int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+            if (appliedStageLevel != savedStage) {
+                // Flush current nodes and recreate a fresh set for the new stage
+                flushAndRecreateNodesForStage(savedStage);
+                appliedStageLevel = savedStage;
+            }
+        } catch (Exception ignored) {}
     }
 
     @Override
@@ -523,6 +644,19 @@ public class GameMapScreen implements Screen{
     public void dispose() {
         coregamemapstage.dispose();
         if (shapeRenderer != null) shapeRenderer.dispose();
+        AssetManager assets = corebringer != null ? corebringer.getAssets() : null;
+        if (assets != null) {
+            try { if (assets.isLoaded("assets/icons/nodes/200node_atlas.atlas")) assets.unload("assets/icons/nodes/200node_atlas.atlas"); } catch (Exception ignored) {}
+            try { if (assets.isLoaded("assets/icons/nodes/100node_atlas.atlas")) assets.unload("assets/icons/nodes/100node_atlas.atlas"); } catch (Exception ignored) {}
+            try { if (assets.isLoaded("backgrounds/map_table.png")) assets.unload("backgrounds/map_table.png"); } catch (Exception ignored) {}
+            try { if (assets.isLoaded("assets/icons/nodes/100node_atlas.png")) assets.unload("assets/icons/nodes/100node_atlas.png"); } catch (Exception ignored) {}
+        } else {
+            // Dispose directly if not using AssetManager
+            try { if (gamemapatlas != null) { gamemapatlas.dispose(); gamemapatlas = null; } } catch (Exception ignored) {}
+            try { if (gamemapbackgroundatlas != null) { gamemapbackgroundatlas.dispose(); gamemapbackgroundatlas = null; } } catch (Exception ignored) {}
+            try { if (mapBgTex != null) { mapBgTex.dispose(); mapBgTex = null; } } catch (Exception ignored) {}
+            try { if (nodesAtlasPreviewTex != null) { nodesAtlasPreviewTex.dispose(); nodesAtlasPreviewTex = null; } } catch (Exception ignored) {}
+        }
     }
     private void drawConnectionLines() {
         if (shapeRenderer == null) return;

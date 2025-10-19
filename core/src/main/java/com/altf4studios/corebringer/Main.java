@@ -59,7 +59,7 @@ public class Main extends Game {
     public void create() {
         //AssetManager is located here
         assetManager = new AssetManager();
-        assetManager.load("startup_bg.png", Texture.class);
+        // Removed loading of 'startup_bg.png' (file not present). Load assets on demand per screen.
 
         ///This is where music plays when the game starts
         corebringerbgm = Gdx.audio.newMusic(Utils.getInternalPath("audio/Mortal-Gaming-144000-(GameIntro1).ogg"));
@@ -268,6 +268,7 @@ public class Main extends Game {
         try { if (corebringerstartmenubgm != null) corebringerstartmenubgm.dispose(); } catch (Exception ignored) {}
         try { if (corebringermapstartbgm != null) corebringermapstartbgm.dispose(); } catch (Exception ignored) {}
         try { if (corebringergamescreenbgm != null) corebringergamescreenbgm.dispose(); } catch (Exception ignored) {}
+        try { if (assetManager != null) assetManager.dispose(); } catch (Exception ignored) {}
 
     }
     @Override public void resize(int width, int height) {
@@ -297,6 +298,10 @@ public class Main extends Game {
     }
     public InputMultiplexer getGlobalMultiplexer() {
         return globalMultiplexer;
+    }
+
+    public AssetManager getAssets() {
+        return assetManager;
     }
 
     // --- Lazy screen helpers ---

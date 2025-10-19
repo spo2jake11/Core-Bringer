@@ -193,18 +193,19 @@ public class RestScreen implements Screen{
         String[] playerDeck = corebringer.gameScreen != null ? 
             corebringer.gameScreen.getSavedDeckIds() : new String[]{};
         
-        // Filter to only level 1 cards (can be upgraded) and track their deck indices
+        // Filter to only level 1 and level 2 cards (can be upgraded) and track their deck indices
         Array<String> tempUpgradeableCardIds = new Array<>();
         Array<Integer> tempUpgradeableCardDeckIndices = new Array<>();
-        
+
         for (int i = 0; i < playerDeck.length; i++) {
             String cardId = playerDeck[i];
-            if (cardId != null && cardId.endsWith("_1")) {
+            if (cardId != null && (cardId.endsWith("_1") || cardId.endsWith("_2"))) {
                 tempUpgradeableCardIds.add(cardId);
                 tempUpgradeableCardDeckIndices.add(i);
             }
         }
         
+        // Select 3 random cards from the player's level 1 and level 2 cards
         // Select 3 random cards from the player's level 1 cards
         Random random = new Random();
         int cardsToShow = Math.min(3, tempUpgradeableCardIds.size);

@@ -140,6 +140,7 @@ public class MainMenuScreen implements Screen {
 //                    }
 //                    corebringer.setScreen(corebringer.gameMapScreen);
                     corebringer.showGameMap();
+//                    corebringer.showMerchant();
                 });
             }
         });
