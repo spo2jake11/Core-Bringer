@@ -603,6 +603,7 @@ public class GameMapScreen implements Screen{
     @Override
     public void show() {
         Gdx.input.setInputProcessor(coregamemapstage);
+        corebringer.playMusic("map");
         // When the map becomes active, check if the saved stage changed (e.g., after boss victory)
         try {
             // Ensure stage is initialized to 1 for new runs

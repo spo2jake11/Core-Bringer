@@ -142,6 +142,7 @@ public class OptionsScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(optionstage);
+        corebringer.playMusic("options");
     }
 
     @Override

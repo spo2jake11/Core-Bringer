@@ -208,6 +208,7 @@ public class MainMenuScreen implements Screen {
     @Override
     public void show() {
         Gdx.input.setInputProcessor(mainmenustage);
+        corebringer.playMusic("menu");
     }
 
     @Override

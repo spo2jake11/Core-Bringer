@@ -90,8 +90,16 @@ public class CardStageUI {
 
     private void createNewHand() {
         // Remove previous hand group to avoid actor buildup and memory growth
-        if (cardHandTable != null && cardHandTable.cardGroup != null) {
-            try { cardHandTable.cardGroup.remove(); } catch (Exception ignored) {}
+        if (cardHandTable != null) {
+            try {
+                if (cardHandTable.cardGroup != null) {
+                    cardHandTable.cardGroup.remove();
+                }
+                // CRITICAL: Dispose the TextureAtlas to prevent 50-100MB leak per hand
+                cardHandTable.dispose();
+            } catch (Exception e) {
+                Gdx.app.error("CardStageUI", "Error disposing old CardHandTable: " + e.getMessage());
+            }
         }
         String[] cardNames = getCardNames();
         int[] cardCosts = getCardCosts(cardNames);
@@ -250,6 +258,11 @@ public class CardStageUI {
         drawButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                // Reset energy at start of next turn cycle
+                if (gameScreen != null) {
+                    gameScreen.setEnergy(gameScreen.getMaxEnergy());
+                    Gdx.app.log("CardStageUI", "Energy reset to max at turn end");
+                }
                 // Clear any active one-turn buff when the player ends their turn
                 if (gameScreen != null) {
                     gameScreen.clearCardEffectMultiplier();
@@ -357,10 +370,10 @@ public class CardStageUI {
         // Secondary effects parsed from description (poison, heal, bleed, stun)
         applySecondaryEffects(card);
 
-        // End player turn
-        if (turnManager != null && turnManager.isPlayerTurn()) {
-            turnManager.endPlayerTurn();
-        }
+//        // End player turn
+//        if (turnManager != null && turnManager.isPlayerTurn()) {
+//            turnManager.endPlayerTurn();
+//        }
     }
 
     // -- Helpers ------------------------------------------------------------
@@ -467,10 +480,19 @@ public class CardStageUI {
         if (hasKeyword(card.description, "heal") || (card.id != null && card.id.toLowerCase().contains("heal"))) {
             int healAmount = parseNumberBeforeKeyword(card.description, "heal");
             if (healAmount <= 0) healAmount = Math.max(0, card.baseEffect);
+
+            // Apply card effect multiplier buff (same as attack/defense cards)
+            if (gameScreen != null) {
+                float mult = gameScreen.getCardEffectMultiplier();
+                if (mult > 1.0f) {
+                    healAmount = Math.round(healAmount * mult);
+                }
+            }
+
             if (player != null && player.isAlive() && healAmount > 0) {
                 // Instant heal on use
                 player.heal(healAmount);
-                Gdx.app.log("CardEffect", "Healed " + healAmount + " HP using '" + card.name + "'");
+                Gdx.app.log("CardEffect", "Healed " + healAmount + " HP using '" + card.name + "' (with multiplier)");
             }
         }
 

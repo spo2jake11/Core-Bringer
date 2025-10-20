@@ -102,7 +102,7 @@ public class BattleManager {
      * Manually execute enemy turn - called when player ends their turn
      */
     public void executeEnemyTurn() {
-        if (turnManager.isEnemyTurn() && !turnManager.isDelaying()) {
+        if (turnManager.isEnemyTurn()) {
             turnManager.executeEnemyTurn();
         }
     }

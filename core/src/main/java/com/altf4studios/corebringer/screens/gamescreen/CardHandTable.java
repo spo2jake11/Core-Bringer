@@ -150,9 +150,23 @@ public class CardHandTable {
         cardGroup.clear();
     }
 
+    // CRITICAL: Dispose method to prevent memory leak
     public void dispose() {
-        if (cardAtlas != null) {
-            cardAtlas.dispose();
+        try {
+            if (cardAtlas != null) {
+                cardAtlas.dispose();
+                Gdx.app.log("CardHandTable", "Disposed TextureAtlas to prevent memory leak");
+            }
+        } catch (Exception e) {
+            Gdx.app.error("CardHandTable", "Error disposing TextureAtlas: " + e.getMessage());
+        }
+
+        // Clear collections
+        if (handCards != null) {
+            handCards.clear();
+        }
+        if (cardGroup != null) {
+            cardGroup.clear();
         }
     }
 }

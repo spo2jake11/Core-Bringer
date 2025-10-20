@@ -505,7 +505,7 @@ public class GameScreen implements Screen{
 
     @Override
     public void show() {
-
+        corebringer.playMusic("battle");
 
         // --- Energy gain from CodeEditorScreen points ---
         if (corebringer.codeEditorScreen != null) {
@@ -647,17 +647,17 @@ public class GameScreen implements Screen{
 
         // --- Energy auto-regen at start of player's actionable turn ---
         // Regen once when player's turn becomes active (not during delay/poison resolution)
-        if (turnManager != null) {
-            boolean playerTurnActive = turnManager.isPlayerTurn() && !turnManager.isDelaying();
-            if (playerTurnActive && !playerTurnEnergyApplied) {
-                setEnergy(MAX_ENERGY);
-                playerTurnEnergyApplied = true;
-            } else if (turnManager.isEnemyTurn()) {
-                // Reset flag so next player turn will regen again
-                playerTurnEnergyApplied = false;
-                // Do not auto-clear buff here; CardStageUI will clear it when End Turn is pressed
-            }
-        }
+//        if (turnManager != null) {
+//            if (turnManager.isPlayerTurn() && !playerTurnEnergyApplied) {
+//                setEnergy(MAX_ENERGY);
+//                playerTurnEnergyApplied = true;
+//                Gdx.app.log("GameScreen", "Energy reset to " + MAX_ENERGY + " at start of player turn");
+//            } else if (turnManager.isEnemyTurn()) {
+//                // Reset flag so next player turn will regen again
+//                playerTurnEnergyApplied = false;
+//                // Do not auto-clear buff here; CardStageUI will clear it when End Turn is pressed
+//            }
+//        }
 
         /// For wiring the HP/Shield values properly
         battleStageUI.updateHpBars(player.getHp(), enemy.getHp());
@@ -798,6 +798,33 @@ public class GameScreen implements Screen{
 
     // --- End test methods ---
 
+    @Override public void hide() {
+        // OPTIMIZATION: Clear stages and cancel actions when screen is hidden
+        try {
+            if (battleStage != null) {
+                battleStage.getRoot().clearActions();
+                // Don't clear actors yet - they may be needed when returning
+            }
+        } catch (Exception e) {
+            Gdx.app.error("GameScreen", "Error in hide() clearing battleStage: " + e.getMessage());
+        }
+
+        try {
+            if (cardStage != null) {
+                cardStage.getRoot().clearActions();
+            }
+        } catch (Exception e) {
+            Gdx.app.error("GameScreen", "Error in hide() clearing cardStage: " + e.getMessage());
+        }
+
+        try {
+            if (uiStage != null) {
+                uiStage.getRoot().clearActions();
+            }
+        } catch (Exception e) {
+            Gdx.app.error("GameScreen", "Error in hide() clearing uiStage: " + e.getMessage());
+        }
+    }
     @Override public void resize(int width, int height) {
         uiStage.getViewport().update(width, height,true);
         battleStage.getViewport().update(width, height, true);
@@ -808,8 +835,6 @@ public class GameScreen implements Screen{
     }
     @Override public void resume() {
 
-    }
-    @Override public void hide() {
     }
 
     @Override
@@ -987,20 +1012,20 @@ public class GameScreen implements Screen{
                 com.altf4studios.corebringer.utils.SaveManager.deleteSave();
                 // Transfer input ownership to the next screen before disposing
                 corebringer.clearInputProcessors();
-                
+
                 // Optionally reset death screen state
                 if (deathScreenWindow != null) {
                     deathScreenWindow.remove();
                     deathScreenWindow = null;
                     deathScreenShown = false;
                 }
-                
+
                 // Dispose all screens except MainMenuScreen
                 corebringer.disposeAllScreensExceptMainMenu();
-                
+
                 // Switch screen; LibGDX will call show() on the next screen automatically
                 corebringer.showMainMenu();
-                
+
                 // Clear the tag so subsequent games are clean
                 instakillTag = null;
             }
