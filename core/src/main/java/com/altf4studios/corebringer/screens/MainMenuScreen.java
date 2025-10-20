@@ -127,7 +127,7 @@ public class MainMenuScreen implements Screen {
                         "heal_heal_package_1"
                     };
                     // Initialize save with currentHp=50 and maxHp=50
-                    SaveManager.saveStats(50, 50, 0, defaultCards, 0);
+                    SaveManager.saveStats(50, 50, 0, 3, defaultCards, 0, 100, 1);
 //                    // Always use a fresh MerchantScreen instance
 //                    try {
 //                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();

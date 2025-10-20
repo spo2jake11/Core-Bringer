@@ -6,6 +6,8 @@ import com.altf4studios.corebringer.compiler.CodePolicyValidator;
 import com.altf4studios.corebringer.compiler.JavaExternalRunner;
 import com.altf4studios.corebringer.quiz.CodeEvaluationService;
 import com.altf4studios.corebringer.quiz.QuestionnaireManager;
+import com.altf4studios.corebringer.utils.SaveManager;
+import com.altf4studios.corebringer.utils.SaveData;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.Screen;
@@ -74,21 +76,34 @@ public class CodeEditorScreen implements Screen {
 
     private void loadQuestions() {
         localQuestions = null;
-        // Attempt 1: Utils internal JSON
+        
+        // Read stageLevel from save data (default to 1 if not found)
+        int stageLevel = 1;
+        try {
+            SaveData saveData = SaveManager.loadStats();
+            if (saveData != null && saveData.stageLevel > 0) {
+                stageLevel = saveData.stageLevel;
+                Gdx.app.log("CodeEditorScreen", "Loaded stageLevel from save: " + stageLevel);
+            }
+        } catch (Exception ex) {
+            Gdx.app.log("CodeEditorScreen", "Could not load stageLevel from save, defaulting to 1: " + ex.getMessage());
+        }
+        
+        // Attempt 1: Utils internal JSON with level
         try {
             com.badlogic.gdx.files.FileHandle fh = Utils.getInternalPath("assets/questionnaire.json");
-            Gdx.app.log("CodeEditorScreen", "Attempting Utils JSON: " + fh.path() + ", exists=" + fh.exists());
-            QuestionnaireManager.get().initFromJson(fh);
+            Gdx.app.log("CodeEditorScreen", "Attempting Utils JSON with level " + stageLevel + ": " + fh.path() + ", exists=" + fh.exists());
+            QuestionnaireManager.get().initFromJsonWithLevel(fh, stageLevel);
         } catch (Exception ex) {
             Gdx.app.error("CodeEditorScreen", "Utils JSON load failed: " + ex.getMessage());
         }
 
-        // Attempt 2: Gdx.files.internal JSON
+        // Attempt 2: Gdx.files.internal JSON with level
         if (!QuestionnaireManager.get().isReady()) {
             try {
                 com.badlogic.gdx.files.FileHandle fh2 = com.badlogic.gdx.Gdx.files.internal("assets/questionnaire.json");
-                Gdx.app.log("CodeEditorScreen", "Attempting Internal JSON: " + fh2.path() + ", exists=" + fh2.exists());
-                QuestionnaireManager.get().initFromJson(fh2);
+                Gdx.app.log("CodeEditorScreen", "Attempting Internal JSON with level " + stageLevel + ": " + fh2.path() + ", exists=" + fh2.exists());
+                QuestionnaireManager.get().initFromJsonWithLevel(fh2, stageLevel);
             } catch (Exception ex) {
                 Gdx.app.error("CodeEditorScreen", "Internal JSON load failed: " + ex.getMessage());
             }
@@ -111,15 +126,28 @@ public class CodeEditorScreen implements Screen {
         if (QuestionnaireManager.get().isReady()) {
             int count = QuestionnaireManager.get().getAll().size;
             localQuestions = new Array<>(QuestionnaireManager.get().getAll());
-            Gdx.app.log("CodeEditorScreen", "Loaded questionnaire with " + count + " questions (mirrored locally)");
+            Gdx.app.log("CodeEditorScreen", "Loaded questionnaire with " + count + " questions for level " + stageLevel + " (mirrored locally)");
         } else {
             // Final fallback: parse JSON locally (tolerates manager state issues)
             try {
                 com.badlogic.gdx.files.FileHandle src = com.badlogic.gdx.Gdx.files.internal("assets/questionnaire.json");
-                Gdx.app.log("CodeEditorScreen", "Attempting local JSON parse: " + src.path() + ", exists=" + src.exists());
+                Gdx.app.log("CodeEditorScreen", "Attempting local JSON parse for level " + stageLevel + ": " + src.path() + ", exists=" + src.exists());
                 JsonReader reader = new JsonReader();
                 JsonValue root = reader.parse(src);
-                JsonValue qArr = root.get("questions");
+                
+                // Try to load from levelX key (e.g., level1, level2, level3)
+                String levelKey = "level" + stageLevel;
+                JsonValue levelNode = root.get(levelKey);
+                JsonValue qArr = null;
+                
+                if (levelNode != null) {
+                    qArr = levelNode.get("questionArray");
+                } else {
+                    // Fallback to root level
+                    qArr = root.get("questions");
+                    if (qArr == null) qArr = root.get("questionArray");
+                }
+                
                 if (qArr != null && qArr.isArray()) {
                     localQuestions = new Array<>();
                     for (JsonValue it = qArr.child; it != null; it = it.next) {
@@ -136,7 +164,7 @@ public class CodeEditorScreen implements Screen {
                         }
                         localQuestions.add(q);
                     }
-                    Gdx.app.log("CodeEditorScreen", "Loaded localQuestions fallback count=" + localQuestions.size);
+                    Gdx.app.log("CodeEditorScreen", "Loaded localQuestions fallback for level " + stageLevel + " count=" + localQuestions.size);
                 }
             } catch (Exception ex) {
                 Gdx.app.error("CodeEditorScreen", "Local JSON parse failed: " + ex.getMessage());
@@ -487,8 +515,32 @@ public class CodeEditorScreen implements Screen {
                         if (corebringer != null && corebringer.gameScreen != null) {
                             com.altf4studios.corebringer.battle.BattleManager bm = corebringer.gameScreen.getBattleManager();
                             if (bm != null) {
-                                // Activate 1-turn card effect buff x1.5 and return to game
-                                corebringer.gameScreen.activateOneTurnBuff(1.5f);
+                                // Calculate buff based on stage level (LINEAR/ADDITIVE)
+                                // Base buff: 1.5x at Level 1
+                                // Each level adds +0.5x
+                                // Level 1: 1.5x
+                                // Level 2: 2.0x
+                                // Level 3: 2.5x
+                                // Level 4: 3.0x
+                                // Level 5: 3.5x
+                                
+                                int stageLevel = 1;
+                                try {
+                                    SaveData saveData = SaveManager.loadStats();
+                                    if (saveData != null && saveData.stageLevel > 0) {
+                                        stageLevel = saveData.stageLevel;
+                                    }
+                                } catch (Exception ex) {
+                                    Gdx.app.log("CodeEditorScreen", "Could not load stageLevel for buff calculation, defaulting to 1: " + ex.getMessage());
+                                }
+                                
+                                // Calculate buff additively: 1.0 + (stageLevel * 0.5)
+                                float buffMultiplier = 1.0f + (stageLevel * 0.5f);
+                                
+                                Gdx.app.log("CodeEditorScreen", "Stage Level: " + stageLevel + " | Buff Multiplier: " + buffMultiplier + "x");
+                                
+                                // Activate 1-turn card effect buff and return to game
+                                corebringer.gameScreen.activateOneTurnBuff(buffMultiplier);
                                 corebringer.setScreen(corebringer.gameScreen);
                             }
                         }
@@ -627,4 +679,3 @@ public class CodeEditorScreen implements Screen {
 
     // Removed legacy QuizQuestion structure in favor of QuestionnaireManager.Question
 }
-

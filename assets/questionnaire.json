@@ -1,6 +1,6 @@
 {
-    "level":  1,
-    "questionArray":  [
+    "level1": {
+        "questionArray":  [
                       {
                           "id":  1,
                           "isSolve":  0,
@@ -681,825 +681,672 @@
                                             "format:order_of_ops"
                                         ],
                           "chance":  0.55
-                      },
-                      {
-                          "id":  51,
-                          "isSolve":  0,
-                          "questions":  "Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a + b) * c. Then print variable d.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:3",
-                                            "op:add",
-                                            "op:mul",
-                                            "var:a",
-                                            "var:b",
-                                            "var:c",
-                                            "var:d",
-                                            "literal:8",
-                                            "literal:4",
-                                            "literal:2"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  52,
-                          "isSolve":  0,
-                          "questions":  "Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a * b) - c. Then, print variable d.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:3",
-                                            "op:mul",
-                                            "op:sub",
-                                            "var:a",
-                                            "var:b",
-                                            "var:c",
-                                            "var:d",
-                                            "literal:8",
-                                            "literal:4",
-                                            "literal:2"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  53,
-                          "isSolve":  0,
-                          "questions":  "Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a + b + c) / 3. Then, print variable d.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:3",
-                                            "op:add",
-                                            "op:div",
-                                            "var:a",
-                                            "var:b",
-                                            "var:c",
-                                            "var:d",
-                                            "literal:8",
-                                            "literal:4",
-                                            "literal:2",
-                                            "literal:3",
-                                            "format:average"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  54,
-                          "isSolve":  0,
-                          "questions":  "Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a * b * c). Then, print variable d.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:3",
-                                            "op:mul",
-                                            "var:a",
-                                            "var:b",
-                                            "var:c",
-                                            "var:d",
-                                            "literal:8",
-                                            "literal:4",
-                                            "literal:2"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  55,
-                          "isSolve":  0,
-                          "questions":  "Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a + b) / c. Then, print variable d.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:3",
-                                            "op:add",
-                                            "op:div",
-                                            "var:a",
-                                            "var:b",
-                                            "var:c",
-                                            "var:d",
-                                            "literal:8",
-                                            "literal:4",
-                                            "literal:2"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  56,
-                          "isSolve":  0,
-                          "questions":  "Declare three integers a = 8, b = 4, c = 2. Do this in variable d: (a + b) * (b - c). Then, print variable d.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:3",
-                                            "op:add",
-                                            "op:mul",
-                                            "op:sub",
-                                            "var:a",
-                                            "var:b",
-                                            "var:c",
-                                            "var:d",
-                                            "literal:8",
-                                            "literal:4",
-                                            "literal:2",
-                                            "format:parentheses"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  57,
-                          "isSolve":  0,
-                          "questions":  "Declare x = 120, y = 60. Print (x / y) + (x * y).",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:div",
-                                            "op:mul",
-                                            "op:add",
-                                            "var:x",
-                                            "var:y",
-                                            "literal:120",
-                                            "literal:60"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  58,
-                          "isSolve":  0,
-                          "questions":  "Declare x = 37, y = 62 Print (x + y) * (x - y).",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:add",
-                                            "op:sub",
-                                            "op:mul",
-                                            "var:x",
-                                            "var:y",
-                                            "literal:37",
-                                            "literal:62",
-                                            "format:parentheses"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  59,
-                          "isSolve":  0,
-                          "questions":  "Declare x = 23, y = 98 Print (x * x) + (y * y).",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "op:add",
-                                            "var:x",
-                                            "var:y",
-                                            "literal:23",
-                                            "literal:98",
-                                            "format:squares"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  60,
-                          "isSolve":  0,
-                          "questions":  "Print x = 100 - 20 and divide it against y = 5 + 5.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:sub",
-                                            "op:add",
-                                            "op:div",
-                                            "var:x",
-                                            "var:y",
-                                            "literal:100",
-                                            "literal:20",
-                                            "literal:5",
-                                            "format:two_expressions"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  61,
-                          "isSolve":  0,
-                          "questions":  "Print x = 50 / 5 and add it against y = 20 * 2.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:div",
-                                            "op:mul",
-                                            "op:add",
-                                            "var:x",
-                                            "var:y",
-                                            "literal:50",
-                                            "literal:5",
-                                            "literal:20",
-                                            "literal:2"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  62,
-                          "isSolve":  0,
-                          "questions":  "Print x = 720 + 254 and multiply it against y = 865 + 243.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:add",
-                                            "op:mul",
-                                            "var:x",
-                                            "var:y",
-                                            "literal:720",
-                                            "literal:254",
-                                            "literal:865",
-                                            "literal:243"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  63,
-                          "isSolve":  0,
-                          "questions":  "Print (10 * (2 + 3)) using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:add",
-                                            "op:mul",
-                                            "literal:10",
-                                            "literal:2",
-                                            "literal:3",
-                                            "format:nested_parentheses"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  64,
-                          "isSolve":  0,
-                          "questions":  "Print (20 / (4 + 1)) using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:add",
-                                            "op:div",
-                                            "literal:20",
-                                            "literal:4",
-                                            "literal:1",
-                                            "format:nested_parentheses"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  65,
-                          "isSolve":  0,
-                          "questions":  "Print (15 + (3 * 2)) - 5 using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:add",
-                                            "op:mul",
-                                            "op:sub",
-                                            "literal:15",
-                                            "literal:3",
-                                            "literal:2",
-                                            "literal:5",
-                                            "format:nested_parentheses"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  66,
-                          "isSolve":  0,
-                          "questions":  "Print (2 * (5 + 5)) + (3 * 2) using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "op:add",
-                                            "literal:2",
-                                            "literal:5",
-                                            "literal:5",
-                                            "literal:3",
-                                            "literal:2",
-                                            "format:nested_parentheses"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  67,
-                          "isSolve":  0,
-                          "questions":  "Print (100 / (5 * 2)) + 10 using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:div",
-                                            "op:mul",
-                                            "op:add",
-                                            "literal:100",
-                                            "literal:5",
-                                            "literal:2",
-                                            "literal:10",
-                                            "format:nested_parentheses"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  68,
-                          "isSolve":  0,
-                          "questions":  "Print (8 + 2) * (6 - 1) using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:add",
-                                            "op:sub",
-                                            "op:mul",
-                                            "literal:8",
-                                            "literal:2",
-                                            "literal:6",
-                                            "literal:1",
-                                            "format:parentheses"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  69,
-                          "isSolve":  0,
-                          "questions":  "Print (10 + 20 + 30) / 3 using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:3",
-                                            "op:add",
-                                            "op:div",
-                                            "literal:10",
-                                            "literal:20",
-                                            "literal:30",
-                                            "literal:3",
-                                            "format:average"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  70,
-                          "isSolve":  0,
-                          "questions":  "Print (25 - 5) * (2 + 3) using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:sub",
-                                            "op:add",
-                                            "op:mul",
-                                            "literal:25",
-                                            "literal:5",
-                                            "literal:2",
-                                            "literal:3",
-                                            "format:parentheses"
-                                        ],
-                          "chance":  0.55
-                      },
-                      {
-                          "id":  71,
-                          "isSolve":  0,
-                          "questions":  "Store your name in a variable and print: Alice has 10 candies.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:string",
-                                            "needs:int:1",
-                                            "var:name",
-                                            "literal:Alice",
-                                            "literal:10",
-                                            "literal:candies",
-                                            "format:sentence"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  72,
-                          "isSolve":  0,
-                          "questions":  "Store two numbers (56 and 75) in variables and print: 'The sum of 56 and 75 is *blank*.'",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:add",
-                                            "literal:56",
-                                            "literal:75",
-                                            "literal:The sum of 56 and 75 is"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  73,
-                          "isSolve":  0,
-                          "questions":  "Store two numbers (12 and 9) and print: 'The product of 12 and 9 is *blank*.'",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "literal:12",
-                                            "literal:9",
-                                            "literal:The product of 12 and 9 is"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  74,
-                          "isSolve":  0,
-                          "questions":  "Store two numbers (24 and 21) and print: 'The difference between 24 and 21 is *blank*.'",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:sub",
-                                            "literal:24",
-                                            "literal:21",
-                                            "literal:The difference between 24 and 21 is"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  75,
-                          "isSolve":  0,
-                          "questions":  "Store two numbers (50 and 5) and print: 'The quotient of 50 and 5 is *blank*.'",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:div",
-                                            "literal:50",
-                                            "literal:5",
-                                            "literal:The quotient of 50 and 5 is"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  76,
-                          "isSolve":  0,
-                          "questions":  "Write a program that calculates the total cost of 3 pens, each costing 15 using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "op:add",
-                                            "literal:3",
-                                            "literal:15",
-                                            "format:cost_total"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  77,
-                          "isSolve":  0,
-                          "questions":  "Write a program that calculates the total cost of 5 apples, each costing 12 using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "op:add",
-                                            "literal:5",
-                                            "literal:12",
-                                            "literal:apples",
-                                            "format:cost_total"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  78,
-                          "isSolve":  0,
-                          "questions":  "Write a program that calculates the cost of 3 books, each costing 100 and 2 notebooks each costing 50 using variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "op:add",
-                                            "literal:3",
-                                            "literal:100",
-                                            "literal:2",
-                                            "literal:50",
-                                            "literal:books",
-                                            "literal:notebooks",
-                                            "format:cost_total"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  79,
-                          "isSolve":  0,
-                          "questions":  "Store 25 in a variable named age. Then print this message: 'Next year, I will be *age* years old.'",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:1",
-                                            "op:add",
-                                            "var:age",
-                                            "literal:25",
-                                            "literal:Next year, I will be",
-                                            "literal:years old"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  80,
-                          "isSolve":  0,
-                          "questions":  "Store the year 2020 in a variable named year. Subtract the year 2001 from it and print the result.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:sub",
-                                            "var:year",
-                                            "literal:2020",
-                                            "literal:2001"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  81,
-                          "isSolve":  0,
-                          "questions":  "Write a program that converts hours to minutes (2 hours).",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:1",
-                                            "op:mul",
-                                            "literal:2",
-                                            "format:unit_convert"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  82,
-                          "isSolve":  0,
-                          "questions":  "Write a program that converts days to hours (3 days).",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:1",
-                                            "op:mul",
-                                            "literal:3",
-                                            "format:unit_convert"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  83,
-                          "isSolve":  0,
-                          "questions":  "Write a program that converts weeks to days (2 weeks).",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:1",
-                                            "op:mul",
-                                            "literal:2",
-                                            "format:unit_convert"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  84,
-                          "isSolve":  0,
-                          "questions":  "Write a program that converts months to days (assume 1 month = 30 days, 2 months).",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "literal:2",
-                                            "literal:30",
-                                            "format:unit_convert"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  85,
-                          "isSolve":  0,
-                          "questions":  "Write a program that prints how many seconds there are in 5 minutes.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:1",
-                                            "op:mul",
-                                            "literal:5",
-                                            "format:unit_convert"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  86,
-                          "isSolve":  0,
-                          "questions":  "Write a program that calculates the total price of 2 burgers (50 each) and 1 drink (20).",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "op:add",
-                                            "literal:2",
-                                            "literal:50",
-                                            "literal:1",
-                                            "literal:20",
-                                            "literal:burgers",
-                                            "literal:drink",
-                                            "format:cost_total"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  87,
-                          "isSolve":  0,
-                          "questions":  "A student scored 85, 90, 78. Calculate and print the average. Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:3",
-                                            "op:add",
-                                            "op:div",
-                                            "literal:85",
-                                            "literal:90",
-                                            "literal:78",
-                                            "format:average"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  88,
-                          "isSolve":  0,
-                          "questions":  "Print: The area of a rectangle is: *blank* (length = 8, width = 5). Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "literal:8",
-                                            "literal:5",
-                                            "format:area_rectangle"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  89,
-                          "isSolve":  0,
-                          "questions":  "Print: The perimeter of a rectangle is: *blank* (length = 8, width = 5). Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:add",
-                                            "op:mul",
-                                            "literal:8",
-                                            "literal:5",
-                                            "format:perimeter_rectangle"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  90,
-                          "isSolve":  0,
-                          "questions":  "Print: The area of a square is: *blank* (side = 6). Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:1",
-                                            "op:mul",
-                                            "literal:6",
-                                            "format:area_square"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  91,
-                          "isSolve":  0,
-                          "questions":  "Print: The area of a triangle is: *blank* (base = 10, height = 5). Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "op:div",
-                                            "literal:10",
-                                            "literal:5",
-                                            "format:area_triangle"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  92,
-                          "isSolve":  0,
-                          "questions":  "Print: The total salary is: *blank* (daily rate = 500, days worked = 20). Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "literal:500",
-                                            "literal:20",
-                                            "format:salary_total"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  93,
-                          "isSolve":  0,
-                          "questions":  "Print: The average of 5, 10, 15, 20, 25 is: *blank*. Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:5",
-                                            "op:add",
-                                            "op:div",
-                                            "literal:5",
-                                            "literal:10",
-                                            "literal:15",
-                                            "literal:20",
-                                            "literal:25",
-                                            "format:average"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  94,
-                          "isSolve":  0,
-                          "questions":  "Print: The total cost of 4 pencils (7 each), 3 erasers (5 each), and 2 rulers (15 each). Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:3",
-                                            "op:mul",
-                                            "op:add",
-                                            "literal:4",
-                                            "literal:7",
-                                            "literal:3",
-                                            "literal:5",
-                                            "literal:2",
-                                            "literal:15",
-                                            "literal:pencils",
-                                            "literal:erasers",
-                                            "literal:rulers",
-                                            "format:cost_total"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  95,
-                          "isSolve":  0,
-                          "questions":  "Print the square of 12. Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:1",
-                                            "op:mul",
-                                            "literal:12",
-                                            "format:square"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  96,
-                          "isSolve":  0,
-                          "questions":  "Print the cube of 3. Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:1",
-                                            "op:mul",
-                                            "literal:3",
-                                            "format:cube"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  97,
-                          "isSolve":  0,
-                          "questions":  "Print: The difference between the largest number (50) and the smallest number (12) is: *blank*. Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:2",
-                                            "op:sub",
-                                            "literal:50",
-                                            "literal:12",
-                                            "format:largest_smallest"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  98,
-                          "isSolve":  0,
-                          "questions":  "Print the sum of the first 5 even numbers: 2 + 4 + 6 + 8 + 10. Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:5",
-                                            "op:add",
-                                            "literal:2",
-                                            "literal:4",
-                                            "literal:6",
-                                            "literal:8",
-                                            "literal:10",
-                                            "format:series_sum"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  99,
-                          "isSolve":  0,
-                          "questions":  "Print the sum of the first 5 odd numbers: 1 + 3 + 5 + 7 + 9. Use variables.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:int:5",
-                                            "op:add",
-                                            "literal:1",
-                                            "literal:3",
-                                            "literal:5",
-                                            "literal:7",
-                                            "literal:9",
-                                            "format:series_sum"
-                                        ],
-                          "chance":  0.7
-                      },
-                      {
-                          "id":  100,
-                          "isSolve":  0,
-                          "questions":  "Print: 'My name is *your name*.' + 'I am *age* years old.' + 'My favorite subject is Java Programming.' using separate variables and print it in separate print stream statements.",
-                          "keyPoints":  [
-                                            "needs:print",
-                                            "needs:string",
-                                            "needs:int:1",
-                                            "var:name",
-                                            "var:age",
-                                            "literal:My name is",
-                                            "literal:I am",
-                                            "literal:years old",
-                                            "literal:My favorite subject is Java Programming.",
-                                            "format:separate_prints"
-                                        ],
-                          "chance":  0.7
                       }
                   ]
+    },
+    "level2": {
+        "questionArray": [
+            {
+                "id": 201,
+                "isSolve": 0,
+                "questions": "Declare a boolean variable named isPrinted, initialize its value to be 'true'. Then, create a condition that prints 'It is printed.' if it's true, and 'It is not printed.' elsewise.",
+                "keyPoints": [
+                    "needs:boolean",
+                    "needs:if",
+                    "needs:else",
+                    "needs:print",
+                    "var:isPrinted",
+                    "literal:true",
+                    "literal:It is printed.",
+                    "literal:It is not printed."
+                ],
+                "chance": 0.5
+            },
+            {
+                "id": 202,
+                "isSolve": 0,
+                "questions": "Declare int variables named budget and price and initialize their values to be 100 and 90 respectively. Then, create a condition that prints 'Budget is greater than price. Buy it.' if budget is greater than price and 'Budget is lower than price. Don't buy it.' elsewise.",
+                "keyPoints": [
+                    "needs:int:2",
+                    "needs:if",
+                    "needs:else",
+                    "needs:print",
+                    "comparison:>",
+                    "var:budget",
+                    "var:price",
+                    "literal:100",
+                    "literal:90",
+                    "literal:Budget is greater than price. Buy it.",
+                    "literal:Budget is lower than price. Don't buy it."
+                ],
+                "chance": 0.5
+            },
+            {
+                "id": 203,
+                "isSolve": 0,
+                "questions": "Create a program that determines whether the double variable named pi with a value of 31.4 is equal to 3.14.",
+                "keyPoints": [
+                    "needs:double",
+                    "needs:if",
+                    "needs:print",
+                    "comparison:==",
+                    "var:pi",
+                    "literal:31.4",
+                    "literal:3.14"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 204,
+                "isSolve": 0,
+                "questions": "Declare int variables named studentA, studentB and studentC and initialize their variables as 90, 75, 60. Then, create a condition where students with grades greater than 75 would print 'Mastered Java Fundamentals.', students with grades equal to 75 would print 'Knew Java Fundamentals.' and students with grades less than 75 would print 'Failed Java Fundamentals.'",
+                "keyPoints": [
+                    "needs:int:3",
+                    "needs:if",
+                    "needs:else_if",
+                    "needs:else",
+                    "needs:print",
+                    "comparison:>",
+                    "comparison:==",
+                    "comparison:<",
+                    "var:studentA",
+                    "var:studentB",
+                    "var:studentC",
+                    "literal:90",
+                    "literal:75",
+                    "literal:60",
+                    "literal:Mastered Java Fundamentals.",
+                    "literal:Knew Java Fundamentals.",
+                    "literal:Failed Java Fundamentals."
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 205,
+                "isSolve": 0,
+                "questions": "Declare an int variable named daysOfTheWeek. Then, use a switch case with 7 cases that contain each day of the week, from Monday to Sunday, and print them.",
+                "keyPoints": [
+                    "needs:int:1",
+                    "needs:switch",
+                    "needs:print",
+                    "var:daysOfTheWeek",
+                    "cases:7",
+                    "literal:Monday",
+                    "literal:Sunday"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 206,
+                "isSolve": 0,
+                "questions": "Use the Scanner Class to type numbers and store it in a variable named number then create a condition that prints 'Number is positive' if the number is positive, 'Number is negative.' if the number is negative and 'Number is zero.' if the number is zero.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:int:1",
+                    "needs:if",
+                    "needs:else_if",
+                    "needs:else",
+                    "needs:print",
+                    "var:number",
+                    "comparison:>",
+                    "comparison:<",
+                    "comparison:==",
+                    "literal:Number is positive",
+                    "literal:Number is negative.",
+                    "literal:Number is zero."
+                ],
+                "chance": 0.5
+            },
+            {
+                "id": 207,
+                "isSolve": 0,
+                "questions": "Use the Scanner class to type numbers and store them in an int variable called typedPassword, then create a condition that validates whether the typedPassword is like the variable named password which had a value of 09112001.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:int:2",
+                    "needs:if",
+                    "needs:print",
+                    "comparison:==",
+                    "var:typedPassword",
+                    "var:password",
+                    "literal:09112001"
+                ],
+                "chance": 0.5
+            },
+            {
+                "id": 208,
+                "isSolve": 0,
+                "questions": "Create a conditional statement that prints true or false after validating the logical expression a > b && c < a where a contains an int value of 10, b contains an int value of 15 and c contains an int value of 5.",
+                "keyPoints": [
+                    "needs:int:3",
+                    "needs:logical_and",
+                    "needs:comparison",
+                    "needs:print",
+                    "var:a",
+                    "var:b",
+                    "var:c",
+                    "comparison:>",
+                    "comparison:<",
+                    "literal:10",
+                    "literal:15",
+                    "literal:5"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 209,
+                "isSolve": 0,
+                "questions": "Use the Scanner Class to type numbers and store them in variables named firstNumber and secondNumber then subtracting the two numbers and storing the answer in a variable called difference before creating a condition that prints 'Number is positive' if the sum is positive, 'Number is negative.' if the sum is negative and 'Number is zero.' if the sum is zero.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:int:3",
+                    "op:sub",
+                    "needs:if",
+                    "needs:else_if",
+                    "needs:else",
+                    "needs:print",
+                    "var:firstNumber",
+                    "var:secondNumber",
+                    "var:difference",
+                    "literal:Number is positive",
+                    "literal:Number is negative.",
+                    "literal:Number is zero."
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 210,
+                "isSolve": 0,
+                "questions": "Create a program that prompts the user to input a year, storing the input in a variable named year, then creating a condition that determines if that year is a regular year or a leap year, elsewise.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:int:1",
+                    "needs:if",
+                    "needs:else",
+                    "needs:print",
+                    "var:year",
+                    "logic:leap_year"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 211,
+                "isSolve": 0,
+                "questions": "Declare an int variable named daysOfTheWeek and intialize its value to 1. Then, use a for-loop and switch case with 7 cases that contain each day of the week, from Monday to Sunday, and print them.",
+                "keyPoints": [
+                    "needs:for",
+                    "needs:switch",
+                    "needs:int:1",
+                    "needs:print",
+                    "var:daysOfTheWeek",
+                    "range:1-7",
+                    "cases:7",
+                    "literal:Monday",
+                    "literal:Sunday"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 212,
+                "isSolve": 0,
+                "questions": "Using a for-loop, create a program that prints numbers 1 to 20 in a reversed order.",
+                "keyPoints": [
+                    "needs:for",
+                    "needs:int:1",
+                    "needs:print",
+                    "order:descending",
+                    "range:20-1"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 213,
+                "isSolve": 0,
+                "questions": "Declare an int variable named evenNumbers that displays even numbers from 1 to 20 using a for loop.",
+                "keyPoints": [
+                    "needs:for",
+                    "needs:int:1",
+                    "needs:print",
+                    "logic:even",
+                    "range:1-20",
+                    "op:mod",
+                    "var:evenNumbers"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 214,
+                "isSolve": 0,
+                "questions": "Declare an int variable named evenNumbers that displays even numbers from 1 to 20 using a while loop.",
+                "keyPoints": [
+                    "needs:while",
+                    "needs:int:1",
+                    "needs:print",
+                    "logic:even",
+                    "range:1-20",
+                    "op:mod",
+                    "var:evenNumbers"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 215,
+                "isSolve": 0,
+                "questions": "Create a program that asks for a number from the user, then declare an int variable called number to hold the number. Afterwards, create a for-loop that displays the multiplication table of the number entered by the user.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:for",
+                    "needs:int:1",
+                    "needs:print",
+                    "var:number",
+                    "format:multiplication_table",
+                    "range:1-10"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 216,
+                "isSolve": 0,
+                "questions": "Print the statement 'First, we CORE! Then we BRINGER! Let's CORE BRINGER!' using a while loop 10 times.",
+                "keyPoints": [
+                    "needs:while",
+                    "needs:int:1",
+                    "needs:print",
+                    "count:10",
+                    "literal:First, we CORE! Then we BRINGER! Let's CORE BRINGER!"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 217,
+                "isSolve": 0,
+                "questions": "Create a countdown of 10 using while loop where in the end, it will print 'Core Bringer is awesome!'",
+                "keyPoints": [
+                    "needs:while",
+                    "needs:int:1",
+                    "needs:print",
+                    "order:descending",
+                    "range:10-1",
+                    "literal:Core Bringer is awesome!"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 218,
+                "isSolve": 0,
+                "questions": "Use the Scanner class to type numbers and store them in an int variable called typedPassword, then create a condition that validates if the typedPassword is like the variable named password which had a value of 4206969. Do this all while in a loop.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:int:2",
+                    "needs:while",
+                    "needs:if",
+                    "comparison:==",
+                    "var:typedPassword",
+                    "var:password",
+                    "literal:4206969"
+                ],
+                "chance": 0.4
+            },
+            {
+                "id": 219,
+                "isSolve": 0,
+                "questions": "Create a program that prints the numbers 1 to 20 with a loop and use if-else statements that prints 'Odd Number' beside the printed number if the number is an odd number, or prints 'Even Number' beside the printed number if the number is an even number.",
+                "keyPoints": [
+                    "needs:for",
+                    "needs:int:1",
+                    "needs:if",
+                    "needs:else",
+                    "needs:print",
+                    "op:mod",
+                    "logic:odd_even",
+                    "range:1-20",
+                    "literal:Odd Number",
+                    "literal:Even Number"
+                ],
+                "chance": 0.45
+            },
+            {
+                "id": 220,
+                "isSolve": 0,
+                "questions": "Use the Scanner Class to type numbers and store them in a variable named number then create a loop of 5 iterations and create conditions to count the number of positive numbers, negative numbers and zeros entered by the user.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:for",
+                    "needs:int:4",
+                    "needs:if",
+                    "needs:else_if",
+                    "needs:else",
+                    "needs:print",
+                    "count:5",
+                    "var:number",
+                    "var:positives",
+                    "var:negatives",
+                    "var:zeros"
+                ],
+                "chance": 0.45
+            }
+        ]
+    },
+    "level3": {
+        "questionArray": [
+            {
+                "id": 301,
+                "isSolve": 0,
+                "questions": "Using arrays, write a program that stores daily temperatures in a week and name the variables according to the days of the week, then create a logic that determines the average temperature in one week, which is then stored in a variable named weeklyAverageTemp.",
+                "keyPoints": [
+                    "needs:array:number",
+                    "needs:for",
+                    "needs:print",
+                    "op:add",
+                    "op:div",
+                    "size:7",
+                    "var:weeklyAverageTemp"
+                ],
+                "chance": 0.4
+            },
+            {
+                "id": 302,
+                "isSolve": 0,
+                "questions": "Initialize an array that will store different item prices and an int variable named budget, then create a logic that calculates the total cost of all items and subtracts it to the budget, which will then be stored in a variable named change and print it.",
+                "keyPoints": [
+                    "needs:array:number",
+                    "needs:int:1",
+                    "needs:for",
+                    "needs:print",
+                    "op:add",
+                    "op:sub",
+                    "var:budget",
+                    "var:change"
+                ],
+                "chance": 0.4
+            },
+            {
+                "id": 303,
+                "isSolve": 0,
+                "questions": "Initialize an array that will store exam scores, up to five, then create a logic that determines which of the scores are the greatest. Print it along with the statement 'My highest exam score is: ' then your highest exam score.",
+                "keyPoints": [
+                    "needs:array:number",
+                    "needs:for",
+                    "needs:print",
+                    "agg:max",
+                    "size:5",
+                    "literal:My highest exam score is:"
+                ],
+                "chance": 0.4
+            },
+            {
+                "id": 304,
+                "isSolve": 0,
+                "questions": "Declare an array with a String data type that will store a list of the titles of your favorite songs, up to five. Print the array two times, one in the original order and one in a reversed order.",
+                "keyPoints": [
+                    "needs:array:string",
+                    "needs:for",
+                    "needs:print",
+                    "size:5",
+                    "order:original",
+                    "order:reversed"
+                ],
+                "chance": 0.38
+            },
+            {
+                "id": 305,
+                "isSolve": 0,
+                "questions": "Declare an array with an integer data type that will store the following numbers: 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987. Then, create a logic that will count the even numbers in the array and print it.",
+                "keyPoints": [
+                    "needs:array:number",
+                    "needs:for",
+                    "needs:print",
+                    "logic:even",
+                    "op:mod",
+                    "agg:count",
+                    "literal:1",
+                    "literal:987"
+                ],
+                "chance": 0.38
+            },
+            {
+                "id": 306,
+                "isSolve": 0,
+                "questions": "Declare an array with an integer data type that will store the following numbers: 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987. Then, create a logic that will count all the odd numbers in the array and add them all and print it.",
+                "keyPoints": [
+                    "needs:array:number",
+                    "needs:for",
+                    "needs:print",
+                    "logic:odd",
+                    "op:mod",
+                    "op:add",
+                    "agg:sum"
+                ],
+                "chance": 0.38
+            },
+            {
+                "id": 307,
+                "isSolve": 0,
+                "questions": "Store these numbers in an array named grades that have an int data type: 60, 72, 89, 91, 78. Then, create a logic that will determine if a student has passed slightly or exceeded the passing grade of 75, else the student has failed slightly or sunk below the passing grade of 75. Afterwards, print each element in the array and display their results beside them.",
+                "keyPoints": [
+                    "needs:array:number",
+                    "needs:for",
+                    "needs:if",
+                    "needs:else_if",
+                    "needs:else",
+                    "needs:print",
+                    "comparison:>",
+                    "comparison:==",
+                    "comparison:<",
+                    "var:grades",
+                    "literal:75",
+                    "literal:60",
+                    "literal:72",
+                    "literal:89",
+                    "literal:91",
+                    "literal:78"
+                ],
+                "chance": 0.4
+            },
+            {
+                "id": 308,
+                "isSolve": 0,
+                "questions": "Store the numbers from 1 to 20 in an array of named numbers that have an int data type. Then, create a logic that will ask the user to enter a random integer/number that the program will check if the same number typed by the user exists in the array.",
+                "keyPoints": [
+                    "needs:array:number",
+                    "needs:scanner",
+                    "needs:for",
+                    "needs:print",
+                    "search:linear",
+                    "range:1-20",
+                    "var:numbers"
+                ],
+                "chance": 0.4
+            },
+            {
+                "id": 309,
+                "isSolve": 0,
+                "questions": "Initialize an array named firstTable with an int data type and store the numbers 1 to 10 inside it. Afterwards, declare an empty array named secondTable with an int data type. Then, create a logic that will store firstTable's elements to the secondTable, but it is doubled. (1 = 2. 2 = 4. 4 = 8 and so on.)",
+                "keyPoints": [
+                    "needs:array:number",
+                    "needs:for",
+                    "needs:print",
+                    "op:mul",
+                    "transform:map*2",
+                    "var:firstTable",
+                    "var:secondTable",
+                    "range:1-10"
+                ],
+                "chance": 0.38
+            },
+            {
+                "id": 310,
+                "isSolve": 0,
+                "questions": "Declare an array named firstTable with an int data type and store the numbers 1 to 10 inside it. Afterwards, create an empty array named secondTable with an int data type. Then, create a logic that will copy firstTable's elements to the secondTable.",
+                "keyPoints": [
+                    "needs:array:number",
+                    "needs:for",
+                    "needs:print",
+                    "transform:copy",
+                    "var:firstTable",
+                    "var:secondTable",
+                    "range:1-10"
+                ],
+                "chance": 0.38
+            },
+            {
+                "id": 311,
+                "isSolve": 0,
+                "questions": "Using the Scanner class and the NextLine () Scanner String input catcher, create a logic that will ask your name and then print it along with the words 'My name is' and your name here, then 'and I am the Core Bringer!'",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:string",
+                    "needs:print",
+                    "method:nextLine",
+                    "literal:My name is",
+                    "literal:and I am the Core Bringer!"
+                ],
+                "chance": 0.4
+            },
+            {
+                "id": 312,
+                "isSolve": 0,
+                "questions": "Using the Scanner class and the length () String method, create a logic that will ask you to input a word, then the program will count how many characters are in the word you input. Print them together in this way: 'The word you inputted is' then your word, and afterwards 'and it has' then the result of your logic, then 'number of characters.'",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:string",
+                    "needs:print",
+                    "method:length",
+                    "literal:The word you inputted is",
+                    "literal:and it has",
+                    "literal:number of characters."
+                ],
+                "chance": 0.4
+            },
+            {
+                "id": 313,
+                "isSolve": 0,
+                "questions": "Using the Scanner class, for-loop, array and the split () String method, create a logic that will let you input your full name, then the logic will determine your initials which are then printed out. (Mike Oxmaul = M.O).",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:string",
+                    "needs:array:string",
+                    "needs:for",
+                    "needs:print",
+                    "method:split",
+                    "method:charAt",
+                    "format:initials"
+                ],
+                "chance": 0.38
+            },
+            {
+                "id": 314,
+                "isSolve": 0,
+                "questions": "Using the Scanner class and the length () String method, create a logic that will let you input a password, then it will check if your password is 10 characters in length, elsewise password is short.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:string",
+                    "needs:if",
+                    "needs:else",
+                    "needs:print",
+                    "method:length",
+                    "comparison:==",
+                    "literal:10"
+                ],
+                "chance": 0.38
+            },
+            {
+                "id": 315,
+                "isSolve": 0,
+                "questions": "Using the Scanner class, toLowerCase() String method, length () String method, charAt () String method, and indexOf () String method, create a logic that lets you input a string, turn it into lowercase and count how many vowels it has. (A, E, I, O, U = Vowels. Core Bringer = 4 vowels)",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:string",
+                    "needs:for",
+                    "needs:print",
+                    "method:toLowerCase",
+                    "method:length",
+                    "method:charAt",
+                    "method:indexOf",
+                    "logic:vowel_count"
+                ],
+                "chance": 0.38
+            },
+            {
+                "id": 316,
+                "isSolve": 0,
+                "questions": "Using the Scanner class and toUpperCase () String method, create a logic that will convert the word you input into all uppercase letters and print it.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:string",
+                    "needs:print",
+                    "method:toUpperCase"
+                ],
+                "chance": 0.38
+            },
+            {
+                "id": 317,
+                "isSolve": 0,
+                "questions": "Using the Scanner class and the reverse () String method, create a logic that will ask you to input a word then declare a String variable named reverse and initialize it as a new StringBuilder() where the word itself, the reverse () method and a converter method, toString(), will be found. After that, use the variable reverse to check if the word is a palindrome, elsewise not. (Palindromes are words that still retain their proper spelling even when reversed. level = level)",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:string",
+                    "needs:if",
+                    "needs:else",
+                    "needs:print",
+                    "class:StringBuilder",
+                    "method:reverse",
+                    "method:toString",
+                    "logic:palindrome",
+                    "var:reverse"
+                ],
+                "chance": 0.36
+            },
+            {
+                "id": 318,
+                "isSolve": 0,
+                "questions": "Using the Scanner class and the replace () String method, create a logic that will ask you to type the sentence 'I am a bad person.' and will then replace the word 'bad' with 'good.'",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:string",
+                    "needs:print",
+                    "method:replace",
+                    "literal:I am a bad person.",
+                    "literal:bad",
+                    "literal:good"
+                ],
+                "chance": 0.36
+            },
+            {
+                "id": 319,
+                "isSolve": 0,
+                "questions": "Using the Scanner class, an array and the split () String method, create a logic that will ask you to type a sentence then split the words and print each one on a new line, just like doing println () but in a different way.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:string",
+                    "needs:array:string",
+                    "needs:for",
+                    "needs:print",
+                    "method:split",
+                    "format:lines"
+                ],
+                "chance": 0.36
+            },
+            {
+                "id": 320,
+                "isSolve": 0,
+                "questions": "Using the Scanner class, an array and the sort () Array method, store the names 'Alex, John, Ben, Sophia, Mark, Dean' in an array, then create a logic that will sort them alphabetically before printing the result.",
+                "keyPoints": [
+                    "needs:scanner",
+                    "needs:array:string",
+                    "needs:print",
+                    "method:Arrays.sort",
+                    "data:names",
+                    "order:ascending",
+                    "literal:Alex",
+                    "literal:John",
+                    "literal:Ben",
+                    "literal:Sophia",
+                    "literal:Mark",
+                    "literal:Dean"
+                ],
+                "chance": 0.36
+            }
+        ]
+    }
 }

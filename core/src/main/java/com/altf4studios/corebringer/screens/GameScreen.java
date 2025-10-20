@@ -987,19 +987,22 @@ public class GameScreen implements Screen{
                 com.altf4studios.corebringer.utils.SaveManager.deleteSave();
                 // Transfer input ownership to the next screen before disposing
                 corebringer.clearInputProcessors();
-                // Switch screen; LibGDX will call show() on the next screen automatically
-                corebringer.showMainMenu();
+                
                 // Optionally reset death screen state
                 if (deathScreenWindow != null) {
                     deathScreenWindow.remove();
                     deathScreenWindow = null;
                     deathScreenShown = false;
                 }
-                // End this GameScreen lifecycle safely: clear stages and dispose next frame
-                try { if (battleStage != null) { battleStage.clear(); } } catch (Exception ignored) {}
-                try { if (cardStage != null) { cardStage.clear(); } } catch (Exception ignored) {}
-                try { if (uiStage != null) { uiStage.clear(); } } catch (Exception ignored) {}
-                Gdx.app.postRunnable(GameScreen.this::dispose);
+                
+                // Dispose all screens except MainMenuScreen
+                corebringer.disposeAllScreensExceptMainMenu();
+                
+                // Switch screen; LibGDX will call show() on the next screen automatically
+                corebringer.showMainMenu();
+                
+                // Clear the tag so subsequent games are clean
+                instakillTag = null;
             }
         });
         Table overlay = new Table();

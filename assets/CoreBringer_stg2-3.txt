@@ -1,0 +1,85 @@
+Stage 2 Questions: (Conditionals and Loops) 
+
+1. Declare a boolean variable named isPrinted, initialize its value to be ‘true’. Then, create a condition that prints “It is printed.” if it's true, and “It is not printed.” elsewise. 
+
+2. Declare int variables named budget and price and initialize their values to be 100 and 90 respectively. Then, create a condition that prints “Budget is greater than price. Buy it.” if budget is greater than price and “Budget is lower than price. Don’t buy it.” elsewise. 
+
+3. Create a program that determines whether the double variable named pi with a value of 31.4 is equal to 3.14. 
+
+4. Declare int variables named studentA, studentB and studentC and initialize their variables as 90, 75, 60. Then, create a condition where students with grades greater than 75 would print “Mastered Java Fundamentals.”, students with grades equal to 75 would print “Knew Java Fundamentals.” and students with grades less than 75 would print “Failed Java Fundamentals.” 
+
+5. Declare an int variable named daysOfTheWeek. Then, use a switch case with 7 cases that contain each day of the week, from Monday to Sunday, and print them. 
+
+6. Use the Scanner Class to type numbers and store it in a variable named number then create a condition that prints “Number is positive” if the number is positive, “Number is negative.” if the number is negative and “Number is zero.” if the number is zero. 
+
+7. Use the Scanner class to type numbers and store them in an int variable called typedPassword, then create a condition that validates whether the typedPassword is like the variable named password which had a value of 09112001. 
+
+8. Create a conditional statement that prints true or false after validating the logical expression a > b && c < a where a contains an int value of 10, b contains an int value of 15 and c contains an int value of 5. 
+
+9. Use the Scanner Class to type numbers and store it in variables named firstNumber and secondNumber then subtracting the two numbers and storing the answer in a variable called difference before creating a condition that prints “Number is positive” if the sum is positive, “Number is negative.” if the sum is negative and “Number is zero.” if the sum is zero. 
+
+10. Create a program that prompts the user to input a year, storing the input in a variable named year, then creating a condition that determines if that year is a regular year or a leap year, elsewise. 
+
+11. Declare an int variable named daysOfTheWeek and intialize its value to 1. Then, use a for-loop and switch case with 7 cases that contain each day of the week, from Monday to Sunday, and print them. 
+
+12. Using a for-loop, create a program that prints numbers 1 to 20 in a reversed order. 
+
+13. Declare an int variable named evenNumbers that displays even numbers from 1 to 20 using a for loop. 
+
+14. Declare an int variable named evenNumbers that displays even numbers from 1 to 20 using a while loop. 
+
+15. Create a program that asks for a number from the user, then declare an int variable called number to hold the number. Afterwards, create a for-loop that displays the multiplication table of the number entered by the user. 
+
+16. Print the statement “First, we CORE! Then we BRINGER! Let’s CORE BRINGER!” using a while loop 10 times. 
+
+17. Create a countdown of 10 using while loop where in the end, it will print “Core Bringer is awesome!” 
+
+18. Use the Scanner class to type numbers and store them in an int variable called typedPassword, then create a condition that validates if the typedPassword is like the variable named password which had a value of 4206969. Do this all while in a loop. 
+
+19. Create a program that prints the numbers 1 to 20 with a loop and use if-else statements that prints “Odd Number” beside the printed number if the number is an odd number, or prints “Even Number” beside the printed number if the number is an even number. 
+
+20. Use the Scanner Class to type numbers and store them in a variable named   number then create a loop of 5 iterations and create conditions to count the number of positive numbers, negative numbers and zeros entered by the user. 
+
+Stage 3 Questions (Arrays and Strings): 
+
+1. Using arrays, write a program that stores daily temperatures in a week and name the variables according to the days of the week, then create a logic that determines the average temperature in one week, which is then stored in a variable named weeklyAverageTemp. 
+
+2. Initialize an array that will store different item prices and an int variable named budget, then create a logic that calculates the total cost of all items and subtracts it to the budget, which will then be stored in a variable named change and print it. 
+
+3. Initialize an array that will store exam scores, up to five, then create a logic that determines which of the scores are the greatest. Print it along with the statement “My highest exam score is: “then your highest exam score. 
+
+4. Declare an array with a String data type that will store a list of the titles of your favorite songs, up to five. Print the array two times, one in the original order and one in a reversed order. 
+
+5. Declare an array with an integer data type that will store the following numbers: 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987. Then, create a logic to count the even numbers in the array and print it. 
+
+6. Declare an array with an integer data type that will store the following numbers: 1, 2, 3, 5, 8, 13, 21, 34, 55, 89, 144, 233, 377, 610, 987. Then, create a logic to count all the odd numbers in the array and add them all and print it. 
+
+7. Store these numbers in an array named grades that have an int data type: 60, 72, 89, 91, 78. Then, create a logic that will determine if a student has passed slightly or exceeded the passing grade of 75, else the student has failed slightly or sunk below the passing grade of 75. Afterwards, print each element in the array and display their results beside them. 
+
+8. Store the numbers from 1 to 20 in an array of named numbers that have an int data type. Then, create a logic that will ask the user to enter a random integer/number that the program will check if the same number typed by the user exists in the array. 
+
+9. Initialize an array named firstTable with an int data type and store the numbers 1 to 10 inside it. Afterwards, declare an empty array named secondTable with an int data type. Then, create a logic that will store firstTable’s elements to the secondTable, but it is doubled. (1 = 2. 2 = 4. 4 = 8 and so on.) 
+
+10. Declare an array named firstTable with an int data type and store the numbers 1 to 10 inside it. Afterwards, create an empty array named secondTable with an int data type. Then, create a logic that will copy firstTable’s elements to the secondTable. 
+
+11. Using the Scanner class and the NextLine () Scanner String input catcher, create a logic that will ask your name and then print it along with the words “My name is” and your name here, then “and I am the Core Bringer!” 
+
+12. Using the Scanner class and the length () String method, create a logic that will ask you to input a word, then the program will count how many characters are in the word you input. Print them together in this way: “The word you inputted is” then your word, and afterwards “and it has” then the result of your logic, then “number of characters.” 
+
+13. Using the Scanner class, for-loop, array and the split () String method, create a logic that will let you input your full name, then the logic will determine your initials which are then printed out. (Mike Oxmaul = M.O). 
+
+14. Using the Scanner class and the length () String method, create a logic that will let you input a password, then it will check if your password is 10 characters in length, elsewise password is short. 
+
+15. Using the Scanner class, toLowerCase() String method, length () String method, charAt () String method, and indexOf () String method, create a logic that lets you input a string, turn it into lowercase and count how many vowels it has. (A, E, I, O, U = Vowels. Core Bringer = 4 vowels) 
+
+16. Using the Scanner class and toUpperCase () String method, create a logic that will convert the word you input into all uppercase letters and print it. 
+
+17. Using the Scanner class and the reverse () String method, create a logic that will ask you to input a word then declare a String variable named reverse and initialize it as a new StringBuilder() where the word itself, the reverse () method and a converter method, toString(), will be found. After that, use the variable reverse to check if the word is a palindrome, elsewise not. (Palindromes are words that still retain their proper spelling even when reversed. level = level) 
+
+18. Using the Scanner class and the replace () String method, create a logic that will ask you to type the sentence “I am a bad person.” and will then replace the word “bad” with “good.” 
+
+19. Using the Scanner class, an array and the split () String method, create a logic that will ask you to type a sentence then split the words and print each one on a new line, just like doing println () but in a different way. 
+
+20. Using the Scanner class, an array and the sort () Array method, store the names “Alex, John, Ben, Sophia, Mark, Dean” in an array, then create a logic that will sort them alphabetically before printing the result. 
+
+ 

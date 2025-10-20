@@ -381,4 +381,136 @@ public class Main extends Game {
         }
         setScreen(treasurePuzzleScreen);
     }
+
+    // Dispose all game-related screens except MainMenuScreen
+    // Called when player dies or wants to return to main menu with a fresh state
+    public void disposeAllScreensExceptMainMenu() {
+        Gdx.app.log("Main", "Disposing all screens except MainMenuScreen...");
+        
+        // Dispose GameScreen
+        if (gameScreen != null) {
+            try {
+                gameScreen.dispose();
+                Gdx.app.log("Main", "Disposed GameScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing GameScreen: " + e.getMessage());
+            }
+            gameScreen = null;
+        }
+        
+        // Dispose GameMapScreen
+        if (gameMapScreen != null) {
+            try {
+                gameMapScreen.dispose();
+                Gdx.app.log("Main", "Disposed GameMapScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing GameMapScreen: " + e.getMessage());
+            }
+            gameMapScreen = null;
+        }
+        
+        // Dispose CodeEditorScreen
+        if (codeEditorScreen != null) {
+            try {
+                codeEditorScreen.dispose();
+                Gdx.app.log("Main", "Disposed CodeEditorScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing CodeEditorScreen: " + e.getMessage());
+            }
+            codeEditorScreen = null;
+        }
+        
+        // Dispose MerchantScreen
+        if (merchantScreen != null) {
+            try {
+                merchantScreen.dispose();
+                Gdx.app.log("Main", "Disposed MerchantScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing MerchantScreen: " + e.getMessage());
+            }
+            merchantScreen = null;
+        }
+        
+        // Dispose RestScreen
+        if (restScreen != null) {
+            try {
+                restScreen.dispose();
+                Gdx.app.log("Main", "Disposed RestScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing RestScreen: " + e.getMessage());
+            }
+            restScreen = null;
+        }
+        
+        // Dispose PuzzleScreen
+        if (puzzleScreen != null) {
+            try {
+                puzzleScreen.dispose();
+                Gdx.app.log("Main", "Disposed PuzzleScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing PuzzleScreen: " + e.getMessage());
+            }
+            puzzleScreen = null;
+        }
+        
+        // Dispose TreasurePuzzleScreen
+        if (treasurePuzzleScreen != null) {
+            try {
+                treasurePuzzleScreen.dispose();
+                Gdx.app.log("Main", "Disposed TreasurePuzzleScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing TreasurePuzzleScreen: " + e.getMessage());
+            }
+            treasurePuzzleScreen = null;
+        }
+        
+        // Dispose AcidFloorEventScreen
+        if (acidFloorEventScreen != null) {
+            try {
+                acidFloorEventScreen.dispose();
+                Gdx.app.log("Main", "Disposed AcidFloorEventScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing AcidFloorEventScreen: " + e.getMessage());
+            }
+            acidFloorEventScreen = null;
+        }
+        
+        // Dispose StartGameMapScreen
+        if (startGameMapScreen != null) {
+            try {
+                startGameMapScreen.dispose();
+                Gdx.app.log("Main", "Disposed StartGameMapScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing StartGameMapScreen: " + e.getMessage());
+            }
+            startGameMapScreen = null;
+        }
+        
+        // Dispose DebugScreen
+        if (debugScreen != null) {
+            try {
+                debugScreen.dispose();
+                Gdx.app.log("Main", "Disposed DebugScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing DebugScreen: " + e.getMessage());
+            }
+            debugScreen = null;
+        }
+        
+        // Dispose CardTestScreen
+        if (cardTestScren != null) {
+            try {
+                cardTestScren.dispose();
+                Gdx.app.log("Main", "Disposed CardTestScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing CardTestScreen: " + e.getMessage());
+            }
+            cardTestScren = null;
+        }
+        
+        // Keep MainMenuScreen and OptionsScreen alive
+        // They will be reused
+        
+        Gdx.app.log("Main", "All game screens disposed successfully");
+    }
 }

@@ -47,6 +47,62 @@ public final class QuestionnaireManager {
         initFromJson(json);
     }
 
+    /** Load from a specific level in the questionnaire.json file */
+    public void initFromJsonWithLevel(FileHandle file, int level) {
+        if (file == null || !file.exists()) {
+            throw new IllegalStateException("Questionnaire JSON not found: " + (file == null ? "<null>" : file.path()));
+        }
+        // Read as UTF-8 string and sanitize any mojibake/smart quotes before parsing
+        String raw = file.readString("UTF-8");
+        String sanitized = sanitizeJson(raw);
+        JsonReader reader = new JsonReader();
+        JsonValue root = reader.parse(sanitized);
+
+        // Try to load from levelX key first (e.g., level1, level2, level3)
+        String levelKey = "level" + level;
+        JsonValue levelNode = root.get(levelKey);
+        
+        Questionnaire qn = new Questionnaire();
+        qn.level = level;
+
+        if (levelNode != null) {
+            // Found levelX key, load from its questionArray
+            JsonValue qArr = levelNode.get("questionArray");
+            if (qArr != null && qArr.isArray()) {
+                loadQuestionsIntoQuestionnaire(qArr, qn);
+            }
+        } else {
+            // Fallback: try loading from root level (old format)
+            JsonValue qArr = root.get("questions");
+            if (qArr == null) qArr = root.get("questionArray");
+            if (qArr != null && qArr.isArray()) {
+                loadQuestionsIntoQuestionnaire(qArr, qn);
+            }
+        }
+
+        this.loaded = qn;
+        Gdx.app.log("QuestionnaireManager", "Loaded questions: " + qn.questions.size + " (level=" + qn.level + ") from " + file.path());
+    }
+
+    private void loadQuestionsIntoQuestionnaire(JsonValue qArr, Questionnaire qn) {
+        for (JsonValue it = qArr.child; it != null; it = it.next) {
+            Question q = new Question();
+            q.id = it.getInt("id", 0);
+            q.isSolve = it.getInt("isSolve", 0);
+            q.questions = it.getString("questions", "");
+            q.chance = it.getFloat("chance", 0.0f);
+            JsonValue kp = it.get("keyPoints");
+            if (kp != null && kp.isArray()) {
+                for (JsonValue s = kp.child; s != null; s = s.next) {
+                    q.keyPoints.add(s.asString());
+                }
+            }
+            // Normalize/assign chance: clamp to [0.2, 0.75] or randomize in range if missing
+            q.chance = normalizeOrRandomizeChance(q.chance, qn.level);
+            qn.questions.add(q);
+        }
+    }
+
     /** Load from a specific file handle */
     public void initFromJson(FileHandle file) {
         if (file == null || !file.exists()) {
