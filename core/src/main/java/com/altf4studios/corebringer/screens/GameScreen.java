@@ -263,8 +263,8 @@ public class GameScreen implements Screen{
             SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energyVal, getMaxEnergy(), cards, battleWon, gold);
         }
 
-        // Set energy from save
-        setEnergy(energyVal);
+        // Set energy to full at start of battle (don't use saved energy value)
+        setEnergy(MAX_ENERGY);
         // Create energy label with background icon (text like 0/3)
         energyLabel = new Label(energy + "/" + MAX_ENERGY, corebringer.testskin);
         energyLabel.setAlignment(Align.center);

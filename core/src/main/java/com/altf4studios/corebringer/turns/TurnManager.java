@@ -27,7 +27,7 @@ public class TurnManager {
     private enum PendingPoisonTarget { NONE, PLAYER, ENEMY }
     private PendingPoisonTarget pendingPoisonTarget = PendingPoisonTarget.NONE;
     private boolean isResolvingPoison = false;
-    private float poisonResolutionDelay = 0.8f; // brief delay to show poison damage
+    private float poisonResolutionDelay = 0f; // brief delay to show poison damage
 
     public TurnManager(Player player, Enemy enemy) {
         this.player = player;
@@ -53,8 +53,8 @@ public class TurnManager {
             if (enemy != null) enemy.clearBlock();
             currentPhase = TurnPhase.ENEMY_TURN;
             turnEnded = true;
-            isDelaying = true;
-            delayTimer = turnDelay;
+//            isDelaying = true;
+//            delayTimer = turnDelay;
             Gdx.app.log("TurnManager", "Player turn ended, switching to enemy turn");
             // After delay, resolve start-of-turn statuses for enemy (poison/bleed/stun)
             pendingPoisonTarget = PendingPoisonTarget.ENEMY;
@@ -68,8 +68,9 @@ public class TurnManager {
             if (player != null) player.clearBlock();
             currentPhase = TurnPhase.PLAYER_TURN;
             turnEnded = true;
-            isDelaying = true;
-            delayTimer = turnDelay;
+            // Remove these lines to eliminate delay:
+            // isDelaying = true;
+            // delayTimer = turnDelay;
             Gdx.app.log("TurnManager", "Enemy turn ended, switching to player turn");
             // After delay, resolve start-of-turn statuses for player (poison/bleed/stun)
             pendingPoisonTarget = PendingPoisonTarget.PLAYER;

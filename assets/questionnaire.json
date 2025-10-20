@@ -1348,5 +1348,433 @@
                 "chance": 0.36
             }
         ]
+    },
+    "level4": {
+        "questionArray": [
+            {
+                "id": 401,
+                "isSolve": 0,
+                "questions": "Create a method sayHello(String name) that prints \"Hello, [name]! Let's continue fighting our way out as the Core Bringer!\" Then, call it to the main method, along with your own name.",
+                "keyPoints": [
+                    "needs:method",
+                    "needs:string",
+                    "needs:print",
+                    "method:sayHello",
+                    "param:String:name",
+                    "literal:Hello",
+                    "literal:Let's continue fighting our way out as the Core Bringer!",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 402,
+                "isSolve": 0,
+                "questions": "Create a method calculateDamage(int attack, int defense) that returns the final damage (attack - defense). Then, call it to the main method, print the damage dealt by calling the method and setting the parameters with the attack having an integer value of 9 and the defense having an integer value of 6.",
+                "keyPoints": [
+                    "needs:method",
+                    "needs:int:2",
+                    "needs:print",
+                    "method:calculateDamage",
+                    "param:int:attack",
+                    "param:int:defense",
+                    "return:int",
+                    "operation:subtract",
+                    "value:9",
+                    "value:6",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 403,
+                "isSolve": 0,
+                "questions": "Create a subclass named Pet with variables named name with a String value \"John\" and species with a String value \"dog\". Then, in the main method, make an object of Pet and print. Output should be: \"John looks like a dog, not going to lie.\"",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:string:2",
+                    "needs:object",
+                    "needs:print",
+                    "class:Pet",
+                    "var:name",
+                    "var:species",
+                    "literal:John",
+                    "literal:dog",
+                    "literal:John looks like a dog, not going to lie.",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 404,
+                "isSolve": 0,
+                "questions": "Create a subclass named BankAccount with a private double variable named balance, a setter method named setBalance() with a logic that accepts any amount if amount is greater than zero which elsewise will not be accepted, then a getter method named getBalance() that returns the balance and shows its current amount. Then, call the getter method at the main method.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:double:1",
+                    "needs:method:2",
+                    "needs:private",
+                    "needs:if",
+                    "class:BankAccount",
+                    "var:balance",
+                    "method:setBalance",
+                    "method:getBalance",
+                    "return:double",
+                    "condition:greater_than_zero",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 405,
+                "isSolve": 0,
+                "questions": "Create a subclass named Student with variables named name and gradeLevel, and inside, create a constructor that sets both as the constructor's parameters and return variables inside the constructor. Now, in the main class, create an object for the constructor, along with your name for the value of the name variable, and 11 for the value of the gradeLevel variable inside the constructor parameter.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:constructor",
+                    "needs:string:1",
+                    "needs:int:1",
+                    "needs:object",
+                    "class:Student",
+                    "var:name",
+                    "var:gradeLevel",
+                    "param:String:name",
+                    "param:int:gradeLevel",
+                    "value:11",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 406,
+                "isSolve": 0,
+                "questions": "Create a subclass named Player and inside it is a String variable named name and an int variable named level, alongside two constructors of the same name of the subclass. The difference is that the first Player constructor will only have a single parameter and return variable, being the name, but the second Player constructor will have both the name and level as parameters and return variables. Then afterwards, on the main class, create objects for the constructors, with playerOne taking the first Player constructor, and playerTwo taking the second. Put your name of choice for the constructors, and a level of your choice for only the second constructor. Then, print them.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:constructor:2",
+                    "needs:string:1",
+                    "needs:int:1",
+                    "needs:object:2",
+                    "needs:print",
+                    "class:Player",
+                    "var:name",
+                    "var:level",
+                    "overload:constructor",
+                    "object:playerOne",
+                    "object:playerTwo",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 407,
+                "isSolve": 0,
+                "questions": "Create a class Juice with a public method drink() that prints \"You take a sip of juice.\" and a private method secretIngredient() that prints \"Mango essence.\" Then, at the main method, create an object that calls only the drink() method. Take note that it's because the private access modifier needs a setter and getter method to be called properly to not get an error, different than the public access modifier.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:method:2",
+                    "needs:public",
+                    "needs:private",
+                    "needs:object",
+                    "needs:print",
+                    "class:Juice",
+                    "method:drink",
+                    "method:secretIngredient",
+                    "literal:You take a sip of juice.",
+                    "literal:Mango essence.",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 408,
+                "isSolve": 0,
+                "questions": "Create a subclass named DiceRoller with a method named roll() that returns a random number between 1 and 6 using Math.random(). In the main method, print the result of three rolls.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:method",
+                    "needs:print",
+                    "needs:math",
+                    "class:DiceRoller",
+                    "method:roll",
+                    "return:int",
+                    "method:Math.random",
+                    "range:1_to_6",
+                    "repeat:3",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 409,
+                "isSolve": 0,
+                "questions": "Create a method named calculateSpeed(double distance, double time) which calculates distance divided by time (distance / time). In the main method, calculate the speed of a car that traveled 250 km in 5 hours.",
+                "keyPoints": [
+                    "needs:method",
+                    "needs:double:2",
+                    "needs:print",
+                    "method:calculateSpeed",
+                    "param:double:distance",
+                    "param:double:time",
+                    "return:double",
+                    "operation:divide",
+                    "value:250",
+                    "value:5",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 410,
+                "isSolve": 0,
+                "questions": "Create a subclass named Friend, along with a String attribute/variable named name inside it. Then inside, create a constructor which references the name variable. In the main class, create an object for the Friend method and put \"Mark\" inside its parameter parenthesis. Then, create another object for the Friend method, but this time, reference the second object to the first object (obj2 = obj1). Then, change the reference value of the first object to \"Martin\" then print the first object and second object. The expected output would be that the first object will have \"Martin\", and the second object will have \"Mark\".",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:constructor",
+                    "needs:string:1",
+                    "needs:object:2",
+                    "needs:print",
+                    "class:Friend",
+                    "var:name",
+                    "literal:Mark",
+                    "literal:Martin",
+                    "reference:object",
+                    "assignment:obj2_equals_obj1",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 411,
+                "isSolve": 0,
+                "questions": "Create a subclass named RamenBowl, and inside is a private int variable named temperature, a setter named setTemperature(int t) that only allows values if its between 50 to 100 or it will get rejected elsewise, then a getter named getTemperature() that returns it. Afterwards, in the main class, create an object of the RamenBowl class and call it to set its temperature values with valid and invalid temps before printing.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:int:1",
+                    "needs:method:2",
+                    "needs:private",
+                    "needs:if",
+                    "needs:object",
+                    "needs:print",
+                    "class:RamenBowl",
+                    "var:temperature",
+                    "method:setTemperature",
+                    "method:getTemperature",
+                    "range:50_to_100",
+                    "validation:temperature",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 412,
+                "isSolve": 0,
+                "questions": "Create a method named greet(String name, String timeOfDay) that returns a string like: \"Good Morning, Player Mark! Continue your adventure as the Core Bringer!\" to the main method.",
+                "keyPoints": [
+                    "needs:method",
+                    "needs:string:2",
+                    "needs:print",
+                    "method:greet",
+                    "param:String:name",
+                    "param:String:timeOfDay",
+                    "return:String",
+                    "literal:Good Morning",
+                    "literal:Player",
+                    "literal:Continue your adventure as the Core Bringer!",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 413,
+                "isSolve": 0,
+                "questions": "Create a subclass named MathHelper with a static method square(int num) that returns the square (means any number multiplied by itself). Then, call it from the main method, without creating an object.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:method",
+                    "needs:static",
+                    "needs:int:1",
+                    "needs:print",
+                    "class:MathHelper",
+                    "method:square",
+                    "param:int:num",
+                    "return:int",
+                    "operation:multiply",
+                    "no_object_creation",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 414,
+                "isSolve": 0,
+                "questions": "Create a subclass named Player with a static int variable named playerCount which has a value of 0 and a variable named name. Then, create a constructor named similarly to the subclass, which obtains the name variable and increments (increases) the value of the playerCount every time a player is created. (means the more it is called). Then, simply call them on the main method, using only the statement new Player() followed by a random name of your choice inside the parameter parenthesis, up to three. Then, print the total players.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:constructor",
+                    "needs:static",
+                    "needs:int:1",
+                    "needs:string:1",
+                    "needs:object:3",
+                    "needs:print",
+                    "class:Player",
+                    "var:playerCount",
+                    "var:name",
+                    "value:0",
+                    "operation:increment",
+                    "repeat:3",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 415,
+                "isSolve": 0,
+                "questions": "Create a subclass named GameSettings with a final int variable named MAX_PLAYERS with a value of 5. Then, at the main class, create an object for the subclass and call the method to print the number of players. However, take note that variables with the final keyword cannot be changed at all unless you manually change it on the code.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:final",
+                    "needs:int:1",
+                    "needs:object",
+                    "needs:print",
+                    "class:GameSettings",
+                    "var:MAX_PLAYERS",
+                    "value:5",
+                    "immutable:final",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 416,
+                "isSolve": 0,
+                "questions": "Create a subclass named Account and initialize private attributes (variables) named 'name' of the String data type and balance of the double data type inside it. Then continuing inside, create a constructor named similarly to the subclass that takes the variables name and balance to its parameter parenthesis, and afterwards, create methods named deposit(double amount) with a logic that will add amount to the balance and print it, and withdraw(double amount) with a logic that will subtract amount from the balance for withdrawal and print it, with a condition that which will let you withdraw if there's still enough left in the balance, elsewise, it will prevent the user and print a warning as there will be not enough amount in the balance. Then, at the main class, create an object of the Account subclass and place any random name and any random number for balance on the parameter parenthesis. Then, call the deposit and withdraw methods many times until the balance is exhausted.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:constructor",
+                    "needs:method:2",
+                    "needs:private",
+                    "needs:string:1",
+                    "needs:double:1",
+                    "needs:if",
+                    "needs:object",
+                    "needs:print",
+                    "class:Account",
+                    "var:name",
+                    "var:balance",
+                    "method:deposit",
+                    "method:withdraw",
+                    "operation:add",
+                    "operation:subtract",
+                    "validation:balance",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 417,
+                "isSolve": 0,
+                "questions": "Create a subclass named Monster, and inside it is the attributes (variables) name (String) and hp (int), alongside a constructor named similarly to the subclass with the same attributes in its body and parameter parenthesis. Then, create a method named takeDamage(int dmg) that subtracts hp by the amount of damage and prints it. Then, in the main class, create two objects for the constructor and make them attack each other using the takeDamage() method.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:constructor",
+                    "needs:method",
+                    "needs:string:1",
+                    "needs:int:1",
+                    "needs:object:2",
+                    "needs:print",
+                    "class:Monster",
+                    "var:name",
+                    "var:hp",
+                    "method:takeDamage",
+                    "param:int:dmg",
+                    "operation:subtract",
+                    "interaction:attack",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 418,
+                "isSolve": 0,
+                "questions": "Create a subclass named Character, and inside it are the attributes (variables) name (String) and power (int). Then inside it, create a constructor with the same name as the subclass and set the attributes in the parameter parenthesis and body of the constructor. Next, create a method named train() alongside an int variable named gain that has the logic of increasing power randomly between 5–15 using Math.random(). The amount the gain given will then be added to the power before printing the result. Lastly, in the main class, make a character by creating an object of the constructor, inputting a random name and any amount of power in the parameter, then calling the method train() three times.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:constructor",
+                    "needs:method",
+                    "needs:string:1",
+                    "needs:int:2",
+                    "needs:math",
+                    "needs:object",
+                    "needs:print",
+                    "class:Character",
+                    "var:name",
+                    "var:power",
+                    "var:gain",
+                    "method:train",
+                    "method:Math.random",
+                    "range:5_to_15",
+                    "operation:add",
+                    "repeat:3",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 419,
+                "isSolve": 0,
+                "questions": "Create a subclass named Phone, and inside it are the private attributes brand (String) and batteryLevel (int). Then continuing inside it, create a constructor with the similar name to the class as well as setting the same private attribute on its parameter and body, with the brand settling on its parameters and body and only batteryLevel only settling at the body starting at 100 (since it's default/fixed amount). Then, create a method named use() that has the logic of reducing batteryLevel by random between 10–30% then printing how much battery was used. Afterwards, in the main class, create an object for the constructor and input any brand on the constructor, then call the use() method.",
+                "keyPoints": [
+                    "needs:class",
+                    "needs:constructor",
+                    "needs:method",
+                    "needs:private",
+                    "needs:string:1",
+                    "needs:int:1",
+                    "needs:math",
+                    "needs:object",
+                    "needs:print",
+                    "class:Phone",
+                    "var:brand",
+                    "var:batteryLevel",
+                    "method:use",
+                    "value:100",
+                    "method:Math.random",
+                    "range:10_to_30",
+                    "operation:subtract",
+                    "call:main"
+                ],
+                "chance": 0.40
+            },
+            {
+                "id": 420,
+                "isSolve": 0,
+                "questions": "Create a subclass named Hero, and inside it is the attributes name (String), hp (int), and attack (int), then create a constructor in the same subclass, with the same attributes for the parameter parenthesis and same setting for the constructor body. Afterwards, create another subclass, this time named Monster, and inside it is the attributes name (String), hp (int), and attack (int). Both of their attack() methods of the subclasses has a logic that reduces the other's hp using random damage from Math.random() and prints all the results from the damage taken and HP reduced on each side. Then, in the main class, create objects for the constructors and fill up their parameters with any name, any amount of HP that isn't negative or 0, and any amount of damage. Afterwards, using a while loop with a condition that the loop will continue while both (&& logic) sides has HP values greater than 0, simulate a few turns and print the results each round, where the hero uses its attack() to attack the monster and the monster to use its attack() to attack the hero in alternating turns. Print whether the hero OR the monster wins.",
+                "keyPoints": [
+                    "needs:class:2",
+                    "needs:constructor:2",
+                    "needs:method:2",
+                    "needs:string:2",
+                    "needs:int:6",
+                    "needs:math",
+                    "needs:while",
+                    "needs:object:2",
+                    "needs:print",
+                    "class:Hero",
+                    "class:Monster",
+                    "var:name",
+                    "var:hp",
+                    "var:attack",
+                    "method:attack",
+                    "method:Math.random",
+                    "condition:hp_greater_than_zero",
+                    "logic:and",
+                    "alternating:turns",
+                    "winner:determination",
+                    "call:main"
+                ],
+                "chance": 0.40
+            }
+        ]
     }
 }

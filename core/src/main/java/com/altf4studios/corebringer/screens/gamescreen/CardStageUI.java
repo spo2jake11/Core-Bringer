@@ -298,7 +298,7 @@ public class CardStageUI {
         // 0.5s span (still Player's Turn text) -> endPlayerTurn -> 0.5s -> enemy acts -> 0.5s -> draw new hand
         cardStage.addAction(Actions.sequence(
             // First 0.5s span (keep Player's Turn text)
-            Actions.delay(0.5f),
+            Actions.delay(0.1f),
             // Now end player's turn to switch to Enemy Turn
             Actions.run(() -> {
                 if (turnManager != null && turnManager.isPlayerTurn()) {
@@ -306,14 +306,14 @@ public class CardStageUI {
                 }
             }),
             // Another 0.5s before enemy acts
-            Actions.delay(0.5f),
+            Actions.delay(0.1f),
             Actions.run(() -> {
                 if (gameScreen != null && gameScreen.getBattleManager() != null) {
                     gameScreen.getBattleManager().executeEnemyTurn();
                 }
             }),
             // 0.5s after enemy action before drawing new hand
-            Actions.delay(0.5f),
+            Actions.delay(0.1f),
             Actions.run(() -> {
                 createNewHand();
                 showCards();
