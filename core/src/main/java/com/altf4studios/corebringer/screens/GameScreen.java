@@ -909,7 +909,7 @@ public class GameScreen implements Screen{
                 float worldWidth = Gdx.graphics.getWidth();
                 float worldHeight = Gdx.graphics.getHeight();
                 JournalWindow journalWindow = new JournalWindow(corebringer.testskin, worldWidth, worldHeight);
-                battleStage.addActor(journalWindow);
+                uiStage.addActor(journalWindow);
                 journalWindow.setVisible(true);
                 optionsWindow.setVisible(false);
                 optionsWindow.remove();
