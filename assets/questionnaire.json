@@ -779,15 +779,14 @@
             {
                 "id": 206,
                 "isSolve": 0,
-                "questions": "Use the Scanner Class to type numbers and store it in a variable named number then create a condition that prints 'Number is positive' if the number is positive, 'Number is negative.' if the number is negative and 'Number is zero.' if the number is zero.",
+                "questions": "Declare a random number and store it in a variable named number with an int data type then create a condition that prints 'Number is positive' if the number is positive, 'Number is negative.' if the number is negative and 'Number is zero.' if the number is zero.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:int:1",
+                    "var:number",
                     "needs:if",
                     "needs:else_if",
                     "needs:else",
                     "needs:print",
-                    "var:number",
                     "comparison:>",
                     "comparison:<",
                     "comparison:==",
@@ -800,9 +799,8 @@
             {
                 "id": 207,
                 "isSolve": 0,
-                "questions": "Use the Scanner class to type numbers and store them in an int variable called typedPassword, then create a condition that validates whether the typedPassword is like the variable named password which had a value of 09112001.",
+                "questions": "Declare a random number and store it in an int variable called typedPassword, then create a condition that validates if the typedPassword is just like the another int variable named password which had a value of 09112001. Elsewise, return an invalid message.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:int:2",
                     "needs:if",
                     "needs:print",
@@ -836,9 +834,8 @@
             {
                 "id": 209,
                 "isSolve": 0,
-                "questions": "Use the Scanner Class to type numbers and store them in variables named firstNumber and secondNumber then subtracting the two numbers and storing the answer in a variable called difference before creating a condition that prints 'Number is positive' if the sum is positive, 'Number is negative.' if the sum is negative and 'Number is zero.' if the sum is zero.",
+                "questions": "Declare random numbers and store it in int variables named firstNumber and secondNumber then subtract the two numbers and store the answer in an int variable called difference before creating a condition that prints 'Number is positive' if the difference is positive, 'Number is negative.' if the difference is negative and 'Number is zero.' if the difference is zero.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:int:3",
                     "op:sub",
                     "needs:if",
@@ -857,14 +854,14 @@
             {
                 "id": 210,
                 "isSolve": 0,
-                "questions": "Create a program that prompts the user to input a year, storing the input in a variable named year, then creating a condition that determines if that year is a regular year or a leap year, elsewise.",
+                "questions": "Create a program and declare an int variable named year with a value 2077, then create a condition that determines if that year is a regular year or a leap year, elsewise.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:int:1",
                     "needs:if",
                     "needs:else",
                     "needs:print",
                     "var:year",
+                    "literal:2077",
                     "logic:leap_year"
                 ],
                 "chance": 0.45
@@ -932,13 +929,13 @@
             {
                 "id": 215,
                 "isSolve": 0,
-                "questions": "Create a program that asks for a number from the user, then declare an int variable called number to hold the number. Afterwards, create a for-loop that displays the multiplication table of the number entered by the user.",
+                "questions": "Create a program and declare an int variable called number to hold the value 9. Afterwards, create a for-loop that displays the multiplication table of the number entered by the user.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:for",
                     "needs:int:1",
                     "needs:print",
                     "var:number",
+                    "literal:9",
                     "format:multiplication_table",
                     "range:1-10"
                 ],
@@ -974,16 +971,15 @@
             {
                 "id": 218,
                 "isSolve": 0,
-                "questions": "Use the Scanner class to type numbers and store them in an int variable called typedPassword, then create a condition that validates if the typedPassword is like the variable named password which had a value of 4206969. Do this all while in a loop.",
+                "questions": "Using a loop, declare numbers and store them in an int variable called currentCount, then create a condition that validates if the currentCount is like the variable named count which had a value of 20, while printing the loop all the way until it hits 20.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:int:2",
                     "needs:while",
+                    "needs:print",
                     "needs:if",
-                    "comparison:==",
-                    "var:typedPassword",
-                    "var:password",
-                    "literal:4206969"
+                    "var:currentCount",
+                    "var:count",
+                    "literal:20"
                 ],
                 "chance": 0.4
             },
@@ -1008,20 +1004,17 @@
             {
                 "id": 220,
                 "isSolve": 0,
-                "questions": "Use the Scanner Class to type numbers and store them in a variable named number then create a loop of 5 iterations and create conditions to count the number of positive numbers, negative numbers and zeros entered by the user.",
+                "questions": "Create a program that prints the numbers 0 to 100 with a loop and use if-else statements to create conditions that count the number of even numbers and odd numbers.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:for",
-                    "needs:int:4",
+                    "needs:int:2",
                     "needs:if",
-                    "needs:else_if",
                     "needs:else",
                     "needs:print",
-                    "count:5",
-                    "var:number",
-                    "var:positives",
-                    "var:negatives",
-                    "var:zeros"
+                    "range:0-100",
+                    "op:mod",
+                    "var:evenCount",
+                    "var:oddCount"
                 ],
                 "chance": 0.45
             }
@@ -1146,15 +1139,15 @@
             {
                 "id": 308,
                 "isSolve": 0,
-                "questions": "Store the numbers from 1 to 20 in an array of named numbers that have an int data type. Then, create a logic that will ask the user to enter a random integer/number that the program will check if the same number typed by the user exists in the array.",
+                "questions": "Store the numbers from 1 to 20 in an array of named numbers that have an int data type. Then, create a logic that will check if a target number stored in a variable exists in the array.",
                 "keyPoints": [
                     "needs:array:number",
-                    "needs:scanner",
                     "needs:for",
                     "needs:print",
                     "search:linear",
                     "range:1-20",
-                    "var:numbers"
+                    "var:numbers",
+                    "var:target"
                 ],
                 "chance": 0.4
             },
@@ -1192,38 +1185,32 @@
             {
                 "id": 311,
                 "isSolve": 0,
-                "questions": "Using the Scanner class and the NextLine () Scanner String input catcher, create a logic that will ask your name and then print it along with the words 'My name is' and your name here, then 'and I am the Core Bringer!'",
+                "questions": "Using the join() String method, create a logic that will print: ‘C-O-R-E-B-R-I-N-G-E-R’.",
                 "keyPoints": [
-                    "needs:scanner",
-                    "needs:string",
+                    "needs:string|array:string",
                     "needs:print",
-                    "method:nextLine",
-                    "literal:My name is",
-                    "literal:and I am the Core Bringer!"
+                    "method:join",
+                    "literal:C-O-R-E-B-R-I-N-G-E-R"
                 ],
                 "chance": 0.4
             },
             {
                 "id": 312,
                 "isSolve": 0,
-                "questions": "Using the Scanner class and the length () String method, create a logic that will ask you to input a word, then the program will count how many characters are in the word you input. Print them together in this way: 'The word you inputted is' then your word, and afterwards 'and it has' then the result of your logic, then 'number of characters.'",
+                "questions": "Using the length() String method, create a logic that will count how many characters are in the given sentence: 'My pen is mightier than sword, as long as it doesn't get cut.' Then, print the result.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:string",
                     "needs:print",
                     "method:length",
-                    "literal:The word you inputted is",
-                    "literal:and it has",
-                    "literal:number of characters."
+                    "literal:My pen is mightier than sword, as long as it doesn't get cut."
                 ],
                 "chance": 0.4
             },
             {
                 "id": 313,
                 "isSolve": 0,
-                "questions": "Using the Scanner class, for-loop, array and the split () String method, create a logic that will let you input your full name, then the logic will determine your initials which are then printed out. (Mike Oxmaul = M.O).",
+                "questions": "Declare a String variable named name with the value of 'Mike Oxmaul'. Then, using for-loop, array and the split() String method, create a logic that will determine the initials of the name which are then printed out.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:string",
                     "needs:array:string",
                     "needs:for",
@@ -1237,25 +1224,25 @@
             {
                 "id": 314,
                 "isSolve": 0,
-                "questions": "Using the Scanner class and the length () String method, create a logic that will let you input a password, then it will check if your password is 10 characters in length, elsewise password is short.",
+                "questions": "Using the length() String method, declare a String variable named password with a value 'John was here.' then create a logic that will check if your password is 10 characters in length and print it, elsewise it will print that the password is short.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:string",
                     "needs:if",
                     "needs:else",
                     "needs:print",
                     "method:length",
                     "comparison:==",
-                    "literal:10"
+                    "literal:10",
+                    "var:password",
+                    "literal:John was here."
                 ],
                 "chance": 0.38
             },
             {
                 "id": 315,
                 "isSolve": 0,
-                "questions": "Using the Scanner class, toLowerCase() String method, length () String method, charAt () String method, and indexOf () String method, create a logic that lets you input a string, turn it into lowercase and count how many vowels it has. (A, E, I, O, U = Vowels. Core Bringer = 4 vowels)",
+                "questions": "Using the toLowerCase() String method, length() String method, charAt() String method, and indexOf() String method, declare a String variable named title with the value 'Core Bringer' then create a logic that turns it into lowercase and counts how many vowels it has (A, E, I, O, U).",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:string",
                     "needs:for",
                     "needs:print",
@@ -1263,6 +1250,8 @@
                     "method:length",
                     "method:charAt",
                     "method:indexOf",
+                    "var:title",
+                    "literal:Core Bringer",
                     "logic:vowel_count"
                 ],
                 "chance": 0.38
@@ -1270,21 +1259,20 @@
             {
                 "id": 316,
                 "isSolve": 0,
-                "questions": "Using the Scanner class and toUpperCase () String method, create a logic that will convert the word you input into all uppercase letters and print it.",
+                "questions": "Using the toUpperCase() String method, create a logic that will convert the word 'corebringer' into all uppercase letters and print it.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:string",
                     "needs:print",
-                    "method:toUpperCase"
+                    "method:toUpperCase",
+                    "literal:corebringer"
                 ],
                 "chance": 0.38
             },
             {
                 "id": 317,
                 "isSolve": 0,
-                "questions": "Using the Scanner class and the reverse () String method, create a logic that will ask you to input a word then declare a String variable named reverse and initialize it as a new StringBuilder() where the word itself, the reverse () method and a converter method, toString(), will be found. After that, use the variable reverse to check if the word is a palindrome, elsewise not. (Palindromes are words that still retain their proper spelling even when reversed. level = level)",
+                "questions": "Using the reverse() String method, declare a String variable named palindrome with the value 'level' and initialize it as a new StringBuilder() where the word itself, the reverse() method and a converter method, toString(), will be found. After that, use the variable palindrome and the equals() String method to check if the word is a palindrome, elsewise not.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:string",
                     "needs:if",
                     "needs:else",
@@ -1292,6 +1280,9 @@
                     "class:StringBuilder",
                     "method:reverse",
                     "method:toString",
+                    "method:equals",
+                    "var:palindrome",
+                    "literal:level",
                     "logic:palindrome",
                     "var:reverse"
                 ],
@@ -1300,9 +1291,8 @@
             {
                 "id": 318,
                 "isSolve": 0,
-                "questions": "Using the Scanner class and the replace () String method, create a logic that will ask you to type the sentence 'I am a bad person.' and will then replace the word 'bad' with 'good.'",
+                "questions": "Using the replace() String method, declare a String variable named statement that has the value ‘I am a bad person.’ and then use replace() to replace the word ‘bad’ with ‘good.’",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:string",
                     "needs:print",
                     "method:replace",
@@ -1315,9 +1305,8 @@
             {
                 "id": 319,
                 "isSolve": 0,
-                "questions": "Using the Scanner class, an array and the split () String method, create a logic that will ask you to type a sentence then split the words and print each one on a new line, just like doing println () but in a different way.",
+                "questions": "Using an array and the split() String method, declare a String variable named sentence with the value 'YEAH! LEEROY JENKINS!' then use split() to split the words and print each one on a new line.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:string",
                     "needs:array:string",
                     "needs:for",
@@ -1330,9 +1319,8 @@
             {
                 "id": 320,
                 "isSolve": 0,
-                "questions": "Using the Scanner class, an array and the sort () Array method, store the names 'Alex, John, Ben, Sophia, Mark, Dean' in an array, then create a logic that will sort them alphabetically before printing the result.",
+                "questions": "Using an array and the sort() Array method, store the names ‘Alex, John, Ben, Sophia, Mark, Dean’ in an array, then create a logic that will sort them alphabetically before printing the result.",
                 "keyPoints": [
-                    "needs:scanner",
                     "needs:array:string",
                     "needs:print",
                     "method:Arrays.sort",

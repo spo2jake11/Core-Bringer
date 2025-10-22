@@ -2,7 +2,8 @@ package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
 import com.altf4studios.corebringer.Utils;
-import com.altf4studios.corebringer.utils.SaveManager;
+import com.altf4studios.corebringer.utils.SimpleSaveManager;
+import com.altf4studios.corebringer.utils.SaveData;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
@@ -118,7 +119,7 @@ public class MainMenuScreen implements Screen {
                 corebringer.fadeOutMusic(corebringer.corebringerstartmenubgm, 1f, () -> {
                     corebringer.fadeInMusic(corebringer.corebringermapstartbgm, 1f);
                     // Create save file with default values if it doesn't exist
-                    boolean saveExists = SaveManager.saveExists();
+                    boolean saveExists = SimpleSaveManager.saveExists();
                     String[] defaultCards = new String[]{
                         "basic_variable_slash_1", "basic_variable_slash_1", "basic_variable_slash_1",
                         "basic_variable_slash_1", "basic_variable_slash_1", "shield_final_shield_1",
@@ -126,8 +127,24 @@ public class MainMenuScreen implements Screen {
                         "shield_final_shield_1", "heal_heal_package_1", "heal_heal_package_1",
                         "heal_heal_package_1"
                     };
+
                     // Initialize save with currentHp=50 and maxHp=50
-                    SaveManager.saveStats(50, 50, 0, 3, defaultCards, 0, 100, 1);
+                    SimpleSaveManager.saveStats(50, 50, 0, 3, defaultCards, 0, 100, 1);
+
+                    // Initialize question data structure
+                    SimpleSaveManager.updateData(data -> {
+                        // Initialize all levels
+                        data.questionData.put("level1", new SaveData.QuestionLevelData("Variables and Data Types"));
+                        data.questionData.put("level2", new SaveData.QuestionLevelData("Loops and Conditionals"));
+                        data.questionData.put("level3", new SaveData.QuestionLevelData("Arrays"));
+                        data.questionData.put("level4", new SaveData.QuestionLevelData("Methods and Basic OOP"));
+                        data.questionData.put("level5", new SaveData.QuestionLevelData("Advance OOP"));
+
+                        // Initialize totals
+                        data.totals = new SaveData.TotalsData();
+
+                        Gdx.app.log("MainMenuScreen", "Question data structure initialized");
+                    });
 //                    // Always use a fresh MerchantScreen instance
 //                    try {
 //                        if (corebringer.merchantScreen != null) corebringer.merchantScreen.dispose();

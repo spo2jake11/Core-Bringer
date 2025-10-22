@@ -3,7 +3,7 @@ package com.altf4studios.corebringer.screens;
 import com.altf4studios.corebringer.Main;
 import com.altf4studios.corebringer.Utils;
 import com.altf4studios.corebringer.utils.LoggingUtils;
-import com.altf4studios.corebringer.utils.SaveManager;
+import com.altf4studios.corebringer.utils.SimpleSaveManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
@@ -64,7 +64,7 @@ public class MerchantScreen implements Screen{
     }
 
     private void tryPurchase(String id, int price, Image img, Label priceLbl, ClickListener[] listenerHolder) {
-        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        SaveData stats = SimpleSaveManager.saveExists() ? SimpleSaveManager.loadData() : null;
         if (stats == null) {
             // No save exists; treat as insufficient context
             showInsufficientGold();
@@ -82,7 +82,7 @@ public class MerchantScreen implements Screen{
         updated[existing.length] = id;
 
         int newGold = currentGold - price;
-        SaveManager.saveStats(
+        SimpleSaveManager.saveStats(
             stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20),
             stats.maxHp > 0 ? stats.maxHp : 20,
             stats.energy,
@@ -149,8 +149,8 @@ public class MerchantScreen implements Screen{
         int hp = 20;
         int maxHp = 20;
         int gold = 0;
-        if (SaveManager.saveExists()) {
-            SaveData stats = SaveManager.loadStats();
+        if (SimpleSaveManager.saveExists()) {
+            SaveData stats = SimpleSaveManager.loadData();
             if (stats != null) {
                 hp = stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : hp);
                 maxHp = stats.maxHp > 0 ? stats.maxHp : Math.max(hp, maxHp);
@@ -225,7 +225,7 @@ public class MerchantScreen implements Screen{
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 // Load current gold
-                SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+                SaveData stats = SimpleSaveManager.saveExists() ? SimpleSaveManager.loadData() : null;
                 int currentGold = (stats != null) ? stats.gold : 0;
                 if (currentGold < 150) {
                     showInsufficientGold();
@@ -326,7 +326,7 @@ public class MerchantScreen implements Screen{
     }
 
     private void tryPurchaseStat(String type, int price, Label titleLbl, Label priceLbl, Button buyBtn, ClickListener[] listenerHolder) {
-        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        SaveData stats = SimpleSaveManager.saveExists() ? SimpleSaveManager.loadData() : null;
         if (stats == null || stats.gold < price) {
             showInsufficientGold();
             return;
@@ -348,7 +348,7 @@ public class MerchantScreen implements Screen{
 
         int newGold = stats.gold - price;
 
-        SaveManager.saveStats(
+        SimpleSaveManager.saveStats(
             hp,
             maxHp,
             energy,
@@ -417,7 +417,7 @@ public class MerchantScreen implements Screen{
         grid.top().left();
 
         // Build from saved deck ids
-        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        SaveData stats = SimpleSaveManager.saveExists() ? SimpleSaveManager.loadData() : null;
         String[] ids = (stats != null && stats.cards != null) ? stats.cards : new String[]{};
 
         int col = 0;
@@ -476,7 +476,7 @@ public class MerchantScreen implements Screen{
 
     private void performCardRemoval(String idToRemove) {
         // Re-validate gold and deck
-        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        SaveData stats = SimpleSaveManager.saveExists() ? SimpleSaveManager.loadData() : null;
         if (stats == null) {
             showInsufficientGold();
             return;
@@ -515,7 +515,7 @@ public class MerchantScreen implements Screen{
 
         int newGold = stats.gold - 150;
         // Persist
-        SaveManager.saveStats(
+        SimpleSaveManager.saveStats(
             stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20),
             stats.maxHp > 0 ? stats.maxHp : 20,
             stats.energy,
@@ -600,11 +600,11 @@ public class MerchantScreen implements Screen{
 
     private void addCardIdToSave(String id) {
         if (id == null || id.isEmpty()) return;
-        SaveData stats = SaveManager.saveExists() ? SaveManager.loadStats() : null;
+        SaveData stats = SimpleSaveManager.saveExists() ? SimpleSaveManager.loadData() : null;
         if (stats == null) {
             // Minimal create if no save
             String[] newCards = new String[]{ id };
-            SaveManager.saveStats(20, 20, 0, 3, newCards, 0, 0);
+            SimpleSaveManager.saveStats(20, 20, 0, 3, newCards, 0, 0);
             updateTopGoldAndHp(20, 20, 0);
             return;
         }
@@ -614,7 +614,7 @@ public class MerchantScreen implements Screen{
         System.arraycopy(existing, 0, updated, 0, existing.length);
         updated[existing.length] = id;
         // Persist preserving other fields
-        SaveManager.saveStats(
+        SimpleSaveManager.saveStats(
             stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20),
             stats.maxHp > 0 ? stats.maxHp : 20,
             stats.energy,

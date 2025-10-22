@@ -6,7 +6,7 @@ import com.altf4studios.corebringer.compiler.CodePolicyValidator;
 import com.altf4studios.corebringer.compiler.JavaExternalRunner;
 import com.altf4studios.corebringer.quiz.CodeEvaluationService;
 import com.altf4studios.corebringer.quiz.QuestionnaireManager;
-import com.altf4studios.corebringer.utils.SaveManager;
+import com.altf4studios.corebringer.utils.SimpleSaveManager;
 import com.altf4studios.corebringer.utils.SaveData;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -16,7 +16,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
-import com.badlogic.gdx.scenes.scene2d.Touchable;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.BaseDrawable;
@@ -80,7 +79,7 @@ public class CodeEditorScreen implements Screen {
         // Read stageLevel from save data (default to 1 if not found)
         int stageLevel = 1;
         try {
-            SaveData saveData = SaveManager.loadStats();
+            SaveData saveData = SimpleSaveManager.loadData();
             if (saveData != null && saveData.stageLevel > 0) {
                 stageLevel = saveData.stageLevel;
                 Gdx.app.log("CodeEditorScreen", "Loaded stageLevel from save: " + stageLevel);
@@ -508,6 +507,11 @@ public class CodeEditorScreen implements Screen {
 
                 QuestionnaireManager.Question q = currentQ;
                 CodeEvaluationService.EvaluationResult ev = evaluator.evaluate(q, code, actual, null);
+                
+                // Save question result to save data
+                if (q != null) {
+                    saveQuestionResult(q, ev.passed);
+                }
 
                 if (ev.passed && q != null) {
                     QuestionnaireManager.get().markSolved(q.id);
@@ -526,7 +530,7 @@ public class CodeEditorScreen implements Screen {
                                 
                                 int stageLevel = 1;
                                 try {
-                                    SaveData saveData = SaveManager.loadStats();
+                                    SaveData saveData = SimpleSaveManager.loadData();
                                     if (saveData != null && saveData.stageLevel > 0) {
                                         stageLevel = saveData.stageLevel;
                                     }
@@ -674,6 +678,42 @@ public class CodeEditorScreen implements Screen {
         stage.dispose();
         if (backgroundTexture != null) {
             backgroundTexture.dispose();
+        }
+    }
+
+    private void saveQuestionResult(QuestionnaireManager.Question question, boolean isCorrect) {
+        SimpleSaveManager.updateData(data -> {
+            // Get current stage level
+            int stageLevel = data.stageLevel > 0 ? data.stageLevel : 1;
+            String levelKey = "level" + stageLevel;
+            
+            // Ensure level data exists
+            if (!data.questionData.containsKey(levelKey)) {
+                String levelName = getLevelName(stageLevel);
+                data.questionData.put(levelKey, new SaveData.QuestionLevelData(levelName));
+            }
+            
+            // Add result to level data
+            SaveData.QuestionLevelData levelData = data.questionData.get(levelKey);
+            levelData.addResult(isCorrect);
+            
+            // Add result to totals
+            data.totals.addResult(isCorrect);
+            
+            Gdx.app.log("CodeEditorScreen", String.format("Saved question result: Level %d (%s), %s (Level: %d correct, %d wrong | Total: %d correct, %d wrong)", 
+                stageLevel, levelData.title, isCorrect ? "CORRECT" : "INCORRECT", 
+                levelData.correct, levelData.wrong, data.totals.correct, data.totals.wrong));
+        });
+    }
+    
+    private String getLevelName(int stageLevel) {
+        switch (stageLevel) {
+            case 1: return "Basic Java Fundamentals";
+            case 2: return "Variables and Control Flow";
+            case 3: return "Arrays and Methods";
+            case 4: return "Classes and Object-Oriented Programming";
+            case 5: return "Advanced OOP and Design Patterns";
+            default: return "Unknown Level";
         }
     }
 

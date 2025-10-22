@@ -1,6 +1,5 @@
 package com.altf4studios.corebringer.utils;
 
-import com.altf4studios.corebringer.utils.SaveData;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.utils.Json;
@@ -27,7 +26,19 @@ public class SaveManager {
 
     // New API: includes maxEnergy, gold, and stageLevel
     public static void saveStats(int currentHp, int maxHp, int energy, int maxEnergy, String[] cards, int battleWon, int gold, int stageLevel) {
-        SaveData data = new SaveData(currentHp, maxHp, energy, maxEnergy, cards, battleWon);
+        // Load existing data to preserve questionData and other fields
+        SaveData data = loadStats();
+        if (data == null) {
+            data = new SaveData(currentHp, maxHp, energy, maxEnergy, cards, battleWon);
+        } else {
+            // Update the existing data with new values
+            data.currentHp = currentHp;
+            data.maxHp = maxHp;
+            data.energy = energy;
+            data.maxEnergy = maxEnergy;
+            data.cards = cards;
+            data.battleWon = battleWon;
+        }
         // Also populate deprecated field for compatibility with old readers/tools
         data.hp = currentHp;
         data.gold = gold;

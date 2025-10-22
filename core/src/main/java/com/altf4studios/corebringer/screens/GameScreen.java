@@ -2,12 +2,14 @@ package com.altf4studios.corebringer.screens;
 
 import com.altf4studios.corebringer.Main;
 // Removed interpreter integration
+import com.altf4studios.corebringer.metrics.CodingMetricsManager;
 import com.altf4studios.corebringer.utils.CardParser;
 import com.altf4studios.corebringer.turns.TurnManager;
 import com.altf4studios.corebringer.battle.BattleManager;
 import com.altf4studios.corebringer.entities.Player;
 import com.altf4studios.corebringer.entities.Enemy;
 import com.altf4studios.corebringer.screens.gamescreen.*;
+import com.altf4studios.corebringer.metrics.MetricsDisplayWindow;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;
@@ -19,6 +21,7 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
@@ -26,12 +29,12 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.scenes.scene2d.Touchable;
-import com.altf4studios.corebringer.utils.SaveManager;
+import com.altf4studios.corebringer.utils.SimpleSaveManager;
+import com.altf4studios.corebringer.utils.SaveData;
 import com.badlogic.gdx.scenes.scene2d.ui.Stack;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
@@ -71,6 +74,7 @@ public class GameScreen implements Screen{
     private Texture energyBgTexture;
     private Window optionsWindow;
     private Window deckWindow;
+    private MetricsDisplayWindow metricsDisplayWindow;
     // Persisted deck ids for this run
     private String[] savedDeckIds;
     // --- End Energy System ---
@@ -89,11 +93,13 @@ public class GameScreen implements Screen{
     // --- Death Screen ---
     private Window deathScreenWindow = null;
     private boolean deathScreenShown = false;
+    private boolean showingMetricsInDeath = false;
     // --- End Death Screen ---
 
     // --- Victory Screen ---
     private Window victoryScreenWindow = null;
     private boolean victoryScreenShown = false;
+    private boolean showingMetricsInVictory = false;
     // --- End Victory Screen ---
 
     // Death/Victory screen textures owned by this screen
@@ -154,7 +160,7 @@ public class GameScreen implements Screen{
         // Load stageLevel from save file if available
         int stageFromSave = 1;
         try {
-            com.altf4studios.corebringer.utils.SaveData sd = SaveManager.loadStats();
+            com.altf4studios.corebringer.utils.SaveData sd = SimpleSaveManager.loadData();
             if (sd != null && sd.stageLevel > 0) stageFromSave = sd.stageLevel;
         } catch (Exception ignored) {}
         this.corebringer = corebringer;
@@ -189,8 +195,8 @@ public class GameScreen implements Screen{
         int enemyHp = 20;
 
         // Load from save file (should exist from MainMenuScreen)
-        if (SaveManager.saveExists()) {
-            com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+        if (SimpleSaveManager.saveExists()) {
+            com.altf4studios.corebringer.utils.SaveData stats = SimpleSaveManager.loadData();
             if (stats != null) {
                 // Prefer new fields; fallback to legacy hp if needed
                 hp = (stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : hp));
@@ -262,7 +268,7 @@ public class GameScreen implements Screen{
             battleStageUI.changeEnemy();
             battleWon = 0;
             // Persist stats with maxEnergy and current deck
-            SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energyVal, getMaxEnergy(), cards, battleWon, gold);
+            SimpleSaveManager.saveStats(player.getHp(), player.getMaxHealth(), energyVal, getMaxEnergy(), cards, battleWon, gold);
         }
 
         // Set energy to full at start of battle (don't use saved energy value)
@@ -344,7 +350,7 @@ public class GameScreen implements Screen{
     // Call this after any stat change (hp, energy, cards, battleWon)
     public void saveProgress(int battleWonValue) {
         String[] deck = savedDeckIds != null ? savedDeckIds : new String[]{};
-        SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energy, getMaxEnergy(), deck, battleWonValue, gold);
+        SimpleSaveManager.saveStats(player.getHp(), player.getMaxHealth(), energy, getMaxEnergy(), deck, battleWonValue, gold);
     }
 
     private void createUI() {
@@ -576,6 +582,7 @@ public class GameScreen implements Screen{
         // --- Ensure viewport is updated to current window size ---
         battleStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
         cardStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+        overlayStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
 
         // Perf HUD label (top-left)
         try {
@@ -964,7 +971,7 @@ public class GameScreen implements Screen{
                     corebringer.fadeInMusic(corebringer.corebringerstartmenubgm, 1f);
                 }
                 // Delete current run save file
-                SaveManager.deleteSave();
+                SimpleSaveManager.deleteSave();
                 // Dispose and clear the existing GameMapScreen so a new run starts fresh
                 try {
                     if (corebringer.gameMapScreen != null) {
@@ -1043,35 +1050,23 @@ public class GameScreen implements Screen{
         deathScreenWindow.setColor(1,1,1,0f);
         deathScreenWindow.addAction(Actions.fadeIn(1.5f));
         // Centered button
-        TextButton btnReturn = new TextButton("Return to Title", corebringer.testskin);
-        btnReturn.addListener(new ClickListener() {
+        TextButton btnCheckStats = new TextButton("Check Your Stats", corebringer.testskin);
+        btnCheckStats.addListener(new ClickListener() {
             @Override public void clicked(InputEvent event, float x, float y) {
-                // Delete save file on death
-                com.altf4studios.corebringer.utils.SaveManager.deleteSave();
-                // Transfer input ownership to the next screen before disposing
-                corebringer.clearInputProcessors();
-
-                // Optionally reset death screen state
+                // Hide death screen and show metrics
                 if (deathScreenWindow != null) {
                     deathScreenWindow.remove();
                     deathScreenWindow = null;
-                    deathScreenShown = false;
                 }
 
-                // Dispose all screens except MainMenuScreen
-                corebringer.disposeAllScreensExceptMainMenu();
-
-                // Switch screen; LibGDX will call show() on the next screen automatically
-                corebringer.showMainMenu();
-
-                // Clear the tag so subsequent games are clean
-                instakillTag = null;
+                // Show metrics
+                showMetricsAfterDeath();
             }
         });
         Table overlay = new Table();
         overlay.setFillParent(true);
         overlay.add(deathImage).expand().fill().row();
-        overlay.add(btnReturn).center().padTop(-300f); // Adjust as needed for button position
+        overlay.add(btnCheckStats).center().padTop(-300f); // Adjust as needed for button position
         deathScreenWindow.add(overlay).expand().fill();
         // Add to uiStage so it renders on top of other stages
         uiStage.addActor(deathScreenWindow);
@@ -1082,10 +1077,48 @@ public class GameScreen implements Screen{
         instakillTag = null;
     }
 
+    private void showMetricsAfterDeath() {
+        if (showingMetricsInDeath) return;
+        showingMetricsInDeath = true;
+
+        showInlineMetricsWindow(() -> {
+            // Hide metrics and reset flag
+            showingMetricsInDeath = false;
+            // Delete save file on death
+            SimpleSaveManager.deleteSave();
+            // Switch screen
+            corebringer.showMainMenu();
+            // Transfer input ownership to the next screen before disposing
+            corebringer.clearInputProcessors();
+            // Clear the tag so subsequent games are clean
+            instakillTag = null;
+            // Dispose all screens except MainMenuScreen
+            corebringer.disposeAllScreensExceptMainMenu();
+        });
+    }
+
+
     private void showVictoryScreen() {
         if (victoryScreenWindow != null) return; // Already shown
         victoryScreenShown = true;
         gameState = GameState.VICTORY;
+
+        // Check if this is the final stage (stage 5) - if so, show completion screen with metrics
+        int currentStage = 1;
+        try {
+            com.altf4studios.corebringer.utils.SaveData saveData = SimpleSaveManager.loadData();
+            if (saveData != null && saveData.stageLevel > 0) {
+                currentStage = saveData.stageLevel;
+            }
+        } catch (Exception ex) {
+            Gdx.app.log("GameScreen", "Could not load stageLevel for victory screen, defaulting to 1: " + ex.getMessage());
+        }
+
+        if (currentStage >= 5) {
+            // This is the final stage - show completion screen with metrics
+            showGameCompletionScreen();
+            return;
+        }
 
         // Calculate window size (60% width, 90% height)
         float windowWidth = Math.min(Gdx.graphics.getWidth() * 0.5f, 800f);   // 80% of screen or max 1200px
@@ -1154,7 +1187,7 @@ public class GameScreen implements Screen{
                 if (bossOnlyBattle) {
                     int currentStage = 1;
                     try {
-                        com.altf4studios.corebringer.utils.SaveData s = SaveManager.loadStats();
+                        com.altf4studios.corebringer.utils.SaveData s = SimpleSaveManager.loadData();
                         if (s != null && s.stageLevel > 0) currentStage = s.stageLevel;
                     } catch (Exception ignored) {}
                     int nextStage = Math.max(1, Math.min(5, currentStage + 1));
@@ -1165,7 +1198,7 @@ public class GameScreen implements Screen{
                     // Persist the new stage level along with current stats
                     try {
                         String[] deck = savedDeckIds != null ? savedDeckIds : new String[]{};
-                        SaveManager.saveStats(player.getHp(), player.getMaxHealth(), energy, getMaxEnergy(), deck, 0, gold, nextStage);
+                        SimpleSaveManager.saveStats(player.getHp(), player.getMaxHealth(), energy, getMaxEnergy(), deck, 0, gold, nextStage);
                     } catch (Exception ignored) {}
                     // Ensure a fresh map screen exists and switch to it
                     corebringer.gameMapScreen = new GameMapScreen(corebringer);
@@ -1207,6 +1240,196 @@ public class GameScreen implements Screen{
         // Block all input except the modal by routing input to uiStage
         Gdx.input.setInputProcessor(uiStage);
     }
+
+    private void showGameCompletionScreen() {
+        if (showingMetricsInVictory) return;
+        showingMetricsInVictory = true;
+
+        // Create completion window
+        float windowWidth = Math.min(Gdx.graphics.getWidth() * 0.8f, 1200f);
+        float windowHeight = Math.min(Gdx.graphics.getHeight() * 0.7f, 800f);
+        float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
+        float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
+
+        // Create completion window
+        victoryScreenWindow = new Window("", corebringer.testskin);
+        victoryScreenWindow.setModal(true);
+        victoryScreenWindow.setMovable(false);
+        victoryScreenWindow.setResizable(false);
+        victoryScreenWindow.setSize(windowWidth, windowHeight);
+        victoryScreenWindow.setPosition(windowX, windowY);
+        victoryScreenWindow.setTouchable(Touchable.enabled);
+        victoryScreenWindow.setColor(0.2f, 0.8f, 0.2f, 0.9f); // Green background for completion
+
+        // Create content table
+        Table contentTable = new Table();
+        contentTable.setFillParent(true);
+        contentTable.pad(20);
+
+        // Completion message
+        Label completionMessage = new Label("🎉 CONGRATULATIONS! 🎉", corebringer.testskin);
+        completionMessage.setAlignment(Align.center);
+        completionMessage.setFontScale(2.5f);
+        completionMessage.setColor(Color.YELLOW);
+
+        Label completionSubMessage = new Label("You have completed Core Bringer!", corebringer.testskin);
+        completionSubMessage.setAlignment(Align.center);
+        completionSubMessage.setFontScale(1.5f);
+        completionSubMessage.setColor(Color.WHITE);
+
+        Label completionSubMessage2 = new Label("You have defeated the final boss!", corebringer.testskin);
+        completionSubMessage2.setAlignment(Align.center);
+        completionSubMessage2.setFontScale(1.2f);
+        completionSubMessage2.setColor(Color.LIGHT_GRAY);
+
+        // Check final stats button
+        TextButton btnCheckFinalStats = new TextButton("Check Your Final Stats", corebringer.testskin);
+        btnCheckFinalStats.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                // Hide completion screen and show metrics
+                if (victoryScreenWindow != null) {
+                    victoryScreenWindow.remove();
+                    victoryScreenWindow = null;
+                    victoryScreenShown = false;
+                }
+
+                // Show metrics
+                showMetricsAfterVictory();
+            }
+        });
+
+        // Layout content
+        contentTable.add(completionMessage).expandX().fillX().padBottom(20).row();
+        contentTable.add(completionSubMessage).expandX().fillX().padBottom(10).row();
+        contentTable.add(completionSubMessage2).expandX().fillX().padBottom(30).row();
+        contentTable.add(btnCheckFinalStats).expandX().fillX().height(60).row();
+
+        victoryScreenWindow.add(contentTable).expand().fill();
+
+        // Add to uiStage so it renders on top of other stages
+        uiStage.addActor(victoryScreenWindow);
+        victoryScreenWindow.toFront();
+        // Block all input except the modal by routing input to uiStage
+        Gdx.input.setInputProcessor(uiStage);
+        // Clear the tag so subsequent games are clean
+        instakillTag = null;
+    }
+
+    private void showMetricsAfterVictory() {
+        if (showingMetricsInVictory) return;
+        showingMetricsInVictory = true;
+
+        showInlineMetricsWindow(() -> {
+            // Hide metrics and reset flag
+            showingMetricsInVictory = false;
+            // Delete save file on completion
+            SimpleSaveManager.deleteSave();
+            // Transfer input ownership to the next screen before disposing
+            corebringer.clearInputProcessors();
+            // Dispose all screens except MainMenuScreen
+            corebringer.disposeAllScreensExceptMainMenu();
+            // Switch screen
+            corebringer.showMainMenu();
+            // Clear the tag so subsequent games are clean
+            instakillTag = null;
+        });
+    }
+
+    // Build and show a self-contained metrics window on uiStage
+    private void showInlineMetricsWindow(Runnable onReturn) {
+        // Ensure UI viewport is current (do not clear battleStage to keep death/victory window flow intact)
+        uiStage.getViewport().update(Gdx.graphics.getWidth(), Gdx.graphics.getHeight(), true);
+
+        float windowWidth = Math.min(Gdx.graphics.getWidth() * 0.8f, 1200f);
+        float windowHeight = Math.min(Gdx.graphics.getHeight() * 0.8f, 800f);
+        float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
+        float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
+
+        Window metricsWin = new Window("Coding Performance Analytics", corebringer.testskin);
+        metricsWin.setModal(true);
+        metricsWin.setMovable(false);
+        metricsWin.setResizable(false);
+        metricsWin.setTouchable(Touchable.enabled);
+        metricsWin.setSize(windowWidth, windowHeight);
+        metricsWin.setPosition(windowX, windowY);
+
+        Table root = new Table();
+        root.setFillParent(true);
+        root.pad(10);
+
+        // Fetch metrics data
+        CodingMetricsManager metrics = CodingMetricsManager.getInstance();
+
+        // Overall section
+        Label hdrOverall = new Label("\uD83D\uDCCA Overall Performance", corebringer.testskin);
+        hdrOverall.setAlignment(Align.left);
+        root.add(hdrOverall).expandX().fillX().padBottom(8).row();
+
+        Table overallTbl = new Table();
+        int totalAttempted = metrics.getTotalQuestionsAttempted();
+        int totalCorrect = metrics.getTotalQuestionsCorrect();
+        int totalWrong = Math.max(0, totalAttempted - totalCorrect);
+        float accuracy = totalAttempted > 0 ? (totalCorrect * 100f / totalAttempted) : 0f;
+        overallTbl.add(new Label("Total Coding Questions: " + totalAttempted, corebringer.testskin)).left().row();
+        Label corr = new Label("✅ Correct: " + totalCorrect, corebringer.testskin);
+        corr.setColor(0,1,0,1);
+        overallTbl.add(corr).left().row();
+        Label wrong = new Label("❌ Wrong: " + totalWrong, corebringer.testskin);
+        wrong.setColor(1,0,0,1);
+        overallTbl.add(wrong).left().row();
+        overallTbl.add(new Label(String.format("Overall Accuracy: %.1f%%", accuracy), corebringer.testskin)).left().row();
+        root.add(overallTbl).expandX().fillX().padBottom(12).row();
+
+        // Level breakdown (condensed)
+        Label hdrLevels = new Label("\uD83D\uDCC8 Level-by-Level Analysis", corebringer.testskin);
+        hdrLevels.setAlignment(Align.left);
+        root.add(hdrLevels).expandX().fillX().padBottom(8).row();
+
+        Table lvlTbl = new Table();
+        com.badlogic.gdx.utils.Array<CodingMetricsManager.LevelMetrics> all = metrics.getAllLevelMetrics();
+        if (all.size == 0) {
+            lvlTbl.add(new Label("No coding attempts recorded yet.", corebringer.testskin)).left().row();
+        } else {
+            for (CodingMetricsManager.LevelMetrics lm : all) {
+                if (lm.questionsAttempted <= 0) continue;
+                lvlTbl.add(new Label(String.format("Level %d - %s", lm.level, lm.levelName), corebringer.testskin)).left().row();
+                lvlTbl.add(new Label(String.format("  ✅ %d  |  ❌ %d  |  Acc: %.1f%%",
+                        lm.questionsCorrect, lm.questionsIncorrect, lm.accuracyPercentage), corebringer.testskin)).left().padBottom(4).row();
+            }
+        }
+        ScrollPane sp = new ScrollPane(lvlTbl, corebringer.testskin);
+        sp.setFadeScrollBars(false);
+        sp.setOverscroll(false, false);
+        root.add(sp).expand().fill().row();
+
+        // Return button row
+        TextButton btnReturn = new TextButton("Return to Main Menu", corebringer.testskin);
+        btnReturn.addListener(new ClickListener(){
+            @Override public void clicked(InputEvent event, float x, float y){
+                if (onReturn != null) onReturn.run();
+            }
+        });
+        Table btnRow = new Table();
+        btnRow.add(btnReturn).height(50).pad(10);
+        root.add(btnRow).expandX().fillX();
+
+        metricsWin.add(root).expand().fill();
+        uiStage.addActor(metricsWin);
+        metricsWin.toFront();
+
+        // Ensure uiStage focuses the metrics window and its scrollable content
+        try {
+            uiStage.setKeyboardFocus(metricsWin);
+            uiStage.setScrollFocus(sp);
+        } catch (Exception ignored) {}
+
+        // Route input via global multiplexer with uiStage only
+        corebringer.clearInputProcessors();
+        corebringer.addInputProcessor(uiStage);
+        Gdx.input.setInputProcessor(corebringer.getGlobalMultiplexer());
+    }
+
 
     /**
      * Rerolls the enemy and cards for a new game session.
@@ -1256,5 +1479,36 @@ public class GameScreen implements Screen{
             battleManager.resetTurns();
             Gdx.app.log("GameScreen", "Turn system reset after reroll. Player HP: " + player.getHp() + ", Enemy HP: " + enemy.getHp());
         }
+    }
+
+    /**
+     * Save game state data (HP, energy, cards, gold, stage level)
+     */
+    public void saveGameState() {
+        SimpleSaveManager.updateData(data -> {
+            if (player != null) {
+                data.currentHp = player.getHp();
+                data.maxHp = player.getMaxHealth();
+                data.energy = player.getEnergy();
+                data.maxEnergy = getMaxEnergy();
+            }
+
+            if (cardStageUI != null) {
+                // Get card names from the card stage UI
+                data.cards = new String[0]; // Placeholder - need to implement getCardNames method
+            }
+
+            // For now, use 0 for battles won (can be enhanced later)
+            data.battleWon = 0;
+
+            // Update stage level based on battles won
+            if (data.battleWon > 0) {
+                data.stageLevel = Math.min(5, (data.battleWon / 3) + 1);
+            }
+
+            Gdx.app.log("GameScreen", String.format("Saved game state: HP=%d/%d, Energy=%d/%d, Cards=%d, Battles=%d, Stage=%d",
+                data.currentHp, data.maxHp, data.energy, data.maxEnergy,
+                data.cards != null ? data.cards.length : 0, data.battleWon, data.stageLevel));
+        });
     }
 }
