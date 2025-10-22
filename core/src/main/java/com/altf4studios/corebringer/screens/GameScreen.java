@@ -43,6 +43,7 @@ public class GameScreen implements Screen{
     private Stage uiStage;
     private Stage battleStage;
     private Stage cardStage;
+    private Stage overlayStage;
 
     // CardParser instance for managing card data
     private CardParser cardParser;
@@ -168,6 +169,7 @@ public class GameScreen implements Screen{
         uiStage = new Stage(new ScreenViewport());
         battleStage = new Stage(new ScreenViewport());
         cardStage = new Stage(new ScreenViewport());
+        overlayStage = new Stage(new ScreenViewport());
 
 
         // --- Load stats from save file (must exist at this point) ---
@@ -282,7 +284,11 @@ public class GameScreen implements Screen{
                 energyBgTexture = new Texture(Gdx.files.internal(energyPath));
             }
             Image bg = new Image(energyBgTexture);
-            bg.setSize(100, 100);
+            // Make energy widget responsive to screen size
+            float screenWidth = Gdx.graphics.getWidth();
+            float screenHeight = Gdx.graphics.getHeight();
+            float energySize = Math.min(screenWidth * 0.08f, screenHeight * 0.12f); // 8% of width or 12% of height, whichever is smaller
+            bg.setSize(energySize, energySize);
             // Build stacked widget: background under, text over
             energyWidget = new Stack();
             energyWidget.add(bg);
@@ -361,7 +367,7 @@ public class GameScreen implements Screen{
 
         // Table handler for the right side
         Table tblRightPane = new Table();
-        Label lblMenu = new Label("Menu", corebringer.testskin);
+        TextButton btnMenu = new TextButton("Menu", corebringer.testskin);
         TextButton btnDeck = new TextButton("Deck", corebringer.testskin);
         Label lblMap = new Label("Map", corebringer.testskin);
 
@@ -378,7 +384,7 @@ public class GameScreen implements Screen{
         tblRightPane.defaults().padRight(10).padLeft(10).uniform();
         tblRightPane.add(lblMap);
         tblRightPane.add(btnDeck);
-        tblRightPane.add(lblMenu);
+        tblRightPane.add(btnMenu);
 
         // Add content to inner table
         innerTable.add(tblLeftPane).left();
@@ -395,6 +401,12 @@ public class GameScreen implements Screen{
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 showDeckWindow();
+            }
+        });
+        btnMenu.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                showOptionsWindow();
             }
         });
     }
@@ -440,8 +452,8 @@ public class GameScreen implements Screen{
             return;
         }
 
-        float windowWidth = Gdx.graphics.getWidth() * 0.8f;
-        float windowHeight = Gdx.graphics.getHeight() * 0.8f;
+        float windowWidth = Math.min(Gdx.graphics.getWidth() * 0.8f, 1200f);   // 80% of screen or max 1200px
+        float windowHeight = Math.min(Gdx.graphics.getHeight() * 0.7f, 800f);
         float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
         float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
 
@@ -449,6 +461,8 @@ public class GameScreen implements Screen{
         deckWindow.setModal(true);
         deckWindow.setMovable(true);
         deckWindow.setResizable(false);
+        // Make windows responsive
+        // 70% of screen or max 800px
         deckWindow.setSize(windowWidth, windowHeight);
         deckWindow.setPosition(windowX, windowY);
 
@@ -463,8 +477,12 @@ public class GameScreen implements Screen{
             String region = atlasName != null ? atlasName.replace(" ", "_") : "bck_card";
             TextureRegionDrawable drawable = new TextureRegionDrawable(deckCardAtlas.findRegion(region));
             Image img = new Image(drawable);
-            img.setSize(150, 190);
-            grid.add(img).size(150, 190);
+            // Make card size responsive
+            float screenWidth = Gdx.graphics.getWidth();
+            float cardWidth = screenWidth * 0.12f;  // 12% of screen width
+            float cardHeight = cardWidth * 1.27f;   // Maintain aspect ratio (190/150 = 1.27)
+            img.setSize(cardWidth, cardHeight);
+            grid.add(img).size(cardWidth, cardHeight);
             col++;
             if (col == 4) {
                 grid.row();
@@ -521,6 +539,7 @@ public class GameScreen implements Screen{
         corebringer.addInputProcessor(uiStage);
         corebringer.addInputProcessor(battleStage);
         corebringer.addInputProcessor(cardStage);
+        corebringer.addInputProcessor(overlayStage);
         // Ensure the global multiplexer is the active input processor
         Gdx.input.setInputProcessor(corebringer.getGlobalMultiplexer());
         corebringer.addInputProcessor(new InputProcessor() {
@@ -618,6 +637,8 @@ public class GameScreen implements Screen{
         cardStage.draw();
         uiStage.act(delta);
         uiStage.draw();
+        overlayStage.act(delta);
+        overlayStage.draw();
         // Removed: editorStage.act(delta); editorStage.draw();
 
         // Perf HUD update (once per second)
@@ -829,6 +850,7 @@ public class GameScreen implements Screen{
         uiStage.getViewport().update(width, height,true);
         battleStage.getViewport().update(width, height, true);
         cardStage.getViewport().update(width, height, true);
+        overlayStage.getViewport().update(width, height, true);
     }
     @Override public void pause() {
 
@@ -849,11 +871,15 @@ public class GameScreen implements Screen{
         try { if (battleStage != null) battleStage.getRoot().clearActions(); } catch (Exception ignored) {}
         try { if (cardStage != null) cardStage.getRoot().clearActions(); } catch (Exception ignored) {}
         try { if (uiStage != null) uiStage.getRoot().clearActions(); } catch (Exception ignored) {}
+        try { if (overlayStage != null) overlayStage.getRoot().clearActions(); } catch (Exception ignored) {}
+
 
         // Dispose stages first to stop any rendering using their batches/meshes
         try { if (battleStage != null) battleStage.dispose(); } catch (Exception ignored) {}
         try { if (cardStage != null) cardStage.dispose(); } catch (Exception ignored) {}
         try { if (uiStage != null) uiStage.dispose(); } catch (Exception ignored) {}
+        try { if (overlayStage != null) overlayStage.dispose(); } catch (Exception ignored) {}
+
 
         // Then dispose UI helpers/atlases/textures owned by the screen
         if (battleStageUI != null) {
@@ -894,23 +920,31 @@ public class GameScreen implements Screen{
 
     private void showOptionsWindow() {
         if (optionsWindow != null && optionsWindow.isVisible()) return;
-        optionsWindow = new Window("Options", corebringer.testskin);
-        optionsWindow.setModal(true);
-        optionsWindow.setMovable(true);
+        optionsWindow = new Window("", corebringer.testskin);
+        optionsWindow.setModal(false);
+        optionsWindow.setMovable(false);
         optionsWindow.pad(20);
-        optionsWindow.setSize(600, 480);
-        optionsWindow.setPosition(Gdx.graphics.getWidth() / 2f - 200f, Gdx.graphics.getHeight() / 2f - 200f);
+        // Make windows responsive
+        float windowWidth = Math.min(Gdx.graphics.getWidth() * 0.4f, 600);   // 80% of screen or max 1200px
+        float windowHeight = Math.min(Gdx.graphics.getHeight() * 0.4f, 600f);  // 70% of screen or max 800px
+        optionsWindow.setSize(windowWidth, windowHeight);
+        // Center the options window properly with new responsive size
+        optionsWindow.setPosition(
+            (Gdx.graphics.getWidth() - windowWidth) / 2f,
+            (Gdx.graphics.getHeight() - windowHeight) / 2f
+        );
         // Add buttons
         TextButton btnJournal = new TextButton("Journal", corebringer.testskin);
-        TextButton btnTitle = new TextButton("Title", corebringer.testskin);
+        TextButton btnTitle = new TextButton("Give up", corebringer.testskin);
         TextButton btnClose = new TextButton("Close", corebringer.testskin);
         btnJournal.addListener(new ClickListener() {
             @Override public void clicked(InputEvent event, float x, float y) {
                 float worldWidth = Gdx.graphics.getWidth();
                 float worldHeight = Gdx.graphics.getHeight();
                 JournalWindow journalWindow = new JournalWindow(corebringer.testskin, worldWidth, worldHeight);
-                battleStage.addActor(journalWindow);
+                overlayStage.addActor(journalWindow);
                 journalWindow.setVisible(true);
+                journalWindow.toFront();
                 optionsWindow.setVisible(false);
                 optionsWindow.remove();
             }
@@ -937,6 +971,7 @@ public class GameScreen implements Screen{
                         corebringer.gameMapScreen.dispose();
                         corebringer.gameMapScreen = null;
                     }
+                    Gdx.app.postRunnable(GameScreen.this::dispose);
                 } catch (Exception ignored) {}
                 corebringer.showMainMenu();
                 optionsWindow.setVisible(false);
@@ -954,6 +989,7 @@ public class GameScreen implements Screen{
             }
         });
         Table table = new Table();
+        table.defaults().pad(7);
         table.add(btnJournal).row();
         table.add(btnTitle).row();
         table.add(btnClose).row();
@@ -990,8 +1026,10 @@ public class GameScreen implements Screen{
         deathImage.getColor().a = 0f;
         deathImage.addAction(Actions.fadeIn(1.5f)); // 1.5 seconds fade in
         // Calculate window size (60% width, 90% height) and center
-        float windowWidth = Gdx.graphics.getWidth() * 0.6f;
-        float windowHeight = Gdx.graphics.getHeight() * 0.9f;
+        // Make windows responsive
+        float windowWidth = Math.min(Gdx.graphics.getWidth() * 0.8f, 1200f);   // 80% of screen or max 1200px
+        float windowHeight = Math.min(Gdx.graphics.getHeight() * 0.7f, 800f);  // 70% of screen or max 800px
+
         float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
         float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
         // Create window to overlay everything
@@ -1050,8 +1088,8 @@ public class GameScreen implements Screen{
         gameState = GameState.VICTORY;
 
         // Calculate window size (60% width, 90% height)
-        float windowWidth = Gdx.graphics.getWidth() * 0.6f;
-        float windowHeight = Gdx.graphics.getHeight() * 0.9f;
+        float windowWidth = Math.min(Gdx.graphics.getWidth() * 0.5f, 800f);   // 80% of screen or max 1200px
+        float windowHeight = Math.min(Gdx.graphics.getHeight() * 0.5f, 800f);
         float windowX = (Gdx.graphics.getWidth() - windowWidth) / 2f;
         float windowY = (Gdx.graphics.getHeight() - windowHeight) / 2f;
 

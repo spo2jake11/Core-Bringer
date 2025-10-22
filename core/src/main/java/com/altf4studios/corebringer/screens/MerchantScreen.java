@@ -426,7 +426,11 @@ public class MerchantScreen implements Screen{
             String region = atlasName != null ? atlasName.replace(" ", "_") : "bck_card";
             TextureRegionDrawable drawable = new TextureRegionDrawable(cardAtlas.findRegion(region) != null ? cardAtlas.findRegion(region) : cardAtlas.findRegion("bck_card"));
             Image img = new Image(drawable);
-            img.setSize(150, 190);
+            // Make merchant card size responsive
+            float screenWidth = Gdx.graphics.getWidth();
+            float cardWidth = screenWidth * 0.1f;   // 10% of screen width (smaller than deck view)
+            float cardHeight = cardWidth * 1.27f;   // Maintain aspect ratio
+            img.setSize(cardWidth, cardHeight);
             // Store the id on the actor's name for retrieval
             img.setName(id);
             img.addListener(new ClickListener(){

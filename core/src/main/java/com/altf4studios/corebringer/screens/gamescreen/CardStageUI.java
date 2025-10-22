@@ -78,12 +78,8 @@ public class CardStageUI {
         createNewHand();
         createDrawButton();
         // Place the End Turn button inside the visible area (bottom-right)
-        float sw = cardStage.getViewport().getScreenWidth();
-        float sh = cardStage.getViewport().getScreenHeight();
-        if (drawButton.getWidth() <= 0f || drawButton.getHeight() <= 0f) {
-            drawButton.setSize(200f, 50f);
-        }
-        drawButton.setPosition(sw - drawButton.getWidth() - 40f, 40f);
+
+
         cardStage.addActor(drawButton);
         showCards();
     }
@@ -196,11 +192,13 @@ public class CardStageUI {
                 @Override
                 public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                     card.setSize(originalWidth * 1.2f, originalHeight * 1.2f);
+                    card.setZIndex(2);
                 }
 
                 @Override
                 public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
                     card.setSize(originalWidth, originalHeight);
+                    card.setZIndex(1);
                 }
             });
 
@@ -252,9 +250,17 @@ public class CardStageUI {
     }
 
     private void createDrawButton() {
+        float screenWidth = cardStage.getViewport().getScreenWidth();
+        float screenHeight = cardStage.getViewport().getScreenHeight();
+        float buttonWidth = screenWidth * 0.08f;  // 12% of screen width
+        float buttonHeight = screenHeight * 0.05f; // 6% of screen height
         drawButton = new TextButton("End Turn", skin);
         drawButton.setVisible(true);
         drawButton.setColor(Color.GOLD);
+        float sw = cardStage.getViewport().getScreenWidth();
+        float sh = cardStage.getViewport().getScreenHeight();
+        drawButton.setSize(buttonWidth, buttonHeight);
+        drawButton.setPosition((sw) * 0.82f, (sh - buttonHeight) * 0.22f);
         drawButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -266,7 +272,7 @@ public class CardStageUI {
                 // Clear any active one-turn buff when the player ends their turn
                 if (gameScreen != null) {
                     gameScreen.clearCardEffectMultiplier();
-                    gameScreen.showCenterMessage("Buff ended", Color.GRAY, 1.0f);
+//                    gameScreen.showCenterMessage("Buff ended", Color.GRAY, 1.0f);
                 }
                 hideCards();
                 cardHandTable.flushHand(discardPile);
@@ -282,7 +288,7 @@ public class CardStageUI {
         // Clear any active one-turn buff when turn is ended programmatically (e.g., incorrect code)
         if (gameScreen != null) {
             gameScreen.clearCardEffectMultiplier();
-            gameScreen.showCenterMessage("Buff ended", Color.GRAY, 1.0f);
+//            gameScreen.showCenterMessage("Buff ended", Color.GRAY, 1.0f);
         }
         hideCards();
         if (cardHandTable != null) {

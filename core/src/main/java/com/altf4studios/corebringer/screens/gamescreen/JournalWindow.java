@@ -14,15 +14,18 @@ import com.badlogic.gdx.scenes.scene2d.InputEvent;
 public class JournalWindow extends Window {
     public JournalWindow(final Skin skin, final float width, final float height) {
         super("Java Tutorial Journal", skin);
+        this.setZIndex(1000);
         this.getTitleLabel().setAlignment(Align.center);
         this.getTitleTable().padLeft(20).padRight(20);
-        this.setModal(true);
-        this.setMovable(true);
+        this.setModal(false);
+        this.setMovable(false);
         this.pad(-40);
         this.setSize(width * 0.8f, height * 0.8f);
+        float windowWidth = width * 0.8f;
+        float windowHeight = height * 0.8f;
         this.setPosition(
-            Gdx.graphics.getWidth() / 2 - 800,
-            Gdx.graphics.getHeight() / 2 - 800
+            (Gdx.graphics.getWidth() - windowWidth) / 2f,
+            (Gdx.graphics.getHeight() - windowHeight) / 2f
         );
         Texture optionBG = new Texture(Gdx.files.internal("ui/optionsBG.png"));
         Drawable optionBGDrawable = new TextureRegionDrawable(new TextureRegion(optionBG));
@@ -34,7 +37,11 @@ public class JournalWindow extends Window {
 
         Table buttonTable = new Table();
         buttonTable.top().left();
-        buttonTable.defaults().pad(20).padLeft(120).width(400).height(40);
+        // Make button sizing responsive
+        float buttonWidth = width * 0.25f;  // 25% of screen width
+        float buttonHeight = height * 0.04f; // 4% of screen height
+        float leftPadding = width * 0.08f;   // 8% of screen width for left padding
+        buttonTable.defaults().pad(20).padLeft(leftPadding).width(buttonWidth).height(buttonHeight);
 
         TextButton btnVariables = new TextButton("Variables & Data Types", skin);
         TextButton btnLoops = new TextButton("Loops", skin);
@@ -68,7 +75,11 @@ public class JournalWindow extends Window {
         contentScroll.setScrollBarPositions(false, true);
 
         contentTable.add(buttonTable).top().left().padRight(10);
-        contentTable.add(contentScroll).size(550, 600).top().left().padRight(100);
+        // Make content area responsive
+        float contentWidth = width * 0.4f;   // 40% of screen width
+        float contentHeight = height * 0.6f; // 60% of screen height
+        float rightPadding = width * 0.08f;  // 8% of screen width for right padding
+        contentTable.add(contentScroll).size(contentWidth, contentHeight).top().left().padRight(rightPadding);
         this.add(contentTable).grow().pad(20);
 
         btnVariables.addListener(new ClickListener() {

@@ -132,7 +132,12 @@ public class BattleStageUI {
         }
 
         enemyImage.setScaling(Scaling.fit);
-        enemyImage.setScale(0.7f);
+        // Make character models responsive to screen size
+        float screenWidth = Gdx.graphics.getWidth();
+        float screenHeight = Gdx.graphics.getHeight();
+        float characterScale = Math.min(screenWidth / 1920f, screenHeight / 1080f); // Scale based on 1920x1080 reference
+        characterScale = Math.max(0.4f, Math.min(characterScale * 0.8f, 1.2f)); // Clamp between 0.4x and 1.2x
+        enemyImage.setScale(characterScale);
         enemyImage.setAlign(Align.center);
         return enemyImage;
     }
@@ -230,42 +235,42 @@ public class BattleStageUI {
 		Table userStatusTable = new Table();
 		userStatusTable.defaults().pad(5).size(40, 40);
 		userShieldBadge = createStatusBadge("Shield");
-		userPoisonBadge = createStatusBadge("Poison");
-		userBleedBadge = createStatusBadge("Bleed");
-		userStunBadge = createStatusBadge("Stun");
+//		userPoisonBadge = createStatusBadge("Poison");
+//		userBleedBadge = createStatusBadge("Bleed");
+//		userStunBadge = createStatusBadge("Stun");
 		userShieldBadge.setVisible(false);
-		userPoisonBadge.setVisible(false);
-		userBleedBadge.setVisible(false);
-		userStunBadge.setVisible(false);
+//		userPoisonBadge.setVisible(false);
+//		userBleedBadge.setVisible(false);
+//		userStunBadge.setVisible(false);
 		// numeric overlays
 		userShieldNum = createBadgeNumberOverlay(userShieldBadge);
-		userPoisonNum = createBadgeNumberOverlay(userPoisonBadge);
-		userBleedNum = createBadgeNumberOverlay(userBleedBadge);
-		userStunNum = createBadgeNumberOverlay(userStunBadge);
+//		userPoisonNum = createBadgeNumberOverlay(userPoisonBadge);
+//		userBleedNum = createBadgeNumberOverlay(userBleedBadge);
+//		userStunNum = createBadgeNumberOverlay(userStunBadge);
 		userStatusTable.add(userShieldBadge);
-		userStatusTable.add(userPoisonBadge);
-		userStatusTable.add(userBleedBadge);
-		userStatusTable.add(userStunBadge);
+//		userStatusTable.add(userPoisonBadge);
+//		userStatusTable.add(userBleedBadge);
+//		userStatusTable.add(userStunBadge);
 
 		Table enemyStatusTable = new Table();
 		enemyStatusTable.defaults().pad(5).size(40, 40);
 		enemyShieldBadge = createStatusBadge("Shield");
-		enemyPoisonBadge = createStatusBadge("Poison");
-		enemyBleedBadge = createStatusBadge("Bleed");
-		enemyStunBadge = createStatusBadge("Stun");
+//		enemyPoisonBadge = createStatusBadge("Poison");
+//		enemyBleedBadge = createStatusBadge("Bleed");
+//		enemyStunBadge = createStatusBadge("Stun");
 		enemyShieldBadge.setVisible(false);
-		enemyPoisonBadge.setVisible(false);
-		enemyBleedBadge.setVisible(false);
-		enemyStunBadge.setVisible(false);
+//		enemyPoisonBadge.setVisible(false);
+//		enemyBleedBadge.setVisible(false);
+//		enemyStunBadge.setVisible(false);
 		// numeric overlays
 		enemyShieldNum = createBadgeNumberOverlay(enemyShieldBadge);
-		enemyPoisonNum = createBadgeNumberOverlay(enemyPoisonBadge);
-		enemyBleedNum = createBadgeNumberOverlay(enemyBleedBadge);
-		enemyStunNum = createBadgeNumberOverlay(enemyStunBadge);
+//		enemyPoisonNum = createBadgeNumberOverlay(enemyPoisonBadge);
+//		enemyBleedNum = createBadgeNumberOverlay(enemyBleedBadge);
+//		enemyStunNum = createBadgeNumberOverlay(enemyStunBadge);
 		enemyStatusTable.add(enemyShieldBadge);
-		enemyStatusTable.add(enemyPoisonBadge);
-		enemyStatusTable.add(enemyBleedBadge);
-		enemyStatusTable.add(enemyStunBadge);
+//		enemyStatusTable.add(enemyPoisonBadge);
+//		enemyStatusTable.add(enemyBleedBadge);
+//		enemyStatusTable.add(enemyStunBadge);
 
 		// Left and right columns
 		Table leftColumn = new Table();

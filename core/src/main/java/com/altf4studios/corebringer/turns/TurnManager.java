@@ -23,11 +23,11 @@ public class TurnManager {
     // Game over logging control
     private boolean gameOverLogged = false;
 
-    // Poison resolution staging to make damage visible between turns
-    private enum PendingPoisonTarget { NONE, PLAYER, ENEMY }
-    private PendingPoisonTarget pendingPoisonTarget = PendingPoisonTarget.NONE;
-    private boolean isResolvingPoison = false;
-    private float poisonResolutionDelay = 0f; // brief delay to show poison damage
+    // Poison resolution staging to make damage visible between turns - COMMENTED OUT
+    // private enum PendingPoisonTarget { NONE, PLAYER, ENEMY }
+    // private PendingPoisonTarget pendingPoisonTarget = PendingPoisonTarget.NONE;
+    // private boolean isResolvingPoison = false;
+    // private float poisonResolutionDelay = 0f; // brief delay to show poison damage
 
     public TurnManager(Player player, Enemy enemy) {
         this.player = player;
@@ -57,8 +57,8 @@ public class TurnManager {
 //            delayTimer = turnDelay;
             Gdx.app.log("TurnManager", "Player turn ended, switching to enemy turn");
             // After delay, resolve start-of-turn statuses for enemy (poison/bleed/stun)
-            pendingPoisonTarget = PendingPoisonTarget.ENEMY;
-            isResolvingPoison = false;
+//            pendingPoisonTarget = PendingPoisonTarget.ENEMY;
+//            isResolvingPoison = false;
         }
     }
 
@@ -73,21 +73,21 @@ public class TurnManager {
             // delayTimer = turnDelay;
             Gdx.app.log("TurnManager", "Enemy turn ended, switching to player turn");
             // After delay, resolve start-of-turn statuses for player (poison/bleed/stun)
-            pendingPoisonTarget = PendingPoisonTarget.PLAYER;
-            isResolvingPoison = false;
+//            pendingPoisonTarget = PendingPoisonTarget.PLAYER;
+//            isResolvingPoison = false;
         }
     }
 
     public void executeEnemyTurn() {
         if (currentPhase == TurnPhase.ENEMY_TURN && enemy.isAlive() && player.isAlive() && !isDelaying) {
-            // Stun check: if stunned, decrement and skip action
-            int stunTurns = enemy.getStatusValue("Stun");
-            if (stunTurns > 0) {
-                Gdx.app.log("TurnManager", "Enemy is stunned and skips the turn (" + stunTurns + " turns remaining)");
-                enemy.decrementStatus("Stun", 1);
-                endEnemyTurn();
-                return;
-            }
+//            // Stun check: if stunned, decrement and skip action
+//            int stunTurns = enemy.getStatusValue("Stun");
+//            if (stunTurns > 0) {
+//                Gdx.app.log("TurnManager", "Enemy is stunned and skips the turn (" + stunTurns + " turns remaining)");
+//                enemy.decrementStatus("Stun", 1);
+//                endEnemyTurn();
+//                return;
+//            }
             // Randomize action: 40% attack, 35% defend, 25% heal
             double roll = Math.random();
             if (roll < 0.60) {
@@ -170,27 +170,27 @@ public class TurnManager {
             }
         }
 
-        // After initial delay, resolve scheduled start-of-turn statuses and add a short delay so it's visible
-        if (!isDelaying && pendingPoisonTarget != PendingPoisonTarget.NONE) {
-            com.altf4studios.corebringer.status.StatusManager sm = com.altf4studios.corebringer.status.StatusManager.getInstance();
-            if (pendingPoisonTarget == PendingPoisonTarget.ENEMY) {
-                Gdx.app.log("TurnManager", "Resolving enemy start-of-turn statuses");
-                // Process all statuses (Poison, Bleed, Stun effects via their handlers)
-                sm.processTurnStart(enemy);
-            } else if (pendingPoisonTarget == PendingPoisonTarget.PLAYER) {
-                Gdx.app.log("TurnManager", "Resolving player start-of-turn statuses");
-                sm.processTurnStart(player);
-            }
-            pendingPoisonTarget = PendingPoisonTarget.NONE;
-            isResolvingPoison = true;
-            isDelaying = true;
-            delayTimer = poisonResolutionDelay;
-        }
-
-        // Clear resolving flag after poison delay completes
-        if (!isDelaying && isResolvingPoison) {
-            isResolvingPoison = false;
-        }
+//        // After initial delay, resolve scheduled start-of-turn statuses and add a short delay so it's visible
+//        if (!isDelaying && pendingPoisonTarget != PendingPoisonTarget.NONE) {
+//            com.altf4studios.corebringer.status.StatusManager sm = com.altf4studios.corebringer.status.StatusManager.getInstance();
+//            if (pendingPoisonTarget == PendingPoisonTarget.ENEMY) {
+//                Gdx.app.log("TurnManager", "Resolving enemy start-of-turn statuses");
+//                // Process all statuses (Poison, Bleed, Stun effects via their handlers)
+//                sm.processTurnStart(enemy);
+//            } else if (pendingPoisonTarget == PendingPoisonTarget.PLAYER) {
+//                Gdx.app.log("TurnManager", "Resolving player start-of-turn statuses");
+//                sm.processTurnStart(player);
+//            }
+//            pendingPoisonTarget = PendingPoisonTarget.NONE;
+//            isResolvingPoison = true;
+//            isDelaying = true;
+//            delayTimer = poisonResolutionDelay;
+//        }
+//
+//        // Clear resolving flag after poison delay completes
+//        if (!isDelaying && isResolvingPoison) {
+//            isResolvingPoison = false;
+//        }
     }
 
     public boolean isDelaying() {
