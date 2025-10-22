@@ -347,14 +347,12 @@ public class TreasurePuzzleScreen implements Screen {
             return; // No save found, skip rewards
         }
         
-        int currentHp = stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20);
-        int maxHp = stats.maxHp > 0 ? stats.maxHp : 20;
-        int newHp = Math.min(maxHp, currentHp + 15);
-        int newGold = stats.gold + 40;
+        // Remove health reward, only give 50 gold
+        int newGold = stats.gold + 50;
         
         SaveManager.saveStats(
-            newHp,
-            maxHp,
+            stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20),
+            stats.maxHp > 0 ? stats.maxHp : 20,
             stats.energy,
             stats.maxEnergy > 0 ? stats.maxEnergy : 3,
             stats.cards,
