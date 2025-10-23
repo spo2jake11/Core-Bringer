@@ -157,9 +157,12 @@ public class PuzzleScreen implements Screen {
         resultCubeImage = new Image(cubePlainTexture);
 
         // Create labels
-        instructionLabel = new Label("Operators randomized. Toggle inputs to reach: ? op ? op ? op ? = Cube (or press Make 1)", corebringer.testskin);
+        instructionLabel = new Label("LOGIC GATES PUZZLE - G11 ICT Programming\n" +
+            "Click inputs to toggle: ? → 0 → 1 → ? | Goal: Make expression = TRUE (Green Cube)\n" +
+            "AND (&&): Both must be TRUE | OR (||): Either can be TRUE | XOR (^): Must be different", corebringer.testskin);
         instructionLabel.setColor(Color.WHITE);
-        instructionLabel.setFontScale(1.2f);
+        instructionLabel.setFontScale(1.0f);
+        instructionLabel.setAlignment(Align.center);
 
         expressionLabel = new Label("", corebringer.testskin);
         expressionLabel.setColor(Color.YELLOW);
@@ -338,6 +341,7 @@ public class PuzzleScreen implements Screen {
         return result;
     }
 
+
     private void checkPuzzleSolved() {
         if (puzzleSolved) {
             // Give rewards immediately
@@ -447,6 +451,7 @@ public class PuzzleScreen implements Screen {
 
         // Add puzzle table to main table
         mainTable.add(puzzleTable).center().row();
+        
         // Add Make 1 button below puzzle
         mainTable.add(makeOneButton).padTop(15f).center();
 
