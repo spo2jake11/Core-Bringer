@@ -45,6 +45,7 @@ public class JournalWindow extends Window {
 
         TextButton btnVariables = new TextButton("Variables & Data Types", skin);
         TextButton btnLoops = new TextButton("Loops", skin);
+		TextButton btnConditionals = new TextButton("Conditionals (if/switch)", skin);
         TextButton btnOOP = new TextButton("OOP", skin);
         TextButton btnArrays = new TextButton("Arrays & Collections", skin);
         TextButton btnMethods = new TextButton("Methods & Functions", skin);
@@ -53,6 +54,7 @@ public class JournalWindow extends Window {
 
         btnVariables.setColor(0.8f, 0.9f, 1.0f, 1.0f);
         btnLoops.setColor(0.8f, 0.9f, 1.0f, 1.0f);
+		btnConditionals.setColor(0.8f, 0.9f, 1.0f, 1.0f);
         btnOOP.setColor(0.8f, 0.9f, 1.0f, 1.0f);
         btnArrays.setColor(0.8f, 0.9f, 1.0f, 1.0f);
         btnMethods.setColor(0.8f, 0.9f, 1.0f, 1.0f);
@@ -61,6 +63,7 @@ public class JournalWindow extends Window {
 
         buttonTable.add(btnVariables).row();
         buttonTable.add(btnLoops).row();
+		buttonTable.add(btnConditionals).row();
         buttonTable.add(btnOOP).row();
         buttonTable.add(btnArrays).row();
         buttonTable.add(btnMethods).row();
@@ -225,6 +228,74 @@ public class JournalWindow extends Window {
                 tutorialContent.setText(content);
             }
         });
+		btnConditionals.addListener(new ClickListener() {
+			@Override
+			public void clicked(InputEvent event, float x, float y) {
+				String content =  " "+"CONDITIONALS IN JAVA (if/else, switch)\n" +
+					"===============================\n\n" +
+					" "+"Conditionals let your program make decisions based on conditions.\n\n" +
+					" "+"COMPARISON OPERATORS:\n" +
+					" "+" ==  equal to\n" +
+					" "+" !=  not equal to\n" +
+					" "+" <   less than, <=  less than or equal\n" +
+					" "+" >   greater than, >= greater than or equal\n\n" +
+					" "+"LOGICAL OPERATORS:\n" +
+					" "+" &&  logical AND\n" +
+					" "+" ||  logical OR\n" +
+					" "+" !   logical NOT\n\n" +
+					" "+"IF / ELSE IF / ELSE:\n" +
+					" "+"  int score = 85;\n" +
+					" "+"  if (score >= 90) {\n" +
+					" "+"      System.out.println(\"Grade A\");\n" +
+					" "+"  } else if (score >= 80) {\n" +
+					" "+"      System.out.println(\"Grade B\");\n" +
+					" "+"  } else {\n" +
+					" "+"      System.out.println(\"Keep trying!\");\n" +
+					" "+"  }\n\n" +
+					" "+"NESTED CONDITIONS (use carefully):\n" +
+					" "+"  boolean hasKey = true;\n" +
+					" "+"  boolean doorLocked = false;\n" +
+					" "+"  if (hasKey && !doorLocked) {\n" +
+					" "+"      System.out.println(\"Door opens\");\n" +
+					" "+"  }\n\n" +
+					" "+"SWITCH STATEMENT:\n" +
+					" "+"  String command = \"START\";\n" +
+					" "+"  switch (command) {\n" +
+					" "+"      case \"START\":\n" +
+					" "+"          System.out.println(\"Game starting...\");\n" +
+					" "+"          break;\n" +
+					" "+"      case \"PAUSE\":\n" +
+					" "+"          System.out.println(\"Paused\");\n" +
+					" "+"          break;\n" +
+					" "+"      default:\n" +
+					" "+"          System.out.println(\"Unknown command\");\n" +
+					" "+"  }\n\n" +
+					" "+"ENHANCED SWITCH (Java 14+):\n" +
+					" "+"  int dayNum = 6;\n" +
+					" "+"  String day = switch (dayNum) {\n" +
+					" "+"      case 1, 2, 3, 4, 5 -> \"Weekday\";\n" +
+					" "+"      case 6, 7 -> \"Weekend\";\n" +
+					" "+"      default -> \"Invalid\";\n" +
+					" "+"  };\n\n" +
+					" "+"DO's AND DON'Ts:\n" +
+					" "+" DO:\n" +
+					" "+"  ✔ Keep conditions simple and readable.\n" +
+					" "+"     Example: if (hp <= 0) gameOver();\n" +
+					" "+"  ✔ Use parentheses to make precedence clear.\n" +
+					" "+"     Example: if ((a > b) && (c > d)) { ... }\n" +
+					" "+"  ✔ Always include a default or final else when appropriate.\n" +
+					" "+"     Example: switch(role) { ... default: handleUnknown(); }\n\n" +
+					" "+" DON'T:\n" +
+					" "+"  ✘ Use '==' to compare strings; use .equals().\n" +
+					" "+"     Example: if (name.equals(\"Alex\")) { ... }\n" +
+					" "+"  ✘ Write deeply nested ifs; refactor or early return.\n" +
+					" "+"  ✘ Forget break in classic switch cases (will fall through).\n" +
+					" "+"  ✘ Put assignments inside conditions by mistake.\n" +
+					" "+"     Example: if (x = 5) { ... } // ERROR: not boolean\n\n" +
+					" "+"Remember: Prefer clarity. Choose switch for many discrete values, if/else for range checks.";
+				tutorialContent.setText(content);
+			}
+		});
         btnOOP.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

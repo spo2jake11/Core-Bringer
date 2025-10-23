@@ -16,6 +16,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
+import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
@@ -129,9 +130,13 @@ public class TreasurePuzzleScreen implements Screen {
         root.setBackground(new TextureRegionDrawable(bgTexture));
 
         // Title and back
-        titleLabel = new Label(currentPuzzle.description, corebringer.testskin);
+        titleLabel = new Label("ARITHMETIC PUZZLE - G11 ICT Programming\n" +
+            "Click operators to cycle: ? → × → ÷ → + → - → ? | Goal: Make expression = " + currentPuzzle.target + "\n" +
+            "Order of Operations: × ÷ first, then + - | Left to right for same precedence", corebringer.testskin);
         titleLabel.setColor(Color.WHITE);
-        titleLabel.setFontScale(1.2f);
+        titleLabel.setFontScale(1.0f);
+        titleLabel.setAlignment(Align.center);
+        
         backButton = new TextButton("Back to Map", corebringer.testskin);
         backButton.addListener(new ClickListener() {
             @Override
@@ -144,7 +149,7 @@ public class TreasurePuzzleScreen implements Screen {
         });
 
         Table topBar = new Table();
-        topBar.add(titleLabel).expandX().left().pad(15f);
+        topBar.add(titleLabel).expandX().center().pad(15f);
         topBar.add(backButton).right().pad(15f);
 
         // Expression row: num1 op num2 op num3 = target   [chest]
@@ -268,6 +273,7 @@ public class TreasurePuzzleScreen implements Screen {
         return Math.abs(result - currentPuzzle.target) < 0.0001f;
     }
 
+
     @Override
     public void show() {
         // Reset to defaults
@@ -279,6 +285,7 @@ public class TreasurePuzzleScreen implements Screen {
         refreshOperator(op1Img, op1State);
         refreshOperator(op2Img, op2State);
         updateChest();
+        
         Gdx.input.setInputProcessor(stage);
     }
 
