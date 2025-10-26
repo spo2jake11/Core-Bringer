@@ -14,6 +14,9 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ObjectMap;
 import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.JsonReader;
+import com.badlogic.gdx.utils.JsonValue;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 public class BattleStageUI {
     private Stage battleStage;
@@ -23,6 +26,7 @@ public class BattleStageUI {
     private String currentEnemyName;
     private Image enemyImageBG;
     private Stack enemyTemplateStack;
+    private Stack userTemplateStack;
     private Label userHpLabel;
     private Label enemyHpLabel;
     private Label userShieldLabel;
@@ -30,6 +34,7 @@ public class BattleStageUI {
     private Label turnIndicatorLabel;
 	// Status badge references for visibility toggling
 	private Stack userShieldBadge;
+	private Stack userBuffBadge;
 	private Stack userPoisonBadge;
 	private Stack userBleedBadge;
 	private Stack userStunBadge;
@@ -39,7 +44,8 @@ public class BattleStageUI {
 	private Stack enemyStunBadge;
 	// Numeric overlays for badges
 	private Label userShieldNum;
-	private Label userPoisonNum;
+    private Label userBuffNum;
+    private Label userPoisonNum;
 	private Label userBleedNum;
 	private Label userStunNum;
 	private Label enemyShieldNum;
@@ -75,32 +81,59 @@ public class BattleStageUI {
 
     private void loadEnemyAtlas() {
         try {
+            // Read authoritative roster and atlas path from enemies.json
+            JsonReader reader = new JsonReader();
+            JsonValue root = reader.parse(Gdx.files.internal("assets/enemies.json"));
+            String atlasPath = root.getString("atlasPath", "assets/basic-characters/enemies_atlas.atlas");
+
+            // Load the enemy atlas via AssetManager if available
             if (assets != null) {
-                String path = "basic-characters/normal_mob/normal_mobs.atlas";
-                if (!assets.isLoaded(path, TextureAtlas.class)) {
-                    assets.load(path, TextureAtlas.class);
-                    assets.finishLoadingAsset(path);
+                if (!assets.isLoaded(atlasPath, TextureAtlas.class)) {
+                    assets.load(atlasPath, TextureAtlas.class);
+                    assets.finishLoadingAsset(atlasPath);
                 }
-                enemyAtlas = assets.get(path, TextureAtlas.class);
+                enemyAtlas = assets.get(atlasPath, TextureAtlas.class);
                 enemyAtlasOwned = false;
             } else {
-                enemyAtlas = new TextureAtlas(Gdx.files.internal("basic-characters/normal_mob/normal_mobs.atlas"));
+                enemyAtlas = new TextureAtlas(Gdx.files.internal(atlasPath));
                 enemyAtlasOwned = true;
             }
+
+            // Build enemy name list from JSON levels (common + boss), keeping only regions present in atlas
             enemyNames = new Array<>();
+            JsonValue levels = root.get("levels");
+            if (levels != null) {
+                for (JsonValue lvl : levels) {
+                    JsonValue common = lvl.get("common");
+                    if (common != null) {
+                        for (JsonValue en : common) {
+                            String name = en.getString("name", null);
+                            if (name != null && enemyAtlas.findRegion(name) != null && !enemyNames.contains(name, false)) {
+                                enemyNames.add(name);
+                            }
+                        }
+                    }
+                    JsonValue boss = lvl.get("boss");
+                    if (boss != null) {
+                        for (JsonValue en : boss) {
+                            String name = en.getString("name", null);
+                            if (name != null && enemyAtlas.findRegion(name) != null && !enemyNames.contains(name, false)) {
+                                enemyNames.add(name);
+                            }
+                        }
+                    }
+                }
+            }
 
-            // Add all enemy names from the atlas
-            enemyNames.add("Experiment");
-            enemyNames.add("Probe");
-            enemyNames.add("Shock_slime");
-            enemyNames.add("duckling_gun");
-            enemyNames.add("liquid_metal");
-            enemyNames.add("nanite");
-            enemyNames.add("standard_slime");
-
-            Gdx.app.log("BattleStageUI", "Loaded " + enemyNames.size + " enemies from atlas");
+            // Fallback: if JSON had none or atlas missing regions, try to use a safe fallback
+            if (enemyNames.size == 0) {
+                Gdx.app.log("BattleStageUI", "No enemy names found from JSON/atlas; using fallback 'merchant'.");
+                enemyNames.add("merchant");
+            } else {
+                Gdx.app.log("BattleStageUI", "Loaded " + enemyNames.size + " enemies from JSON roster and atlas");
+            }
         } catch (Exception e) {
-            Gdx.app.error("BattleStageUI", "Error loading enemy atlas: " + e.getMessage());
+            Gdx.app.error("BattleStageUI", "Error loading enemy atlas or roster: " + e.getMessage());
             enemyNames = new Array<>();
             enemyNames.add("merchant"); // fallback
         }
@@ -220,11 +253,12 @@ public class BattleStageUI {
         userImageBG.setScaling(Scaling.contain);
         userImageBG.setAlign(Align.center);
 
+
         // Random enemy selection
         currentEnemyName = getRandomEnemyName();
         enemyImageBG = createEnemyImage(currentEnemyName);
 
-		Stack userTemplateStack = new Stack();
+		userTemplateStack = new Stack();
 		userTemplateStack.add(userImageBG);
 		userTemplateStack.add(userTemplate);
 		enemyTemplateStack = new Stack();
@@ -235,19 +269,23 @@ public class BattleStageUI {
 		Table userStatusTable = new Table();
 		userStatusTable.defaults().pad(5).size(40, 40);
 		userShieldBadge = createStatusBadge("Shield");
+		userBuffBadge = createStatusBadge("Buff");
 //		userPoisonBadge = createStatusBadge("Poison");
 //		userBleedBadge = createStatusBadge("Bleed");
 //		userStunBadge = createStatusBadge("Stun");
 		userShieldBadge.setVisible(false);
+		userBuffBadge.setVisible(false);
 //		userPoisonBadge.setVisible(false);
 //		userBleedBadge.setVisible(false);
 //		userStunBadge.setVisible(false);
 		// numeric overlays
 		userShieldNum = createBadgeNumberOverlay(userShieldBadge);
+        userBuffNum = createBadgeNumberOverlay(userBuffBadge);
 //		userPoisonNum = createBadgeNumberOverlay(userPoisonBadge);
 //		userBleedNum = createBadgeNumberOverlay(userBleedBadge);
 //		userStunNum = createBadgeNumberOverlay(userStunBadge);
 		userStatusTable.add(userShieldBadge);
+		userStatusTable.add(userBuffBadge);
 //		userStatusTable.add(userPoisonBadge);
 //		userStatusTable.add(userBleedBadge);
 //		userStatusTable.add(userStunBadge);
@@ -308,6 +346,8 @@ public class BattleStageUI {
         switch (name){
             case "Shield":
                 imgPath = "assets/Status/shield.png";
+                break;            case "Buff":
+                imgPath = "assets/Status/buff.png";
                 break;
             case "Poison":
                 imgPath = "assets/Status/poison.png";
@@ -483,6 +523,66 @@ public class BattleStageUI {
         return enemyAtlas != null;
     }
 
+    // --- Floating Combat Text ---
+    private void showFloatingText(Stack targetStack, String text, Color color) {
+        if (targetStack == null || text == null || text.isEmpty()) return;
+        try {
+            Label lbl = new Label(text, skin);
+            if (color != null) lbl.setColor(color);
+            lbl.setAlignment(Align.center);
+            // Start slightly above center
+            Table container = new Table();
+            container.add(lbl).padTop(0);
+            // Place overlaying the stack
+            targetStack.add(container);
+            // Animate: move up and fade out, then remove
+            float duration = 0.9f;
+            container.getColor().a = 1f;
+            container.addAction(Actions.sequence(
+                Actions.parallel(
+                    Actions.moveBy(0, 30f, duration),
+                    Actions.fadeOut(duration)
+                ),
+                Actions.removeActor()
+            ));
+        } catch (Exception ignored) {}
+    }
+
+    public void showDamageOnEnemy(int amount) {
+        if (amount > 0) showFloatingText(enemyTemplateStack, "-" + amount, Color.RED);
+    }
+
+    public void showDamageOnPlayer(int amount) {
+        if (amount > 0) showFloatingText(userTemplateStack, "-" + amount, Color.RED);
+    }
+
+    public void showShieldOnEnemy(int amount) {
+        if (amount > 0) showFloatingText(enemyTemplateStack, "+" + amount, Color.CYAN);
+    }
+
+    public void showShieldOnPlayer(int amount) {
+        if (amount > 0) showFloatingText(userTemplateStack, "+" + amount, Color.CYAN);
+    }
+
+    public void showHealOnEnemy(int amount) {
+        if (amount > 0) showFloatingText(enemyTemplateStack, "+" + amount, Color.GREEN);
+    }
+
+    public void showHealOnPlayer(int amount) {
+        if (amount > 0) showFloatingText(userTemplateStack, "+" + amount, Color.GREEN);
+    }    // Toggle the player's Buff badge visibility
+    public void setPlayerBuffBadgeVisible(boolean visible) {
+        if (userBuffBadge != null) {
+            userBuffBadge.setVisible(visible);
+        }
+    }    // Set the player's Buff badge text (e.g., x2.0)
+    public void setPlayerBuffBadgeText(String text) {
+        if (text == null) text = "";
+        if (userBuffNum != null) userBuffNum.setText(text);
+    }
+
+
+
     public void dispose() {
         if (enemyAtlasOwned && enemyAtlas != null) {
             enemyAtlas.dispose();
@@ -498,3 +598,5 @@ public class BattleStageUI {
         }
     }
 }
+
+

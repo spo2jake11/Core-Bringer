@@ -398,13 +398,24 @@ public class CardStageUI {
             }
         }
         if (enemy != null && enemy.isAlive()) {
+            int beforeHp = enemy.getHp();
+            int beforeBlock = enemy.getBlock();
             enemy.takeDamage(damage);
+            int hpLost = Math.max(0, beforeHp - enemy.getHp());
+            if (gameScreen != null && gameScreen.getBattleStageUI() != null && hpLost > 0) {
+                gameScreen.getBattleStageUI().showDamageOnEnemy(hpLost);
+            }
         }
         // Hybrid: attack + shield from description
         if (hasKeyword(card.description, "gain") && hasKeyword(card.description, "shield")) {
             int shieldFromDesc = parseShieldFromDescription(card.description);
             if (shieldFromDesc > 0 && player != null && player.isAlive()) {
+                int before = player.getBlock();
                 player.gainBlock(shieldFromDesc);
+                int delta = Math.max(0, player.getBlock() - before);
+                if (gameScreen != null && gameScreen.getBattleStageUI() != null && delta > 0) {
+                    gameScreen.getBattleStageUI().showShieldOnPlayer(delta);
+                }
             }
         }
     }
@@ -419,7 +430,12 @@ public class CardStageUI {
             }
         }
         if (player != null && player.isAlive()) {
+            int before = player.getBlock();
             player.gainBlock(block);
+            int delta = Math.max(0, player.getBlock() - before);
+            if (gameScreen != null && gameScreen.getBattleStageUI() != null && delta > 0) {
+                gameScreen.getBattleStageUI().showShieldOnPlayer(delta);
+            }
         }
         // Hybrid: defense + attack from description
         if (hasKeyword(card.description, "deal") || hasKeyword(card.description, "damage")) {
@@ -431,7 +447,13 @@ public class CardStageUI {
                 }
             }
             if (damage > 0 && enemy != null && enemy.isAlive()) {
+                int beforeHp = enemy.getHp();
+                int beforeBlock = enemy.getBlock();
                 enemy.takeDamage(damage);
+                int hpLost = Math.max(0, beforeHp - enemy.getHp());
+                if (gameScreen != null && gameScreen.getBattleStageUI() != null && hpLost > 0) {
+                    gameScreen.getBattleStageUI().showDamageOnEnemy(hpLost);
+                }
             }
         }
     }
@@ -496,8 +518,13 @@ public class CardStageUI {
             }
 
             if (player != null && player.isAlive() && healAmount > 0) {
+                int before = player.getHp();
                 // Instant heal on use
                 player.heal(healAmount);
+                int healed = Math.max(0, player.getHp() - before);
+                if (gameScreen != null && gameScreen.getBattleStageUI() != null && healed > 0) {
+                    gameScreen.getBattleStageUI().showHealOnPlayer(healed);
+                }
                 Gdx.app.log("CardEffect", "Healed " + healAmount + " HP using '" + card.name + "' (with multiplier)");
             }
         }

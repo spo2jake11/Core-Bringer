@@ -139,18 +139,28 @@ public class GameScreen implements Screen{
     public void activateOneTurnBuff(float multiplier) {
         cardEffectMultiplier = Math.max(1.0f, multiplier);
         showCenterMessage("Overhack Buff: x" + String.format("%.2f", cardEffectMultiplier) + " this turn", Color.GREEN, 2.0f);
+        // Show Buff status badge on player
+        if (battleStageUI != null) {
+            try { battleStageUI.setPlayerBuffBadgeVisible(true); } catch (Throwable ignored) {}
+        }
     }
     public float getCardEffectMultiplier() {
         return cardEffectMultiplier;
     }
     public void clearCardEffectMultiplier() {
         cardEffectMultiplier = 1.0f;
+        // Hide Buff status badge on player at end of turn
+        if (battleStageUI != null) {
+            try { battleStageUI.setPlayerBuffBadgeVisible(false); } catch (Throwable ignored) {}
+        }
     }
     // --- End Instakill Victory Flow ---
 
 
     // Whether this battle should use only boss enemies
     private boolean bossOnlyBattle = false;
+    // Current stage level loaded from save (1..N), used to pick enemies per level from enemies.json
+    private int stageLevelForBattle = 1;
 
     public GameScreen(Main corebringer) {
         this(corebringer, false);
@@ -165,6 +175,7 @@ public class GameScreen implements Screen{
         } catch (Exception ignored) {}
         this.corebringer = corebringer;
         this.bossOnlyBattle = bossOnly;
+        this.stageLevelForBattle = stageFromSave; // persist for JSON enemy selection and rerolls
 
         // Initialize CardParser
         cardParser = CardParser.getInstance();
@@ -210,16 +221,17 @@ public class GameScreen implements Screen{
             }
         }
 
-        // Load enemy from new JSON format: level -> common/boss pools
+        // Load enemy from JSON format: levels[] -> pick by saved stage level -> common/boss pools
         try {
             com.badlogic.gdx.files.FileHandle file = Gdx.files.internal("assets/enemies.json");
             String json = file.readString();
             com.badlogic.gdx.utils.JsonReader jsonReader = new com.badlogic.gdx.utils.JsonReader();
             com.badlogic.gdx.utils.JsonValue root = jsonReader.parse(json);
-            // For now, pick from first level; can be extended to use current map level
+            // Pick level based on saved stageLevel (1-based), clamped to available levels
             com.badlogic.gdx.utils.JsonValue levels = root.get("levels");
             if (levels != null && levels.size > 0) {
-                com.badlogic.gdx.utils.JsonValue level = levels.get(0);
+                int levelIndex = com.badlogic.gdx.math.MathUtils.clamp(stageLevelForBattle - 1, 0, levels.size - 1);
+                com.badlogic.gdx.utils.JsonValue level = levels.get(levelIndex);
                 com.badlogic.gdx.utils.JsonValue pool = bossOnlyBattle ? level.get("boss") : level.get("common");
                 if (pool != null && pool.size > 0) {
                     int idx = com.badlogic.gdx.math.MathUtils.random(pool.size - 1);
@@ -250,6 +262,10 @@ public class GameScreen implements Screen{
         ///Every stages provides a main method for them
         ///They also have local variables and objects for them to not interact with other methods
         battleStageUI = new BattleStageUI(battleStage, corebringer.testskin, corebringer.getAssets());
+        // Sync enemy image in UI with the enemy selected from enemies.json
+        if (battleStageUI != null && enemyName != null && !enemyName.isEmpty()) {
+            battleStageUI.changeEnemy(enemyName);
+        }
         // Apply stage-specific background (clamped 1..5)
         int bgStage = Math.max(1, Math.min(5, stageFromSave));
         battleStageUI.setBackgroundStage(bgStage);
@@ -337,6 +353,10 @@ public class GameScreen implements Screen{
 
     public BattleManager getBattleManager() {
         return battleManager;
+    }
+
+    public com.altf4studios.corebringer.screens.gamescreen.BattleStageUI getBattleStageUI() {
+        return battleStageUI;
     }
 
     public com.altf4studios.corebringer.screens.gamescreen.CardStageUI getCardStageUI() {
@@ -1442,10 +1462,11 @@ public class GameScreen implements Screen{
             String json = file.readString();
             com.badlogic.gdx.utils.JsonReader jsonReader = new com.badlogic.gdx.utils.JsonReader();
             com.badlogic.gdx.utils.JsonValue root = jsonReader.parse(json);
-            // Navigate: levels -> first level -> common or boss
+            // Navigate: levels -> current saved stage level -> common or boss
             com.badlogic.gdx.utils.JsonValue levels = root.get("levels");
             if (levels != null && levels.size > 0) {
-                com.badlogic.gdx.utils.JsonValue level = levels.get(0);
+                int levelIndex = com.badlogic.gdx.math.MathUtils.clamp(stageLevelForBattle - 1, 0, levels.size - 1);
+                com.badlogic.gdx.utils.JsonValue level = levels.get(levelIndex);
                 com.badlogic.gdx.utils.JsonValue pool = bossOnlyBattle ? level.get("boss") : level.get("common");
                 if (pool != null && pool.size > 0) {
                     int idx = com.badlogic.gdx.math.MathUtils.random(pool.size - 1);

@@ -29,11 +29,6 @@ public class BattleManager {
         // Progress turn timings and staged effects
         turnManager.update(deltaTime);
 
-        // Enemy AI action - REMOVED: No longer automatic, only when player ends turn
-        // if (turnManager.isEnemyTurn() && !turnManager.isDelaying()) {
-        //     turnManager.executeEnemyTurn();
-        // }
-
         // Reflect current turn state on the UI
         if (battleStageUI != null) {
             if (turnManager.isPlayerTurn()) {
@@ -71,56 +66,82 @@ public class BattleManager {
             battleStageUI.updateEnemyStatusValuesWithDuration(enemy.getBlock(), ePoisonStacks, ePoisonDur, eBleedStacks, eBleedDur, eStunTurns);
         }
 
-        // Log game over once
         if (turnManager.shouldLogGameOver()) {
-            String winner = getWinner();
+            String winner = turnManager.getWinner();
             Gdx.app.log("BattleManager", "Game Over! Winner: " + winner);
         }
-    }
-
-    public void resetTurns() {
-        turnManager.reset();
-    }
-
-    public void resetGame() {
-        turnManager.resetGame();
-    }
-
-    public boolean isGameOver() {
-        return turnManager.isGameOver();
-    }
-
-    public String getWinner() {
-        return turnManager.getWinner();
-    }
-
-    public TurnManager getTurnManager() {
-        return turnManager;
     }
 
     /**
      * Manually execute enemy turn - called when player ends their turn
      */
     public void executeEnemyTurn() {
-        if (turnManager.isEnemyTurn()) {
-            turnManager.executeEnemyTurn();
+        if (turnManager.isEnemyTurn() && enemy.isAlive() && player.isAlive()) {
+            double roll = Math.random();
+            if (roll < 0.60) { // attack
+                Gdx.app.log("TurnManager", "Enemy attacks (40%)");
+                int beforeHp = player.getHp();
+                enemy.attack(player);
+                int hpLost = Math.max(0, beforeHp - player.getHp());
+                if (battleStageUI != null && hpLost > 0) {
+                    battleStageUI.showDamageOnPlayer(hpLost);
+                }
+                turnManager.endEnemyTurn();
+            } else if (roll < 0.85) { // defend
+                Gdx.app.log("TurnManager", "Enemy defends (35%)");
+                int beforeBlock = enemy.getBlock();
+                enemy.defend();
+                int delta = Math.max(0, enemy.getBlock() - beforeBlock);
+                if (battleStageUI != null && delta > 0) {
+                    battleStageUI.showShieldOnEnemy(delta);
+                }
+                turnManager.endEnemyTurn();
+            } else { // heal
+                int healAmount = Math.max(3, enemy.getMaxHealth() / 10); // at least 3, ~10% max HP
+                Gdx.app.log("TurnManager", "Enemy heals for " + healAmount + " HP (25%)");
+                int beforeHp = enemy.getHp();
+                enemy.heal(healAmount);
+                int healed = Math.max(0, enemy.getHp() - beforeHp);
+                if (battleStageUI != null && healed > 0) {
+                    battleStageUI.showHealOnEnemy(healed);
+                }
+            }
         }
     }
+    // --- Accessors and wrappers restored for compatibility ---
+    public TurnManager getTurnManager() {
+        return turnManager;
+    }
 
+    public void resetTurns() {
+        if (turnManager != null) turnManager.reset();
+    }
+
+    public void resetGame() {
+        if (turnManager != null) turnManager.resetGame();
+    }
+
+    public boolean isGameOver() {
+        return turnManager != null && turnManager.isGameOver();
+    }
+
+    public String getWinner() {
+        return (turnManager != null) ? turnManager.getWinner() : null;
+    }
     // --- Overhack helpers ---
-    /** Instantly kill the current enemy (sets HP to 0). */
-    public void instakillEnemy() {
-        if (enemy != null && !turnManager.isGameOver()) {
-            enemy.setHp(0);
-        }
-    }
 
-    /** Ends the player's turn immediately. */
+    /**
+     * Instantly kill the current enemy (sets HP to 0).
+     */
+
+
+    /**
+     * Ends the player's turn immediately.
+     */
     public void endPlayerTurnNow() {
         if (turnManager != null && turnManager.isPlayerTurn()) {
             turnManager.endPlayerTurn();
         }
     }
 }
-
 

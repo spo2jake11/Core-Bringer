@@ -1,19 +1,144 @@
 {
+  "atlasPath": "assets/basic-characters/enemies_atlas.atlas",
   "levels": [
     {
       "level": 1,
       "common": [
-        { "name": "Experiment", "hp": 22 },
-        { "name": "Probe", "hp": 25 },
-        { "name": "Shock_slime", "hp": 28 },
-        { "name": "duckling_gun", "hp": 21 },
-        { "name": "liquid_metal", "hp": 30 },
-        { "name": "nanite", "hp": 24 },
-        { "name": "standard_slime", "hp": 27 }
+        {"name": "coral_slime",     "hp": 22},
+        {"name": "duckling_gun",    "hp": 21},
+        {"name": "liquid_metal",    "hp": 30},
+        {"name": "nanite",          "hp": 24},
+        {"name": "standard_slime",  "hp": 27},
+        {"name": "Shock_slime",     "hp": 28},
+        {"name": "Experiment",      "hp": 22},
+        {"name": "Probe",           "hp": 25},
+        {"name": "probe_turret",    "hp": 26},
+        {"name": "gleam_enchanter", "hp": 20},
+        {"name": "hermit",          "hp": 30},
+        {"name": "Mech_Slime",      "hp": 30},
+        {"name": "prism_probe",     "hp": 25},
+        {"name": "leafbug",         "hp": 20},
+        {"name": "ocean_slime",     "hp": 22},
+        {"name": "bundled_probes",  "hp": 32},
+        {"name": "madtackle",       "hp": 21},
+        {"name": "moss_gremlin",    "hp": 23}
       ],
       "boss": [
-        { "name": "Core_Sentinel", "hp": 80 },
-        { "name": "Overclocked_Golem", "hp": 90 }
+        {"name": "Ancient_slime",   "hp": 70},
+        {"name": "Ruin_Guardian",   "hp": 90},
+        {"name": "Sand_Wall",       "hp": 80}
+      ]
+    },
+    {
+      "level": 2,
+      "common": [
+        {"name": "coral_slime",     "hp": 24},
+        {"name": "duckling_gun",    "hp": 23},
+        {"name": "liquid_metal",    "hp": 33},
+        {"name": "nanite",          "hp": 26},
+        {"name": "standard_slime",  "hp": 30},
+        {"name": "Shock_slime",     "hp": 31},
+        {"name": "Experiment",      "hp": 24},
+        {"name": "Probe",           "hp": 27},
+        {"name": "probe_turret",    "hp": 29},
+        {"name": "gleam_enchanter", "hp": 22},
+        {"name": "hermit",          "hp": 33},
+        {"name": "Mech_Slime",      "hp": 33},
+        {"name": "prism_probe",     "hp": 27},
+        {"name": "leafbug",         "hp": 22},
+        {"name": "ocean_slime",     "hp": 24},
+        {"name": "bundled_probes",  "hp": 35},
+        {"name": "madtackle",       "hp": 23},
+        {"name": "moss_gremlin",    "hp": 25}
+      ],
+      "boss": [
+        {"name": "Scanner",         "hp": 70},
+        {"name": "mind_flayer",     "hp": 80},
+        {"name": "Praeton_Wyrm",    "hp": 90}
+      ]
+    },
+    {
+      "level": 3,
+      "common": [
+        {"name": "leafbug",         "hp": 24},
+        {"name": "gleam_enchanter", "hp": 24},
+        {"name": "duckling_gun",    "hp": 25},
+        {"name": "madtackle",       "hp": 25},
+        {"name": "coral_slime",     "hp": 26},
+        {"name": "Experiment",      "hp": 26},
+        {"name": "ocean_slime",     "hp": 26},
+        {"name": "moss_gremlin",    "hp": 28},
+        {"name": "nanite",          "hp": 29},
+        {"name": "Probe",           "hp": 30},
+        {"name": "prism_probe",     "hp": 30},
+        {"name": "probe_turret",    "hp": 31},
+        {"name": "standard_slime",  "hp": 32},
+        {"name": "Shock_slime",     "hp": 34},
+        {"name": "hermit",          "hp": 36},
+        {"name": "Mech_Slime",      "hp": 36},
+        {"name": "liquid_metal",    "hp": 36},
+        {"name": "bundled_probes",  "hp": 38}
+      ],
+      "boss": [
+        {"name": "Sand_Goblin",     "hp": 80},
+        {"name": "Sand_Wrym",       "hp": 90},
+        {"name": "yellow_madtackle","hp": 100}
+      ]
+    },
+    {
+      "level": 4,
+      "common": [
+        {"name": "leafbug",         "hp": 26},
+        {"name": "gleam_enchanter", "hp": 26},
+        {"name": "duckling_gun",    "hp": 27},
+        {"name": "madtackle",       "hp": 27},
+        {"name": "coral_slime",     "hp": 29},
+        {"name": "Experiment",      "hp": 29},
+        {"name": "ocean_slime",     "hp": 29},
+        {"name": "moss_gremlin",    "hp": 30},
+        {"name": "nanite",          "hp": 31},
+        {"name": "Probe",           "hp": 32},
+        {"name": "prism_probe",     "hp": 32},
+        {"name": "probe_turret",    "hp": 34},
+        {"name": "standard_slime",  "hp": 35},
+        {"name": "Shock_slime",     "hp": 36},
+        {"name": "hermit",          "hp": 39},
+        {"name": "Mech_Slime",      "hp": 39},
+        {"name": "liquid_metal",    "hp": 39},
+        {"name": "bundled_probes",  "hp": 42}
+      ],
+      "boss": [
+        {"name": "coral_hermit",    "hp": 80},
+        {"name": "gleamyfish",      "hp": 90},
+        {"name": "grand_squid",     "hp": 100}
+      ]
+    },
+    {
+      "level": 5,
+      "common": [
+        {"name": "leafbug",         "hp": 28},
+        {"name": "gleam_enchanter", "hp": 28},
+        {"name": "duckling_gun",    "hp": 29},
+        {"name": "madtackle",       "hp": 29},
+        {"name": "coral_slime",     "hp": 31},
+        {"name": "Experiment",      "hp": 31},
+        {"name": "ocean_slime",     "hp": 31},
+        {"name": "moss_gremlin",    "hp": 32},
+        {"name": "nanite",          "hp": 34},
+        {"name": "Probe",           "hp": 35},
+        {"name": "prism_probe",     "hp": 35},
+        {"name": "probe_turret",    "hp": 36},
+        {"name": "standard_slime",  "hp": 38},
+        {"name": "Shock_slime",     "hp": 39},
+        {"name": "hermit",          "hp": 42},
+        {"name": "Mech_Slime",      "hp": 42},
+        {"name": "liquid_metal",    "hp": 42},
+        {"name": "bundled_probes",  "hp": 45}
+      ],
+      "boss": [
+        {"name": "Harkness",        "hp": 100},
+        {"name": "Brine_Guardian",  "hp": 110},
+        {"name": "The_Keeper",      "hp": 120}
       ]
     }
   ]
