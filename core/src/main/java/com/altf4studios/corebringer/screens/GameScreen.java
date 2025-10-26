@@ -121,7 +121,7 @@ public class GameScreen implements Screen{
     private GLProfiler glProfiler;
     private Label perfLabel;
     private float perfTimer = 0f;
-    private boolean perfHudEnabled = true; // toggle with F3
+    private boolean perfHudEnabled = false; // off by default; toggle with F3
 
     // --- Instakill Victory Flow ---
     // When an instakill happens from CodeEditorScreen, delay victory popup by a short duration and tag it.

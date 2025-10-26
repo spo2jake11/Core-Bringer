@@ -9,6 +9,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
@@ -33,6 +34,7 @@ public class MainMenuScreen implements Screen {
     private ImageButton startbutton;
     private ImageButton optionsbutton;
     private ImageButton exitbutton;
+    private ImageButton tutorialbutton;
     private int debugclickingcount;
     private Label magicword;
     private boolean isDebugMessageInvisible = false;
@@ -82,10 +84,14 @@ public class MainMenuScreen implements Screen {
         startbutton.getImage().setScaling(Scaling.stretch);
         optionsbutton.getImage().setScaling(Scaling.stretch);
         exitbutton.getImage().setScaling(Scaling.stretch);
+        // Tutorial uses a simple TextButton styled by skin
+        TextureRegionDrawable tutorialRegion = new TextureRegionDrawable(new TextureRegion(new Texture(Gdx.files.internal("assets/h2pbtn.png"))));
+        tutorialbutton = new ImageButton(tutorialRegion);
 
         ///Game Start and Options Table calling
         gamestartandnavigationtable.add(startbutton).width(250f).height(50f).pad(10f).row();
         gamestartandnavigationtable.add(optionsbutton).width(250f).height(50f).pad(10f).row();
+        gamestartandnavigationtable.add(tutorialbutton).width(250f).height(50f).pad(10f).row();
         gamestartandnavigationtable.add(exitbutton).width(250f).height(50f).pad(10f).row();
 
 
@@ -108,6 +114,14 @@ public class MainMenuScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.app.exit();
+            }
+        });
+
+        ///This gives function to the Tutorial Button
+        tutorialbutton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                corebringer.showTutorial();
             }
         });
 

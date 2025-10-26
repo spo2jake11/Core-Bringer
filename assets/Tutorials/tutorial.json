@@ -1,0 +1,59 @@
+{
+	"battle": {
+		"location": "assets/Tutorials/Battle",
+		"pages": {
+			"1": "battle1.png",
+			"2": "battle2.png",
+			"3": "battle3.png",
+			"4": "battle4.png",
+			"5": "battle5.png",
+			"6": "battle6.png",
+			"7": "battle7.png",
+			"8": "battle8.png",
+			"9": "battle9.png",
+			"10": "battle10.png",
+			"11": "battle11.png"
+		}
+	},
+	"coding": {
+		"location": "assets/Tutorials/Coding",
+		"pages": {
+			"1": "coding1.png",
+			"2": "coding2.png",
+			"3": "coding3.png",
+			"4": "coding4.png",
+			"5": "coding5.png",
+			"6": "coding6.png",
+			"7": "coding7.png"
+		}
+	},
+	"map": {
+		"location": "assets/Tutorials/Map",
+		"pages": {
+			"1": "map1.png",
+			"2": "map2.png",
+			"3": "map3.png",
+			"4": "map4.png",
+			"5": "map5.png",
+			"6": "map6.png"
+		}
+	},
+	"merchant": {
+		"location": "assets/Tutorials/Merchant",
+		"pages": {
+			"1": "merchant1.png",
+			"2": "merchant2.png",
+			"3": "merchant3.png",
+			"4": "merchant4.png",
+			"5": "merchant5.png"
+		}
+	},
+	"rest": {
+		"location": "assets/Tutorials/Rest",
+		"pages": {
+			"1": "rest1.png",
+			"2": "rest2.png",
+			"3": "rest3.png"
+		}
+	}
+}

@@ -50,6 +50,7 @@ public class Main extends Game {
     public TreasurePuzzleScreen treasurePuzzleScreen;
     public RestScreen restScreen;
     public AcidFloorEventScreen acidFloorEventScreen;
+    public TutorialScreen tutorialScreen;
     public SampleCardHandler selecteddebugcard;
     private AssetManager assetManager;
     // OPTIMIZED: JShell lazy-loaded (was 20-50MB at startup)
@@ -100,6 +101,7 @@ public class Main extends Game {
         cardTestScren = null;
         merchantScreen = null;
         restScreen = null;
+        tutorialScreen = null;
         // Lazily create GameScreen when a map node is clicked
         gameScreen = null;
         gameMapScreen = null;
@@ -539,6 +541,13 @@ public class Main extends Game {
         setScreen(treasurePuzzleScreen);
     }
 
+    public void showTutorial() {
+        if (tutorialScreen == null) {
+            tutorialScreen = new TutorialScreen(this);
+        }
+        setScreen(tutorialScreen);
+    }
+
     // Helper method to dispose screens not currently in use
     private void disposeNonEssentialScreens(Screen keepScreen) {
         // Dispose debug/test screens
@@ -638,6 +647,17 @@ public class Main extends Game {
                 Gdx.app.error("Main", "Error disposing TreasurePuzzleScreen: " + e.getMessage());
             }
             treasurePuzzleScreen = null;
+        }
+
+        // Dispose TutorialScreen
+        if (tutorialScreen != null) {
+            try {
+                tutorialScreen.dispose();
+                Gdx.app.log("Main", "Disposed TutorialScreen");
+            } catch (Exception e) {
+                Gdx.app.error("Main", "Error disposing TutorialScreen: " + e.getMessage());
+            }
+            tutorialScreen = null;
         }
 
         // Dispose AcidFloorEventScreen
