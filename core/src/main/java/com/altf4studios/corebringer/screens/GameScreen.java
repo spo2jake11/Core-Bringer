@@ -1108,8 +1108,6 @@ public class GameScreen implements Screen{
             SimpleSaveManager.deleteSave();
             // Switch screen
             corebringer.showMainMenu();
-            // Transfer input ownership to the next screen before disposing
-            corebringer.clearInputProcessors();
             // Clear the tag so subsequent games are clean
             instakillTag = null;
             // Dispose all screens except MainMenuScreen
@@ -1346,7 +1344,7 @@ public class GameScreen implements Screen{
             // Delete save file on completion
             SimpleSaveManager.deleteSave();
             // Transfer input ownership to the next screen before disposing
-            corebringer.clearInputProcessors();
+
             // Dispose all screens except MainMenuScreen
             corebringer.disposeAllScreensExceptMainMenu();
             // Switch screen
