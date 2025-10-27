@@ -57,6 +57,9 @@ public class Main extends Game {
     private JShell jshell;
     private ByteArrayOutputStream jshellOutputStream;
     private InputMultiplexer globalMultiplexer = new InputMultiplexer();
+    // Track fade tasks to prevent overlapping transitions
+    private com.badlogic.gdx.utils.Timer.Task fadeOutTask;
+    private com.badlogic.gdx.utils.Timer.Task fadeInTask;
 
     @Override
     public void create() {
@@ -129,41 +132,29 @@ public class Main extends Game {
         // If same music is already playing, don't reload
         if (currentMusicType != null && currentMusicType.equals(musicType)) {
             if (currentlyPlayingMusic != null && currentlyPlayingMusic.isPlaying()) {
-                // Update backward compatibility references
                 updateBackwardCompatibilityRefs();
                 return;
             }
+        }
+
+        // Cancel any in-flight fade tasks to avoid overlap
+        cancelMusicTransitions();
+
+        // Stop and dispose any currently playing music immediately to prevent overlap
+        if (currentlyPlayingMusic != null) {
+            try { currentlyPlayingMusic.stop(); } catch (Exception ignored) {}
+            try { currentlyPlayingMusic.dispose(); } catch (Exception ignored) {}
+            currentlyPlayingMusic = null;
+            currentMusicType = null;
+            updateBackwardCompatibilityRefs();
         }
 
         // Get the new music path
         String musicPath = getMusicPath(musicType);
         if (musicPath == null) return;
 
-        // If there's currently playing music, fade it out then switch
-        if (currentlyPlayingMusic != null && currentlyPlayingMusic.isPlaying()) {
-            final Music oldMusic = currentlyPlayingMusic;
-            final String newMusicPath = musicPath;
-            final String newMusicType = musicType;
-
-            Gdx.app.log("Main", "Fading out current music (" + currentMusicType + ") over " + fadeDuration + "s");
-
-            // Fade out current music, then load new music
-            fadeOutMusic(oldMusic, fadeDuration, () -> {
-                // Dispose old music
-                try {
-                    oldMusic.dispose();
-                    Gdx.app.log("Main", "Disposed previous music after fade out");
-                } catch (Exception e) {
-                    Gdx.app.error("Main", "Error disposing old music: " + e.getMessage());
-                }
-
-                // Load and fade in new music
-                loadAndFadeInMusic(newMusicPath, newMusicType, fadeDuration);
-            });
-        } else {
-            // No current music, just load and fade in new music
-            loadAndFadeInMusic(musicPath, musicType, fadeDuration);
-        }
+        // Load and fade in new music (no parallel old music)
+        loadAndFadeInMusic(musicPath, musicType, fadeDuration);
     }
 
     // Helper method to load and fade in new music
@@ -321,7 +312,9 @@ public class Main extends Game {
         final float initialVolume = targetMusic.getVolume();
         final int steps = 20;
         final float stepTime = duration / steps;
-        Timer.schedule(new Timer.Task() {
+        // Cancel any existing fade-out task and create a new one we can cancel later
+        if (fadeOutTask != null) { try { fadeOutTask.cancel(); } catch (Exception ignored) {} }
+        fadeOutTask = new Timer.Task() {
             int currentStep = 0;
             @Override
             public void run() {
@@ -340,11 +333,14 @@ public class Main extends Game {
                     if (targetMusic != null) {
                         targetMusic.setVolume(target);
                     }
+                    // Clear task reference
+                    fadeOutTask = null;
                     if (afterFade != null) afterFade.run();
                     this.cancel();
                 }
             }
-        }, 0, stepTime, steps);
+        };
+        Timer.schedule(fadeOutTask, 0, stepTime, steps);
     }
 
     // Fade in the given music over duration (seconds)
@@ -360,7 +356,9 @@ public class Main extends Game {
         targetMusic.play();
         final int steps = 20;
         final float stepTime = duration / steps;
-        Timer.schedule(new Timer.Task() {
+        // Cancel any existing fade-in task and create a new one we can cancel later
+        if (fadeInTask != null) { try { fadeInTask.cancel(); } catch (Exception ignored) {} }
+        fadeInTask = new Timer.Task() {
             int currentStep = 0;
             @Override
             public void run() {
@@ -373,10 +371,19 @@ public class Main extends Game {
                     if (targetMusic != null) {
                         targetMusic.setVolume(targetVolume);
                     }
+                    // Clear task reference
+                    fadeInTask = null;
                     this.cancel();
                 }
             }
-        }, 0, stepTime, steps);
+        };
+        Timer.schedule(fadeInTask, 0, stepTime, steps);
+    }
+
+    // Helper to cancel any running fade transitions to prevent overlap
+    private void cancelMusicTransitions() {
+        try { if (fadeOutTask != null) { fadeOutTask.cancel(); fadeOutTask = null; } } catch (Exception ignored) {}
+        try { if (fadeInTask != null) { fadeInTask.cancel(); fadeInTask = null; } } catch (Exception ignored) {}
     }
 
     @Override public void pause() {

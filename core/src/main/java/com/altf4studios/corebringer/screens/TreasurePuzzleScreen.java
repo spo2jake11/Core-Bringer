@@ -106,22 +106,22 @@ public class TreasurePuzzleScreen implements Screen {
     }
 
     private void loadTextures() {
-        bgTexture = new Texture(Utils.getInternalPath("Puzzle/woodThemeBG.png"));
-        qTexture = new Texture(Utils.getInternalPath("Puzzle/QuestionMark.png"));
-        mulTexture = new Texture(Utils.getInternalPath("Puzzle/x.png"));
-        divTexture = new Texture(Utils.getInternalPath("Puzzle/divisionSign.png"));
-        plusTexture = new Texture(Utils.getInternalPath("Puzzle/plusSign.png"));
-        subTexture = new Texture(Utils.getInternalPath("Puzzle/subtractionSign.png"));
-        equalsTexture = new Texture(Utils.getInternalPath("Puzzle/equalSign.png"));
-        chestClosedTexture = new Texture(Utils.getInternalPath("Puzzle/closedTreasureChest.png"));
-        chestOpenTexture = new Texture(Utils.getInternalPath("Puzzle/openTreasureChest.png"));
-        congratulationsTexture = new Texture(Utils.getInternalPath("Puzzle/Congratulations.png"));
+        bgTexture = new Texture(Utils.getInternalPath("assets/Puzzle/woodThemeBG.png"));
+        qTexture = new Texture(Utils.getInternalPath("assets/Puzzle/QuestionMark.png"));
+        mulTexture = new Texture(Utils.getInternalPath("assets/Puzzle/x.png"));
+        divTexture = new Texture(Utils.getInternalPath("assets/Puzzle/divisionSign.png"));
+        plusTexture = new Texture(Utils.getInternalPath("assets/Puzzle/plusSign.png"));
+        subTexture = new Texture(Utils.getInternalPath("assets/Puzzle/subtractionSign.png"));
+        equalsTexture = new Texture(Utils.getInternalPath("assets/Puzzle/equalSign.png"));
+        chestClosedTexture = new Texture(Utils.getInternalPath("assets/Puzzle/closedTreasureChest.png"));
+        chestOpenTexture = new Texture(Utils.getInternalPath("assets/Puzzle/openTreasureChest.png"));
+        congratulationsTexture = new Texture(Utils.getInternalPath("assets/Puzzle/Congratulations.png"));
         
         // Load number textures based on current puzzle
-        n1Texture = new Texture(Utils.getInternalPath("Puzzle/" + currentPuzzle.num1 + ".png"));
-        n2Texture = new Texture(Utils.getInternalPath("Puzzle/" + currentPuzzle.num2 + ".png"));
-        n3Texture = new Texture(Utils.getInternalPath("Puzzle/" + currentPuzzle.num3 + ".png"));
-        targetTexture = new Texture(Utils.getInternalPath("Puzzle/" + currentPuzzle.target + ".png"));
+        n1Texture = new Texture(Utils.getInternalPath("assets/Puzzle/" + currentPuzzle.num1 + ".png"));
+        n2Texture = new Texture(Utils.getInternalPath("assets/Puzzle/" + currentPuzzle.num2 + ".png"));
+        n3Texture = new Texture(Utils.getInternalPath("assets/Puzzle/" + currentPuzzle.num3 + ".png"));
+        targetTexture = new Texture(Utils.getInternalPath("assets/Puzzle/" + currentPuzzle.target + ".png"));
     }
 
     private void buildUI() {

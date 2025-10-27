@@ -111,18 +111,18 @@ public class PuzzleScreen implements Screen {
     }
 
     private void loadTextures() {
-        input1Texture = new Texture(Utils.getInternalPath("Puzzle/1.png"));
-        input0Texture = new Texture(Utils.getInternalPath("Puzzle/0.png"));
-        questionMarkTexture = new Texture(Utils.getInternalPath("Puzzle/Questionmark.png"));
-        andTexture = new Texture(Utils.getInternalPath("Puzzle/&&.png"));
-        orTexture = new Texture(Utils.getInternalPath("Puzzle/OR.png"));
-        xorTexture = new Texture(Utils.getInternalPath("Puzzle/^.png"));
-        notTexture = new Texture(Utils.getInternalPath("Puzzle/!.png"));
-        cubePlainTexture = new Texture(Utils.getInternalPath("Puzzle/cubePlain.png"));
-        cubeGreenTexture = new Texture(Utils.getInternalPath("Puzzle/cubeGreen.png"));
-        cubeRedTexture = new Texture(Utils.getInternalPath("Puzzle/cubeRed.png"));
-        backgroundTexture = new Texture(Utils.getInternalPath("Puzzle/stonePuzzleBG.png"));
-        congratulationsTexture = new Texture(Utils.getInternalPath("Puzzle/Congratulations.png"));
+        input1Texture = new Texture(Utils.getInternalPath("assets/Puzzle/1.png"));
+        input0Texture = new Texture(Utils.getInternalPath("assets/Puzzle/0.png"));
+        questionMarkTexture = new Texture(Utils.getInternalPath("assets/Puzzle/QuestionMark.png"));
+        andTexture = new Texture(Utils.getInternalPath("assets/Puzzle/&&.png"));
+        orTexture = new Texture(Utils.getInternalPath("assets/Puzzle/OR.png"));
+        xorTexture = new Texture(Utils.getInternalPath("assets/Puzzle/^.png"));
+        notTexture = new Texture(Utils.getInternalPath("assets/Puzzle/!.png"));
+        cubePlainTexture = new Texture(Utils.getInternalPath("assets/Puzzle/cubePlain.png"));
+        cubeGreenTexture = new Texture(Utils.getInternalPath("assets/Puzzle/cubeGreen.png"));
+        cubeRedTexture = new Texture(Utils.getInternalPath("assets/Puzzle/cubeRed.png"));
+        backgroundTexture = new Texture(Utils.getInternalPath("assets/Puzzle/stonePuzzleBG.png"));
+        congratulationsTexture = new Texture(Utils.getInternalPath("assets/Puzzle/Congratulations.png"));
     }
 
     private void initializeUI() {

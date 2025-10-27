@@ -299,6 +299,7 @@ com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
         buttonDisabled: { name: rect, color: disabled },
         buttonChecked: { name: rect, color: checked },
         buttonCheckedOver: { name: rect, color: checkedOver },
+        buttonHoverWhite: { name: rect, color: white },
         checkBoxOn: { name: check-on, color: up },
         checkBoxOff: { name: check, color: up },
         checkBoxOver: { name: check, color: over },
@@ -404,15 +405,15 @@ com.badlogic.gdx.scenes.scene2d.ui.Window$WindowStyle: {
         default-horizontal: { handle: splitPane }
     },
     com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle: {
-        default: { up: buttonUp, over: buttonOver, down: buttonDown, disabled: buttonDisabled, font: default, fontColor: font,
-            overFontColor: fontOver, downFontColor: fontDown, disabledFontColor: fontDisabled, pressedOffsetY: -1, pressedOffsetX: 1 },
-        toggle: { up: buttonUp, over: buttonOver, down: buttonDown, checked: buttonChecked, checkedOver: buttonCheckedOver,
-            disabled: buttonDisabled, font: default, fontColor: font, overFontColor: fontOver, downFontColor: fontDown, disabledFontColor:
-            fontDisabled, checkedFontColor: fontChecked, checkedOverFontColor: fontCheckedOver, pressedOffsetY: -1, pressedOffsetX: 1 },
-        text: { font: default, fontColor: up, overFontColor: over, downFontColor: down, disabledFontColor: disabled,
+        default: { up: buttonUp, over: buttonHoverWhite, down: buttonDown, disabled: buttonDisabled, font: default, fontColor: font,
+            overFontColor: black, downFontColor: fontDown, disabledFontColor: fontDisabled, pressedOffsetY: -1, pressedOffsetX: 1 },
+        toggle: { up: buttonUp, over: buttonHoverWhite, down: buttonDown, checked: buttonChecked, checkedOver: buttonHoverWhite,
+            disabled: buttonDisabled, font: default, fontColor: font, overFontColor: black, downFontColor: fontDown, disabledFontColor:
+            fontDisabled, checkedFontColor: fontChecked, checkedOverFontColor: black, pressedOffsetY: -1, pressedOffsetX: 1 },
+        text: { font: default, fontColor: up, overFontColor: black, downFontColor: down, disabledFontColor: disabled,
             pressedOffsetY: -1, pressedOffsetX: 1 },
-        textToggle: { font: default, fontColor: up, overFontColor: over, downFontColor: down, disabledFontColor:
-        disabled, checkedFontColor: font, checkedOverFontColor: fontOver, pressedOffsetY: -1, pressedOffsetX: 1 }
+        textToggle: { font: default, fontColor: up, overFontColor: black, downFontColor: down, disabledFontColor:
+        disabled, checkedFontColor: font, checkedOverFontColor: black, pressedOffsetY: -1, pressedOffsetX: 1 }
     },
     com.badlogic.gdx.scenes.scene2d.ui.TextField$TextFieldStyle: {
         default: { font: default, messageFont: default, fontColor: font, focusedFontColor: fontOver, disabledFontColor: fontDisabled,
