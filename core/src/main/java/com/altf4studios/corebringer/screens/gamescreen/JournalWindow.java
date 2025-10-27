@@ -44,6 +44,7 @@ public class JournalWindow extends Window {
         buttonTable.defaults().pad(20).padLeft(leftPadding).width(buttonWidth).height(buttonHeight);
 
         TextButton btnVariables = new TextButton("Variables & Data Types", skin);
+        TextButton btnConditionals = new TextButton("Conditionals", skin);
         TextButton btnLoops = new TextButton("Loops", skin);
         TextButton btnOOP = new TextButton("OOP", skin);
         TextButton btnArrays = new TextButton("Arrays & Collections", skin);
@@ -52,6 +53,7 @@ public class JournalWindow extends Window {
         TextButton btnClose = new TextButton("Close Journal", skin);
 
         btnVariables.setColor(0.8f, 0.9f, 1.0f, 1.0f);
+        btnConditionals.setColor(0.8f, 0.9f, 1.0f, 1.0f);
         btnLoops.setColor(0.8f, 0.9f, 1.0f, 1.0f);
         btnOOP.setColor(0.8f, 0.9f, 1.0f, 1.0f);
         btnArrays.setColor(0.8f, 0.9f, 1.0f, 1.0f);
@@ -60,6 +62,7 @@ public class JournalWindow extends Window {
         btnClose.setColor(1.0f, 0.7f, 0.7f, 1.0f);
 
         buttonTable.add(btnVariables).row();
+        buttonTable.add(btnConditionals).row();
         buttonTable.add(btnLoops).row();
         buttonTable.add(btnOOP).row();
         buttonTable.add(btnArrays).row();
@@ -140,6 +143,93 @@ public class JournalWindow extends Window {
                     " "+"       int level;\n" +
                     " "+"       System.out.println(level); // ERROR: variable not initialized\n\n" +
                     " "+"Remember: clear naming and correct data types help prevent bugs!";
+                tutorialContent.setText(content);
+            }
+        });
+        btnConditionals.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                String content = " "+"CONDITIONALS IN JAVA\n" +
+                    "===================\n\n" +
+                    " "+"Conditionals allow your program to make decisions and execute different code paths based on conditions.\n\n" +
+                    " "+"IF STATEMENT:\n" +
+                    " "+"  if (condition) {\n" +
+                    " "+"      // code to execute if condition is true\n" +
+                    " "+"  }\n\n" +
+                    " "+"IF-ELSE STATEMENT:\n" +
+                    " "+"  if (condition) {\n" +
+                    " "+"      // code if true\n" +
+                    " "+"  } else {\n" +
+                    " "+"      // code if false\n" +
+                    " "+"  }\n\n" +
+                    " "+"IF-ELSE IF-ELSE STATEMENT:\n" +
+                    " "+"  if (score >= 90) {\n" +
+                    " "+"      System.out.println(\"Grade: A\");\n" +
+                    " "+"  } else if (score >= 80) {\n" +
+                    " "+"      System.out.println(\"Grade: B\");\n" +
+                    " "+"  } else if (score >= 70) {\n" +
+                    " "+"      System.out.println(\"Grade: C\");\n" +
+                    " "+"  } else {\n" +
+                    " "+"      System.out.println(\"Grade: F\");\n" +
+                    " "+"  }\n\n" +
+                    " "+"SWITCH STATEMENT:\n" +
+                    " "+"  switch (day) {\n" +
+                    " "+"      case 1: System.out.println(\"Monday\"); break;\n" +
+                    " "+"      case 2: System.out.println(\"Tuesday\"); break;\n" +
+                    " "+"      case 3: System.out.println(\"Wednesday\"); break;\n" +
+                    " "+"      default: System.out.println(\"Invalid day\"); break;\n" +
+                    " "+"  }\n\n" +
+                    " "+"TERNARY OPERATOR:\n" +
+                    " "+"  String result = (age >= 18) ? \"Adult\" : \"Minor\";\n\n" +
+                    " "+"COMPARISON OPERATORS:\n" +
+                    " "+"  ==  equals\n" +
+                    " "+"  !=  not equals\n" +
+                    " "+"  >   greater than\n" +
+                    " "+"  <   less than\n" +
+                    " "+"  >=  greater than or equal\n" +
+                    " "+"  <=  less than or equal\n\n" +
+                    " "+"LOGICAL OPERATORS:\n" +
+                    " "+"  &&  AND - both conditions must be true\n" +
+                    " "+"  ||  OR  - at least one condition must be true\n" +
+                    " "+"  !   NOT - reverses the boolean value\n\n" +
+                    " "+"DO's AND DON'Ts:\n" +
+                    " "+" DO:\n" +
+                    " "+"  ✔ Always use braces {} for if statements, even with single statements.\n" +
+                    " "+"     Example:\n" +
+                    " "+"       if (x > 0) { System.out.println(\"Positive\"); }\n\n" +
+                    " "+"  ✔ Use meaningful variable names in conditions.\n" +
+                    " "+"     Example:\n" +
+                    " "+"       if (isPlayerAlive) { ... }\n\n" +
+                    " "+"  ✔ Use 'break' in switch statements to prevent fall-through.\n" +
+                    " "+"     Example:\n" +
+                    " "+"       case 1: doSomething(); break;\n\n" +
+                    " "+"  ✔ Use else-if for multiple exclusive conditions.\n" +
+                    " "+"     Example:\n" +
+                    " "+"       if (x > 10) { } else if (x > 5) { } else { }\n\n" +
+                    " "+" DON'T:\n" +
+                    " "+"  ✘ Use == to compare strings (use .equals() instead).\n" +
+                    " "+"     Example:\n" +
+                    " "+"       String name = \"John\";\n" +
+                    " "+"       if (name == \"John\") // ERROR: compares references, not values\n" +
+                    " "+"       if (name.equals(\"John\")) // CORRECT: compares values\n\n" +
+                    " "+"  ✘ Forget curly braces, which can cause unexpected behavior.\n" +
+                    " "+"     Example:\n" +
+                    " "+"       if (x > 0)\n" +
+                    " "+"           System.out.println(\"Positive\");\n" +
+                    " "+"       System.out.println(\"Always prints\"); // Always executes!\n\n" +
+                    " "+"  ✘ Use assignment (=) instead of comparison (==).\n" +
+                    " "+"     Example:\n" +
+                    " "+"       if (x = 5) // ERROR: assigns 5 to x, not comparison\n" +
+                    " "+"       if (x == 5) // CORRECT: compares x with 5\n\n" +
+                    " "+"  ✘ Nest too many if-else statements (use switch or methods instead).\n" +
+                    " "+"     Example:\n" +
+                    " "+"       if (x == 1) { } else if (x == 2) { ... } // Too many else-ifs\n\n" +
+                    " "+"  ✘ Forget to handle all cases in switch statements.\n" +
+                    " "+"     Example:\n" +
+                    " "+"       switch (x) {\n" +
+                    " "+"           case 1: break; // Missing default case\n" +
+                    " "+"       }\n\n" +
+                    " "+"Remember: Conditionals control the flow of your program, so use them wisely!";
                 tutorialContent.setText(content);
             }
         });

@@ -36,7 +36,6 @@ public class PuzzleScreen implements Screen {
     private Image congratulationsImage;
     private Label rewardLabel;
     private TextButton backButton;
-    private TextButton makeOneButton;
 
     // Puzzle state for single expression
     private boolean[] inputs; // 4 inputs
@@ -83,31 +82,6 @@ public class PuzzleScreen implements Screen {
             case 2: return xorTexture;
             default: return questionMarkTexture;
         }
-    }
-
-    private void solveForOne() {
-        // Try all 16 combinations to find one that evaluates to true
-        for (int mask = 0; mask < 16; mask++) {
-            // Apply combination to inputs
-            for (int i = 0; i < 4; i++) {
-                boolean bit = ((mask >> i) & 1) == 1;
-                inputs[i] = bit;
-                isQuestionMark[i] = false;
-                inputImages[i].setDrawable(new TextureRegionDrawable(bit ? input1Texture : input0Texture));
-            }
-            boolean result = evaluateExpression();
-            if (result) {
-                updateResult();
-                return;
-            }
-        }
-        // If no solution found (shouldn't happen for OR present), just set all 1s
-        for (int i = 0; i < 4; i++) {
-            inputs[i] = true;
-            isQuestionMark[i] = false;
-            inputImages[i].setDrawable(new TextureRegionDrawable(input1Texture));
-        }
-        updateResult();
     }
 
     private void loadTextures() {
@@ -157,9 +131,9 @@ public class PuzzleScreen implements Screen {
         resultCubeImage = new Image(cubePlainTexture);
 
         // Create labels
-        instructionLabel = new Label("Operators randomized. Toggle inputs to reach: ? op ? op ? op ? = Cube (or press Make 1)", corebringer.testskin);
+        instructionLabel = new Label("INSTRUCTION: Click on the input boxes to toggle between 0, 1, or ?\nMake the expression evaluate to 1 (green cube) to solve the puzzle!", corebringer.testskin);
         instructionLabel.setColor(Color.WHITE);
-        instructionLabel.setFontScale(1.2f);
+        instructionLabel.setFontScale(1.8f);
 
         expressionLabel = new Label("", corebringer.testskin);
         expressionLabel.setColor(Color.YELLOW);
@@ -175,7 +149,7 @@ public class PuzzleScreen implements Screen {
         legendLabel.setFontScale(1.0f);
 
         // Create reward label
-        rewardLabel = new Label("Reward: +40 Gold, +15 HP", corebringer.testskin);
+        rewardLabel = new Label("Reward: +50 Gold", corebringer.testskin);
         rewardLabel.setColor(Color.GOLD);
         rewardLabel.setFontScale(1.5f);
         rewardLabel.setVisible(false);
@@ -186,8 +160,6 @@ public class PuzzleScreen implements Screen {
 
         // Create back button
         backButton = new TextButton("Back to Map", corebringer.testskin);
-        // Create make-one button
-        makeOneButton = new TextButton("Make 1", corebringer.testskin);
 
         // Setup input listeners
         setupInputToggleListeners();
@@ -204,12 +176,6 @@ public class PuzzleScreen implements Screen {
                     try { corebringer.gameMapScreen.advanceToNextRank(); } catch (Exception ignored) {}
                 }
                 corebringer.setScreen(corebringer.gameMapScreen);
-            }
-        });
-        makeOneButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                solveForOne();
             }
         });
     }
@@ -447,8 +413,6 @@ public class PuzzleScreen implements Screen {
 
         // Add puzzle table to main table
         mainTable.add(puzzleTable).center().row();
-        // Add Make 1 button below puzzle
-        mainTable.add(makeOneButton).padTop(15f).center();
 
         // Add back button to upper left corner
         backButton.setPosition(20f, puzzleStage.getHeight() - backButton.getHeight() - 20f);

@@ -45,6 +45,7 @@ public class TreasurePuzzleScreen implements Screen {
     private Image congratulationsImage;
     private Image subtractionImg;
     private Label rewardLabel;
+    private Label instructionLabel;
 
 
     private Texture subTexture;
@@ -147,6 +148,11 @@ public class TreasurePuzzleScreen implements Screen {
         topBar.add(titleLabel).expandX().left().pad(15f);
         topBar.add(backButton).right().pad(15f);
 
+        // Create instruction label
+        instructionLabel = new Label("INSTRUCTION: Click on the operator boxes (?) to change them!\nCycle through: ? → × → ÷ → + → -\nSelect the correct operators to make the expression equal the target number.", corebringer.testskin);
+        instructionLabel.setColor(Color.WHITE);
+        instructionLabel.setFontScale(1.8f);
+
         // Expression row: num1 op num2 op num3 = target   [chest]
         num1Img = new Image(n1Texture);
         num2Img = new Image(n2Texture);
@@ -178,7 +184,7 @@ public class TreasurePuzzleScreen implements Screen {
         congratulationsImage.setVisible(false);
         
         // Create reward label
-        rewardLabel = new Label("Reward: +40 Gold, +15 HP", corebringer.testskin);
+        rewardLabel = new Label("Reward: +50 Gold", corebringer.testskin);
         rewardLabel.setColor(Color.GOLD);
         rewardLabel.setFontScale(1.5f);
         rewardLabel.setVisible(false);
@@ -206,6 +212,7 @@ public class TreasurePuzzleScreen implements Screen {
 
         root.top();
         root.add(topBar).growX().row();
+        root.add(instructionLabel).padTop(15f).row();
         root.add(content).expand().center();
 
         updateChest();
