@@ -805,16 +805,15 @@
                     "needs:if",
                     "needs:print",
                     "comparison:==",
-                    "var:typedPassword",
-                    "var:password",
-                    "literal:09112001"
+                    "var:anotherPassword",
+                    "var:password"
                 ],
                 "chance": 0.5
             },
             {
                 "id": 208,
                 "isSolve": 0,
-                "questions": "Create a conditional statement that prints true or false after validating the logical expression a > b && c < a where a contains an int value of 10, b contains an int value of 15 and c contains an int value of 5.",
+                "questions": "Create a conditional statement that prints true or false after validating the logical expression a > b && c < a.",
                 "keyPoints": [
                     "needs:int:3",
                     "needs:logical_and",
@@ -824,27 +823,20 @@
                     "var:b",
                     "var:c",
                     "comparison:>",
-                    "comparison:<",
-                    "literal:10",
-                    "literal:15",
-                    "literal:5"
+                    "comparison:<"
                 ],
                 "chance": 0.45
             },
             {
                 "id": 209,
                 "isSolve": 0,
-                "questions": "Declare random numbers and store it in int variables named firstNumber and secondNumber then subtract the two numbers and store the answer in an int variable called difference before creating a condition that prints 'Number is positive' if the difference is positive, 'Number is negative.' if the difference is negative and 'Number is zero.' if the difference is zero.",
+                "questions": "Declare random numbers, subtract the two numbers then create a condition that prints 'Number is positive' if the difference is positive, 'Number is negative.' if the difference is negative and 'Number is zero.' if the difference is zero.",
                 "keyPoints": [
-                    "needs:int:3",
                     "op:sub",
                     "needs:if",
                     "needs:else_if",
                     "needs:else",
                     "needs:print",
-                    "var:firstNumber",
-                    "var:secondNumber",
-                    "var:difference",
                     "literal:Number is positive",
                     "literal:Number is negative.",
                     "literal:Number is zero."

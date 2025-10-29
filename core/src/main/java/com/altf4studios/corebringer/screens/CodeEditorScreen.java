@@ -46,6 +46,9 @@ public class CodeEditorScreen implements Screen {
     private Label questionLabel;
     private Label keyPointsLabel;
     private boolean showHints = true;
+    private ScrollPane questionPane;
+    private com.badlogic.gdx.scenes.scene2d.ui.Cell<?> questionPaneCell;
+    private Table rootTable;
 
     private QuestionnaireManager.Question currentQ;
     private final CodeEvaluationService evaluator = new CodeEvaluationService();
@@ -75,7 +78,7 @@ public class CodeEditorScreen implements Screen {
 
     private void loadQuestions() {
         localQuestions = null;
-        
+
         // Read stageLevel from save data (default to 1 if not found)
         int stageLevel = 1;
         try {
@@ -87,7 +90,7 @@ public class CodeEditorScreen implements Screen {
         } catch (Exception ex) {
             Gdx.app.log("CodeEditorScreen", "Could not load stageLevel from save, defaulting to 1: " + ex.getMessage());
         }
-        
+
         // Attempt 1: Utils internal JSON with level
         try {
             com.badlogic.gdx.files.FileHandle fh = Utils.getInternalPath("assets/questionnaire.json");
@@ -133,12 +136,12 @@ public class CodeEditorScreen implements Screen {
                 Gdx.app.log("CodeEditorScreen", "Attempting local JSON parse for level " + stageLevel + ": " + src.path() + ", exists=" + src.exists());
                 JsonReader reader = new JsonReader();
                 JsonValue root = reader.parse(src);
-                
+
                 // Try to load from levelX key (e.g., level1, level2, level3)
                 String levelKey = "level" + stageLevel;
                 JsonValue levelNode = root.get(levelKey);
                 JsonValue qArr = null;
-                
+
                 if (levelNode != null) {
                     qArr = levelNode.get("questionArray");
                 } else {
@@ -146,7 +149,7 @@ public class CodeEditorScreen implements Screen {
                     qArr = root.get("questions");
                     if (qArr == null) qArr = root.get("questionArray");
                 }
-                
+
                 if (qArr != null && qArr.isArray()) {
                     localQuestions = new Array<>();
                     for (JsonValue it = qArr.child; it != null; it = it.next) {
@@ -248,9 +251,15 @@ public class CodeEditorScreen implements Screen {
         qContainer.add(questionLabel).expandX().fillX().padBottom(6).row();
         qContainer.add(keyPointsLabel).expandX().fillX();
 
-        ScrollPane questionPane = new ScrollPane(qContainer, skin);
+        questionPane = new ScrollPane(qContainer, skin);
         questionPane.setFadeScrollBars(false);
-        questionTable.add(questionPane).expand().fill().padLeft(5);
+        // Make sure the question panel is vertically scrollable and behaves consistently
+        questionPane.setOverscroll(false, false);
+        questionPane.setScrollingDisabled(true, false); // disable horizontal, enable vertical
+        questionPane.setSmoothScrolling(true);
+        questionPaneCell = questionTable.add(questionPane).expandX().fillX().height(Gdx.graphics.getHeight() * 0.7f).padLeft(5);
+        // Spacer to consume remaining vertical space so the question pane stays at ~70% height, aligned top
+        questionTable.add().expandY().fillY();
 
         // Code editor panel
         codeInputArea = new TextArea("// Type your solution here\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println(\"\");\n    }\n}\n", skin);
@@ -361,11 +370,11 @@ public class CodeEditorScreen implements Screen {
         right.add(btnToggleHints).padTop(10).left().row();
         // Energy gain button removed
 
-        // Layout root using a SplitPane to enforce 35% (left) / 65% (right)
-        Table root = new Table();
-        root.setFillParent(true);
+        // Layout root using a SplitPane to enforce 30% (left) / 70% (right)
+        rootTable = new Table();
+        rootTable.setFillParent(true);
         SplitPane split = new SplitPane(questionTable, right, false, skin);
-        split.setSplitAmount(0.4f); // 40% left, 60% right
+        split.setSplitAmount(0.4f); // 30% left, 70% right
         // Lock divider without disabling touch so children can receive input
         split.setMinSplitAmount(0.4f);
         split.setMaxSplitAmount(0.4f);
@@ -374,9 +383,9 @@ public class CodeEditorScreen implements Screen {
         spStyle.handle = skin.newDrawable("white", 0f, 0f, 0f, 0f);
         split.setStyle(spStyle);
 
-        root.add(split).expand().fill().pad(5);
+        rootTable.add(split).expand().fill().pad(5);
 
-        stage.addActor(root);
+        stage.addActor(rootTable);
 
         createOutputWindow();
 
@@ -507,7 +516,7 @@ public class CodeEditorScreen implements Screen {
 
                 QuestionnaireManager.Question q = currentQ;
                 CodeEvaluationService.EvaluationResult ev = evaluator.evaluate(q, code, actual, null);
-                
+
                 // Save question result to save data
                 if (q != null) {
                     saveQuestionResult(q, ev.passed);
@@ -520,14 +529,8 @@ public class CodeEditorScreen implements Screen {
                             com.altf4studios.corebringer.battle.BattleManager bm = corebringer.gameScreen.getBattleManager();
                             if (bm != null) {
                                 // Calculate buff based on stage level (LINEAR/ADDITIVE)
-                                // Base buff: 1.5x at Level 1
-                                // Each level adds +0.5x
-                                // Level 1: 1.5x
-                                // Level 2: 2.0x
-                                // Level 3: 2.5x
-                                // Level 4: 3.0x
-                                // Level 5: 3.5x
-                                
+
+
                                 int stageLevel = 1;
                                 try {
                                     SaveData saveData = SimpleSaveManager.loadData();
@@ -537,12 +540,12 @@ public class CodeEditorScreen implements Screen {
                                 } catch (Exception ex) {
                                     Gdx.app.log("CodeEditorScreen", "Could not load stageLevel for buff calculation, defaulting to 1: " + ex.getMessage());
                                 }
-                                
+
                                 // Calculate buff additively: 1.0 + (stageLevel * 0.5)
                                 float buffMultiplier = 1.0f + (stageLevel * 0.5f);
-                                
+
                                 Gdx.app.log("CodeEditorScreen", "Stage Level: " + stageLevel + " | Buff Multiplier: " + buffMultiplier + "x");
-                                
+
                                 // Activate 1-turn card effect buff and return to game
                                 corebringer.gameScreen.activateOneTurnBuff(buffMultiplier);
                                 corebringer.setScreen(corebringer.gameScreen);
@@ -668,7 +671,14 @@ public class CodeEditorScreen implements Screen {
         stage.draw();
     }
 
-    @Override public void resize(int width, int height) { stage.getViewport().update(width, height, true); }
+    @Override public void resize(int width, int height) {
+        stage.getViewport().update(width, height, true);
+        // Keep left question pane at ~70% of current screen height
+        if (questionPaneCell != null) {
+            questionPaneCell.height(Gdx.graphics.getHeight() * 0.7f);
+            if (rootTable != null) rootTable.invalidateHierarchy();
+        }
+    }
     @Override public void pause() {}
     @Override public void resume() {}
     @Override public void hide() {
@@ -686,26 +696,26 @@ public class CodeEditorScreen implements Screen {
             // Get current stage level
             int stageLevel = data.stageLevel > 0 ? data.stageLevel : 1;
             String levelKey = "level" + stageLevel;
-            
+
             // Ensure level data exists
             if (!data.questionData.containsKey(levelKey)) {
                 String levelName = getLevelName(stageLevel);
                 data.questionData.put(levelKey, new SaveData.QuestionLevelData(levelName));
             }
-            
+
             // Add result to level data
             SaveData.QuestionLevelData levelData = data.questionData.get(levelKey);
             levelData.addResult(isCorrect);
-            
+
             // Add result to totals
             data.totals.addResult(isCorrect);
-            
-            Gdx.app.log("CodeEditorScreen", String.format("Saved question result: Level %d (%s), %s (Level: %d correct, %d wrong | Total: %d correct, %d wrong)", 
-                stageLevel, levelData.title, isCorrect ? "CORRECT" : "INCORRECT", 
+
+            Gdx.app.log("CodeEditorScreen", String.format("Saved question result: Level %d (%s), %s (Level: %d correct, %d wrong | Total: %d correct, %d wrong)",
+                stageLevel, levelData.title, isCorrect ? "CORRECT" : "INCORRECT",
                 levelData.correct, levelData.wrong, data.totals.correct, data.totals.wrong));
         });
     }
-    
+
     private String getLevelName(int stageLevel) {
         switch (stageLevel) {
             case 1: return "Basic Java Fundamentals";
