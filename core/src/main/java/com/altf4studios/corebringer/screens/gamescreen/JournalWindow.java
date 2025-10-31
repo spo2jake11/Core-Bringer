@@ -1,6 +1,7 @@
 package com.altf4studios.corebringer.screens.gamescreen;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -38,7 +39,7 @@ public class JournalWindow extends Window {
         Table buttonTable = new Table();
         buttonTable.top().left();
         // Make button sizing responsive
-        float buttonWidth = width * 0.25f;  // 25% of screen width
+        float buttonWidth = width * 0.19f;  // 25% of screen width
         float buttonHeight = height * 0.04f; // 4% of screen height
         float leftPadding = width * 0.08f;   // 8% of screen width for left padding
         buttonTable.defaults().pad(20).padLeft(leftPadding).width(buttonWidth).height(buttonHeight);
@@ -71,9 +72,14 @@ public class JournalWindow extends Window {
         buttonTable.add(btnClose).row();
 
         final TextArea tutorialContent = new TextArea("Welcome to the Java Tutorial Journal!\n\nSelect a topic from the left to learn about Java programming concepts.\n\nEach tutorial includes:\n• Theory and explanation\n• Code examples\n• Best practices\n• Common pitfalls to avoid", skin);
+        // Force white text color for both enabled and disabled states
+        com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle whiteTextStyle = new com.badlogic.gdx.scenes.scene2d.ui.TextField.TextFieldStyle(tutorialContent.getStyle());
+        whiteTextStyle.fontColor = Color.WHITE;
+        whiteTextStyle.disabledFontColor = Color.WHITE;
+        tutorialContent.setStyle(whiteTextStyle);
         tutorialContent.setDisabled(true);
         tutorialContent.setPrefRows(150);
-        tutorialContent.getStyle().fontColor = com.badlogic.gdx.graphics.Color.WHITE;
+
         // Set black background for the content area
         com.badlogic.gdx.graphics.Pixmap blackPixmap = new com.badlogic.gdx.graphics.Pixmap(1, 1, com.badlogic.gdx.graphics.Pixmap.Format.RGBA8888);
         blackPixmap.setColor(com.badlogic.gdx.graphics.Color.BLACK);
@@ -86,9 +92,11 @@ public class JournalWindow extends Window {
         contentScroll.setScrollBarPositions(false, true);
 
         contentTable.add(buttonTable).top().left().padRight(10);
-        // Make content area responsive
-        float contentWidth = width * 0.4f;   // 40% of screen width
-        float contentHeight = height * 0.6f; // 60% of screen height
+        // CONTENT WINDOW SIZE (right panel inside the journal)
+        // Use ABSOLUTE PIXELS here so you can set exact sizes.
+        // Tip: tweak these numbers directly (e.g., 700f, 500f).
+        float contentWidth = 870f;   // <-- Content WIDTH in pixels
+        float contentHeight = 600f;  // <-- Content HEIGHT in pixels
         float rightPadding = width * 0.08f;  // 8% of screen width for right padding
         contentTable.add(contentScroll).size(contentWidth, contentHeight).top().left().padRight(rightPadding);
         this.add(contentTable).grow().pad(20);
@@ -144,6 +152,8 @@ public class JournalWindow extends Window {
                     " "+"       System.out.println(level); // ERROR: variable not initialized\n\n" +
                     " "+"Remember: clear naming and correct data types help prevent bugs!";
                 tutorialContent.setText(content);
+
+
             }
         });
         btnConditionals.addListener(new ClickListener() {
