@@ -49,7 +49,7 @@ public class RiddleMasterEventScreen implements Screen {
         title.setAlignment(Align.center);
 
         descriptionLabel = new Label(
-            "A mysterious figure appears and poses a riddle:\n\n\"I can store numbers or words,\nI change my value when reassigned.\nWithout me, your code cannot remember.\nWhat am I?\"",
+            "A mysterious figure is blocking the door and poses a riddle:\n\n\"I can store numbers or words,\nI change my value when reassigned.\nWithout me, your code cannot remember.\nWhat am I?\"",
             corebringer.testskin
         );
         descriptionLabel.setAlignment(Align.center);
@@ -97,11 +97,11 @@ public class RiddleMasterEventScreen implements Screen {
             showInfo("No save found. Effect skipped.");
             return;
         }
-        
+
         int currentHp = stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20);
         int maxHp = stats.maxHp > 0 ? stats.maxHp : 20;
         int newHp = Math.min(maxHp, currentHp + 12);
-        
+
         SaveManager.saveStats(
             newHp,
             maxHp,
@@ -120,10 +120,10 @@ public class RiddleMasterEventScreen implements Screen {
             showInfo("No save found. Effect skipped.");
             return;
         }
-        
+
         int currentHp = stats.currentHp > 0 ? stats.currentHp : (stats.hp > 0 ? stats.hp : 20);
         int newHp = Math.max(1, currentHp - 12); // Ensure HP doesn't go below 1
-        
+
         SaveManager.saveStats(
             newHp,
             stats.maxHp > 0 ? stats.maxHp : 20,
