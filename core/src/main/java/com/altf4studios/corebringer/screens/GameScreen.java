@@ -1004,7 +1004,7 @@ public class GameScreen implements Screen{
                 optionsWindow.setVisible(false);
                 optionsWindow.remove();
                 // Re-register input processors for the new screen
-                if (corebringer.getScreen() != null) corebringer.getScreen().show();
+//                if (corebringer.getScreen() != null) corebringer.getScreen().show();
             }
         });
         btnClose.addListener(new ClickListener() {
@@ -1132,7 +1132,7 @@ public class GameScreen implements Screen{
             Gdx.app.log("GameScreen", "Could not load stageLevel for victory screen, defaulting to 1: " + ex.getMessage());
         }
 
-        if (currentStage >= 5) {
+        if (currentStage >= 5 && bossOnlyBattle) {
             // This is the final stage - show completion screen with metrics
             showGameCompletionScreen();
             return;

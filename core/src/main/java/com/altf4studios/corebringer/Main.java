@@ -130,8 +130,15 @@ public class Main extends Game {
         if (isMusicMuted) return;
 
         // If same music is already playing, don't reload
+        // If same music is already playing, don't reload but sync volume
         if (currentMusicType != null && currentMusicType.equals(musicType)) {
             if (currentlyPlayingMusic != null && currentlyPlayingMusic.isPlaying()) {
+                // Sync volume with saved settings before returning
+                SettingsData s = SettingsManager.loadSettings();
+                if (s != null) {
+                    float vol = Math.max(0f, Math.min(1f, s.volume));
+                    currentlyPlayingMusic.setVolume(vol);
+                }
                 updateBackwardCompatibilityRefs();
                 return;
             }

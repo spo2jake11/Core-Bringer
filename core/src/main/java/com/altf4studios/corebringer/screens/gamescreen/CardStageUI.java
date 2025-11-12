@@ -238,15 +238,29 @@ public class CardStageUI {
     }
 
     private void showNoEnergyDialog() {
-        Dialog dialog = new Dialog("No Energy", skin) {
-            @Override
-            protected void result(Object object) {
-                this.hide();
-            }
-        };
-        dialog.text("No energy! Please recharge!");
-        dialog.button("OK");
-        dialog.show(cardStage);
+        Label floatingText = new Label("Not Enough Energy!", skin);
+        floatingText.setColor(Color.RED);
+        floatingText.setFontScale(2.0f);
+        
+        // Center the text on the screen
+        float screenWidth = cardStage.getViewport().getWorldWidth();
+        float screenHeight = cardStage.getViewport().getWorldHeight();
+        floatingText.setPosition(
+            (screenWidth - floatingText.getPrefWidth() * 2.0f) / 2,
+            screenHeight / 2
+        );
+        
+        cardStage.addActor(floatingText);
+        
+        // Animate: fade in, move up, fade out, then remove
+        floatingText.addAction(Actions.sequence(
+            Actions.parallel(
+                Actions.fadeIn(0.2f),
+                Actions.moveBy(0, 50, 1.0f)
+            ),
+            Actions.fadeOut(0.5f),
+            Actions.removeActor()
+        ));
     }
 
     private void createDrawButton() {

@@ -456,7 +456,7 @@ public class CodeEditorScreen implements Screen {
         }
         if (k.startsWith("literal:")) {
             String lit = k.substring(8).trim();
-            return lit.isEmpty() ? k : ("Include literal: " + lit);
+            return lit.isEmpty() ? k : ("Include value: " + lit);
         }
         if (k.startsWith("format:")) {
             String fmt = k.substring(7).trim();
