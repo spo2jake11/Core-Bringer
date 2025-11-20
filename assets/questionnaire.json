@@ -4,7 +4,7 @@
                       {
                           "id":  1,
                           "isSolve":  0,
-                          "questions":  "Declare an int variable age = 18 and print it.",
+                          "questions":  "Create an int variable age with an int value of 18 and print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:1",
@@ -15,7 +15,7 @@
                       {
                           "id":  2,
                           "isSolve":  0,
-                          "questions":  "Create a String variable with your name and print it.",
+                          "questions":  "Create a String variable of any name of your choice, then use your name as its value and print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string"
@@ -25,7 +25,7 @@
                       {
                           "id":  3,
                           "isSolve":  0,
-                          "questions":  "Print: 'I am learning Java!' using a variable with a String data type.",
+                          "questions":  "Place the String statement \"I am learning Java!\" in a variable with a String data type then print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string",
@@ -36,7 +36,7 @@
                       {
                           "id":  4,
                           "isSolve":  0,
-                          "questions":  "Declare two int variables a = 5, b = 10 and print them.",
+                          "questions":  "Create two int variables named num1 with an int value of 5, then num2 with an int value of 10, then print them using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
@@ -48,7 +48,7 @@
                       {
                           "id":  5,
                           "isSolve":  0,
-                          "questions":  "Print: 'My favorite number is *blank*' using a variable named favNum.",
+                          "questions":  "Place the String statement \"My favorite number is *replace this with your favorite number*\" in a variable named favNum with a String data type then print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:1",
@@ -59,7 +59,7 @@
                       {
                           "id":  6,
                           "isSolve":  0,
-                          "questions":  "Print two variables (firstName containing Mike, lastName containing Oxmaul) together as full name.",
+                          "questions":  "Create two String variables (firstName containing \"Mike\", lastName containing \"Oxmaul\") and print them together as a full name. (Remember: System.out.println prints Strings line after line, while System.out.print prints Strings together in one line)",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string:2",
@@ -72,7 +72,7 @@
                       {
                           "id":  7,
                           "isSolve":  0,
-                          "questions":  "Store the year 2004 in a variable named year and print it.",
+                          "questions":  "Store the int value 2004 in a variable named year and print it using System.out.print. (Remember: System.out.println prints Strings line after line, while System.out.print prints Strings together in one line)",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:1",
@@ -84,19 +84,18 @@
                       {
                           "id":  8,
                           "isSolve":  0,
-                          "questions":  "Declare a variable city and print: I live in Philippines.",
+                          "questions":  "Create a String variable named city and store the String statement \"I live in *replace this with your favorite country*\" then print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string",
-                                            "var:city",
-                                            "literal:Philippines"
+                                            "var:city"
                                         ],
                           "chance":  0.35
                       },
                       {
                           "id":  9,
                           "isSolve":  0,
-                          "questions":  "Print: 'Java is fun!' using a variable.",
+                          "questions":  "Create a String variable named excitement and store the String statement \"Java is fun!\" before printing it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string",
@@ -107,7 +106,7 @@
                       {
                           "id":  10,
                           "isSolve":  0,
-                          "questions":  "Print: 'Hello, my name is Nathaniel, and I am 21 years old.' using variables for name and age.",
+                          "questions":  "Print the String statement \"Hello, my name is *replace this with your name*, and I am *replace this with your age* years old.\". Use the String variables name for storing the value for your name and age for storing the value for your age, then print them using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string",
@@ -122,7 +121,7 @@
                       {
                           "id":  11,
                           "isSolve":  0,
-                          "questions":  "Print the same number twice using two different variables.",
+                          "questions":  "Create two int variables named num1 and num2 then store your favorite number inside the two of them before printing them using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
@@ -133,7 +132,7 @@
                       {
                           "id":  12,
                           "isSolve":  0,
-                          "questions":  "Store the value 'Deez Nuts' in a variable named favoriteFood and print it.",
+                          "questions":  "Store the value \"Deez Nuts\" in a String variable named favoriteFood and print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string",
@@ -145,7 +144,7 @@
                       {
                           "id":  13,
                           "isSolve":  0,
-                          "questions":  "Create a variable named letter with a char data type and place the value â€˜Aâ€™ inside it and print it.",
+                          "questions":  "Create a variable named letter with a char data type and place the char value 'A' inside it and print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:char",
@@ -157,7 +156,7 @@
                       {
                           "id":  14,
                           "isSolve":  0,
-                          "questions":  "Store a double variable named price and place 9.99 inside it and print it.",
+                          "questions":  "Create a double variable named price and place the double value 9.99 inside it then print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:double",
@@ -169,10 +168,11 @@
                       {
                           "id":  15,
                           "isSolve":  0,
-                          "questions":  "Print the message: 'The price is: 9.99' using a variable.",
+                          "questions":  "Store the String statement \"The price is: 9.99\" in a String variable named priceAnnouncement, then print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
-                                            "needs:double|float|string",
+                                            "needs:string",
+                                            "var:priceAnnouncement",
                                             "literal:The price is:",
                                             "literal:9.99"
                                         ],
@@ -181,31 +181,30 @@
                       {
                           "id":  16,
                           "isSolve":  0,
-                          "questions":  "Print this sentence using two variables: 'Corebringer is a great game, and I will recommend it to my friends.'",
+                          "questions":  "Create two String variables: a variable named gameName that has a String value \"Core Bringer\", and a variable named gameReview which has the String statement \"is a great game, and I will recommend it to my friends.\", then print them using System.out.print. (Remember: System.out.println prints Strings line after line, while System.out.print prints Strings together in one line)",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string:2",
-                                            "literal:Corebringer is a great game",
-                                            "literal:recommend it to my friends"
+                                            "var:gameName",
+                                            "var:gameReview"
                                         ],
                           "chance":  0.35
                       },
                       {
                           "id":  17,
                           "isSolve":  0,
-                          "questions":  "Declare a variable for your school's name (full name of STI which is Systems Technology Institute) and print it.",
+                          "questions":  "Create a String variable named schoolName that has the String value \"Systems Technology Institute\" and print it using System.out.println. (Fun Fact: Systems Technology Institute is the true name of STI when it was a computer school back in 1983. Though it was deprecated when the school evolved to suit the modern era and took on the name STI College.)",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string",
-                                            "var:schoolName",
-                                            "literal:Systems Technology Institute"
+                                            "var:schoolName"
                                         ],
                           "chance":  0.35
                       },
                       {
                           "id":  18,
                           "isSolve":  0,
-                          "questions":  "Declare two String variables and print them in the same line.",
+                          "questions":  "Create two String variables named word1 and word2 and store two of your favorite things as values for the two variables then print them using System.out.print. (Remember: System.out.println prints Strings line after line, while System.out.print prints Strings together in one line)",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:string:2",
@@ -216,7 +215,7 @@
                       {
                           "id":  19,
                           "isSolve":  0,
-                          "questions":  "Print your age initialized from a variable named age and add it to a message to print: 'I am 18 years old and young, not old.'",
+                          "questions":  "Create a int variable named age then store your age inside it as its value before adding it to a message in System.out.println. Example snippet: System.out.println(\"I am \" + age + \" years old and young, not old.\");",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:1",
@@ -224,14 +223,14 @@
                                             "var:age",
                                             "literal:I am",
                                             "literal:years old",
-                                            "literal:young, not old."
+                                            "literal:and young, not old."
                                         ],
                           "chance":  0.35
                       },
                       {
                           "id":  20,
                           "isSolve":  0,
-                          "questions":  "Store a float value in a variable and print it.",
+                          "questions":  "Create a variable named floatNum with a float data type and store the float value 3.69f then print it using System.out.println.",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:float"
@@ -241,13 +240,13 @@
                       {
                           "id":  21,
                           "isSolve":  0,
-                          "questions":  "Declare a = 5, b = 3. Print their sum.",
+                          "questions":  "Create two int variables named num1 with an int value of 5, and num2 with an int value of 3. Then, print their sum using System.out.println. Example snippet: System.out.println(num1 + num2);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:add",
-                                            "var:a",
-                                            "var:b",
+                                            "var:num1",
+                                            "var:num2",
                                             "literal:5",
                                             "literal:3"
                                         ],
@@ -256,13 +255,13 @@
                       {
                           "id":  22,
                           "isSolve":  0,
-                          "questions":  "Declare a = 29, b = 30. Print their difference.",
+                          "questions":  "Create two int variables named num1 with an int value of 29, and num2 with an int value of 30. Then, print their difference using System.out.println. Example snippet: System.out.println(num1 - num2);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:sub",
-                                            "var:a",
-                                            "var:b",
+                                            "var:num1",
+                                            "var:num2",
                                             "literal:29",
                                             "literal:30"
                                         ],
@@ -271,13 +270,13 @@
                       {
                           "id":  23,
                           "isSolve":  0,
-                          "questions":  "Declare a = 98, b = 67. Print their product.",
+                          "questions":  "Create two int variables named num1 with an int value of 98, and num2 with an int value of 67. Then, print their product using System.out.println. Example snippet: System.out.println(num1 * num2);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:mul",
-                                            "var:a",
-                                            "var:b",
+                                            "var:num1",
+                                            "var:num2",
                                             "literal:98",
                                             "literal:67"
                                         ],
@@ -286,13 +285,13 @@
                       {
                           "id":  24,
                           "isSolve":  0,
-                          "questions":  "Declare a = 45, b = 24. Print their quotient.",
+                          "questions":  "Create two int variables named num1 with an int value of 45, and num2 with an int value of 24. Then, print their quotient using System.out.println. Example snippet: System.out.println(num1 / num2);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:div",
-                                            "var:a",
-                                            "var:b",
+                                            "var:num1",
+                                            "var:num2",
                                             "literal:45",
                                             "literal:24"
                                         ],
@@ -301,73 +300,62 @@
                       {
                           "id":  25,
                           "isSolve":  0,
-                          "questions":  "Print: 5 + 3 = 8.",
+                          "questions":  "Literally print the String statement \"5 + 3 = 8\" after storing it in a String variable named simpleEquation and using System.out.println to print it.",
                           "keyPoints":  [
                                             "needs:print",
-                                            "needs:int:2",
-                                            "op:add",
-                                            "literal:5",
-                                            "literal:3",
-                                            "literal:8",
-                                            "format:equation"
+                                            "needs:string",
+                                            "var:simpleEquation",
+                                            "literal:5 + 3 = 8"
                                         ],
                           "chance":  0.35
                       },
                       {
                           "id":  26,
                           "isSolve":  0,
-                          "questions":  "Print: 5 - 3 = 2.",
+                          "questions":  "Literally print the String statement \"5 - 3 = 2\" after storing it in a String variable named simpleEquation and using System.out.println to print it.",
                           "keyPoints":  [
                                             "needs:print",
-                                            "needs:int:2",
-                                            "op:sub",
-                                            "literal:5",
-                                            "literal:3",
-                                            "literal:2",
-                                            "format:equation"
+                                            "needs:string",
+                                            "var:simpleEquation",
+                                            "literal:5 - 3 = 2"
                                         ],
                           "chance":  0.35
                       },
                       {
                           "id":  27,
                           "isSolve":  0,
-                          "questions":  "Print: 5 * 3 = 15.",
+                          "questions":  "Literally print the String statement \"5 * 3 = 15\" after storing it in a String variable named simpleEquation and using System.out.println to print it.",
                           "keyPoints":  [
                                             "needs:print",
-                                            "needs:int:2",
-                                            "op:mul",
-                                            "literal:5",
-                                            "literal:3",
-                                            "literal:15",
-                                            "format:equation"
+                                            "needs:string",
+                                            "var:simpleEquation",
+                                            "literal:5 * 3 = 15"
                                         ],
                           "chance":  0.35
                       },
                       {
                           "id":  28,
                           "isSolve":  0,
-                          "questions":  "Print: 5 / 3 = 1.",
+                          "questions":  "Literally print the String statement \"5 / 3 = 1.67\" after storing it in a String variable named simpleEquation and using System.out.println to print it.",
                           "keyPoints":  [
                                             "needs:print",
-                                            "needs:int:2",
-                                            "op:div",
-                                            "literal:5",
-                                            "literal:3",
-                                            "literal:1",
-                                            "format:equation"
+                                            "needs:string",
+                                            "var:simpleEquation",
+                                            "literal:5 / 3 = 1.67"
                                         ],
                           "chance":  0.35
                       },
                       {
                           "id":  29,
                           "isSolve":  0,
-                          "questions":  "Use the variable x = 12, and the variable y = 4. Print their sum.",
+                          "questions":  "Create two int variables named num1 with an int value of 12, and num2 with an int value of 4. Then, create another int variable named sum that will add the two variables and store their sum. Afterwards, print the value of the sum using System.out.println. Example snippet: int sum = num1 + num2; System.out.println(sum);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:add",
-                                            "var:x",
-                                            "var:y",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:sum",
                                             "literal:12",
                                             "literal:4"
                                         ],
@@ -376,13 +364,14 @@
                       {
                           "id":  30,
                           "isSolve":  0,
-                          "questions":  "Use the variable x = 23, and the variable y = 76. Print their difference.",
+                          "questions":  "Create two int variables named num1 with an int value of 23, and num2 with an int value of 76. Then, create another int variable named difference that will subtract the two variables and store their difference. Afterwards, print the value of the difference using System.out.println. Example snippet: int difference = num1 - num2; System.out.println(difference);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:sub",
-                                            "var:x",
-                                            "var:y",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:difference",
                                             "literal:23",
                                             "literal:76"
                                         ],
@@ -391,13 +380,14 @@
                       {
                           "id":  31,
                           "isSolve":  0,
-                          "questions":  "Use the variable x = 120, and the variable y = 10. Print their product.",
+                          "questions":  "Create two int variables named num1 with an int value of 120, and num2 with an int value of 10. Then, create another int variable named product that will multiply the two variables and store their product. Afterwards, print the value of the product using System.out.println. Example snippet: int product = num1 * num2; System.out.println(product);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:mul",
-                                            "var:x",
-                                            "var:y",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:product",
                                             "literal:120",
                                             "literal:10"
                                         ],
@@ -406,13 +396,14 @@
                       {
                           "id":  32,
                           "isSolve":  0,
-                          "questions":  "Use the variable x = 190, and the variable y = 56. Print their quotient.",
+                          "questions":  "Create two int variables named num1 with an int value of 190, and num2 with an int value of 10. Then, create another int variable named quotient that will divide the two variables and store their quotient. Afterwards, print the value of the quotient using System.out.println. Example snippet: int quotient = num1 / num2; System.out.println(quotient);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:div",
-                                            "var:x",
-                                            "var:y",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:quotient",
                                             "literal:190",
                                             "literal:56"
                                         ],
@@ -421,29 +412,29 @@
                       {
                           "id":  33,
                           "isSolve":  0,
-                          "questions":  "Create three variables a, b and c and print their total sum.",
+                          "questions":  "Create three int variables named a1, b1 and c1 and store any int value inside them, then add them altogether and print their total sum using System.out.println. Example snippet: System.out.println(a1 + b1 + c1);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:3",
                                             "op:add",
-                                            "var:a",
-                                            "var:b",
-                                            "var:c"
+                                            "var:a1",
+                                            "var:b1",
+                                            "var:c1"
                                         ],
                           "chance":  0.35
                       },
                       {
                           "id":  34,
                           "isSolve":  0,
-                          "questions":  "Create three variables x, y and z and print their average.",
+                          "questions":  "Create three int variables named x1, y1 and z1 with int values 3, 6, 9 respectively, then add them altogether, divide them by 3, and print their average using System.out.println. Example snippet: System.out.println((x1 + y1 + z1) / 3);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:3",
                                             "op:add",
                                             "op:div",
-                                            "var:x",
-                                            "var:y",
-                                            "var:z",
+                                            "var:x1",
+                                            "var:y1",
+                                            "var:z1",
                                             "format:average"
                                         ],
                           "chance":  0.35
@@ -451,7 +442,7 @@
                       {
                           "id":  35,
                           "isSolve":  0,
-                          "questions":  "Print the result of (10 + 2) using variables.",
+                          "questions":  "Create two int variables named num1 with an int value of 10, and num2 with an int value of 2. Then, create another int variable named sum that will add the two variables and store their sum. Afterwards, print the value of the sum using System.out.println. Example snippet: int sum = num1 + num2; System.out.println(sum);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
@@ -464,7 +455,7 @@
                       {
                           "id":  36,
                           "isSolve":  0,
-                          "questions":  "Print the result of (10 - 2) using variables.",
+                          "questions":  "Create two int variables named num1 with an int value of 10, and num2 with an int value of 2. Then, create another int variable named difference that will subtract the two variables and store their difference. Afterwards, print the value of the difference using System.out.println. Example snippet: int difference = num1 - num2; System.out.println(difference);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
@@ -477,7 +468,7 @@
                       {
                           "id":  37,
                           "isSolve":  0,
-                          "questions":  "Print the result of (10 * 2) using variables.",
+                          "questions":  "Create two int variables named num1 with an int value of 10, and num2 with an int value of 2. Then, create another int variable named product that will multiply the two variables and store their product. Afterwards, print the value of the product using System.out.println. Example snippet: int product = num1 * num2; System.out.println(product);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
@@ -490,7 +481,7 @@
                       {
                           "id":  38,
                           "isSolve":  0,
-                          "questions":  "Print the result of (10 / 2) using variables.",
+                          "questions":  "Create two int variables named num1 with an int value of 10, and num2 with an int value of 2. Then, create another int variable named quotient that will divide the two variables and store their quotient. Afterwards, print the value of the sum using System.out.println. Example snippet: int quotient = num1 / num2; System.out.println(quotient);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
@@ -503,12 +494,15 @@
                       {
                           "id":  39,
                           "isSolve":  0,
-                          "questions":  "Print the answer of (20 + 5) - 3 using variables (remember the PEMDAS).",
+                          "questions":  "Create three int variables named num1 with an int value of 20, num2 with an int value of 5, and num3 with an int value of 3. Then, add num1 and num2 inside a parenthesis while placing num3 outside for subtraction. Afterwards, print the answer using System.out.println. Example snippet: System.out.println((num1 + num2) - num3); (Remember: PEMDAS works here for the logic of precedence. Meaning, whatever is first, it is performed first.It stands for Parentheses, Exponents, Multiplication and Division (read from left to right), and Addition and Subtraction (read from left to right))",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:add",
                                             "op:sub",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:num3",
                                             "literal:20",
                                             "literal:5",
                                             "literal:3",
@@ -519,12 +513,15 @@
                       {
                           "id":  40,
                           "isSolve":  0,
-                          "questions":  "Print the answer of (6 * 2) + 4 using variables (remember the PEMDAS).",
+                          "questions":  "Create three int variables named num1 with an int value of 6, num2 with an int value of 2, and num3 with an int value of 4. Then, multiply num1 and num2 inside a parenthesis while placing num3 outside for addition. Afterwards, print the answer using System.out.println. Example snippet: System.out.println((num1 * num2) + num3); (Remember: PEMDAS works here for the logic of precedence. Meaning, whatever is first, it is performed first. It stands for Parentheses, Exponents, Multiplication and Division (read from left to right), and Addition and Subtraction (read from left to right))",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:mul",
                                             "op:add",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:num3",
                                             "literal:6",
                                             "literal:2",
                                             "literal:4",
@@ -535,12 +532,15 @@
                       {
                           "id":  41,
                           "isSolve":  0,
-                          "questions":  "Print the answer of (10 + 20) / 2 using variables (remember the PEMDAS).",
+                          "questions":  "Create three int variables named num1 with an int value of 10, num2 with an int value of 20, and num3 with an int value of 2. Then, add num1 and num2 inside a parenthesis while placing num3 outside for division. Afterwards, print the answer using System.out.println. Example snippet: System.out.println((num1 + num2) / num3); (Remember: PEMDAS works here for the logic of precedence. Meaning, whatever is first, it is performed first. It stands for Parentheses, Exponents, Multiplication and Division (read from left to right), and Addition and Subtraction (read from left to right))",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:add",
                                             "op:div",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:num3",
                                             "literal:10",
                                             "literal:20",
                                             "literal:2",
@@ -551,12 +551,15 @@
                       {
                           "id":  42,
                           "isSolve":  0,
-                          "questions":  "Print the answer of (15 - 5) * 3 using variables (remember the PEMDAS).",
+                          "questions":  "Create three int variables named num1 with an int value of 15, num2 with an int value of 5, and num3 with an int value of 3. Then, subtract num1 and num2 inside a parenthesis while placing num3 outside for multiplication. Afterwards, print the answer using System.out.println. Example snippet: System.out.println((num1 - num2) * num3); (Remember: PEMDAS works here for the logic of precedence. Meaning, whatever is first, it is performed first. It stands for Parentheses, Exponents, Multiplication and Division (read from left to right), and Addition and Subtraction (read from left to right))",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:sub",
                                             "op:mul",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:num3",
                                             "literal:15",
                                             "literal:5",
                                             "literal:3",
@@ -567,12 +570,15 @@
                       {
                           "id":  43,
                           "isSolve":  0,
-                          "questions":  "Print the answer of (8 / 2) + 7 using variables (remember the PEMDAS).",
+                          "questions":  "Create three int variables named num1 with an int value of 8, num2 with an int value of 2, and num3 with an int value of 7. Then, divide num1 and num2 inside a parenthesis while placing num3 outside for addition. Afterwards, print the answer using System.out.println. Example snippet: System.out.println((num1 / num2) + num3); (Remember: PEMDAS works here for the logic of precedence. Meaning, whatever is first, it is performed first. It stands for Parentheses, Exponents, Multiplication and Division (read from left to right), and Addition and Subtraction (read from left to right))",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:div",
                                             "op:add",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:num3",
                                             "literal:8",
                                             "literal:2",
                                             "literal:7",
@@ -583,11 +589,14 @@
                       {
                           "id":  44,
                           "isSolve":  0,
-                          "questions":  "Print the result of 7 * 7 using variables.",
+                          "questions":  "Create two int variables named num1 with an int value of 7, and num2 with an int value of 7. Then, create another int variable named product that will multiply the two variables and store their product. Afterwards, print the value of the product using System.out.println. Example snippet: int product = num1 * num2; System.out.println(product);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:mul",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:product",
                                             "literal:7",
                                             "literal:7"
                                         ],
@@ -596,11 +605,14 @@
                       {
                           "id":  45,
                           "isSolve":  0,
-                          "questions":  "Print the result of 9 + 9 using variables.",
+                          "questions":  "Create two int variables named num1 with an int value of 9, and num2 with an int value of 9. Then, create another int variable named sum that will add the two variables and store their sum. Afterwards, print the value of the sum using System.out.println. Example snippet: int sum = num1 + num2; System.out.println(sum);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:add",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:sum",
                                             "literal:9",
                                             "literal:9"
                                         ],
@@ -609,11 +621,14 @@
                       {
                           "id":  46,
                           "isSolve":  0,
-                          "questions":  "Print the result of 100 - 25 using variables.",
+                          "questions":  "Create two int variables named num1 with an int value of 100, and num2 with an int value of 25. Then, create another int variable named difference that will subtract the two variables and store their difference. Afterwards, print the value of the difference using System.out.println. Example snippet: int difference = num1 - num2; System.out.println(difference);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:sub",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:difference",
                                             "literal:100",
                                             "literal:25"
                                         ],
@@ -622,11 +637,14 @@
                       {
                           "id":  47,
                           "isSolve":  0,
-                          "questions":  "Print the result of 50 / 5 using variables.",
+                          "questions":  "Create two int variables named num1 with an int value of 50, and num2 with an int value of 5. Then, create another int variable named quotient that will divide the two variables and store their quotient. Afterwards, print the value of the sum using System.out.println. Example snippet: int quotient = num1 / num2; System.out.println(quotient);",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:div",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:quotient",
                                             "literal:50",
                                             "literal:5"
                                         ],
@@ -635,15 +653,15 @@
                       {
                           "id":  48,
                           "isSolve":  0,
-                          "questions":  "Print the result of 6 + 4 * 2 using variables.",
+                          "questions":  "Create three int variables named num1 with an int value of 6, num2 with an int value of 4, and num3 with an int value of 2. Then, add num1 and num2 then multiply them using num3. Afterwards, print the answer using System.out.println. Example snippet: System.out.println(num1 + num2 * num3); (Remember: PEMDAS works here for the logic of precedence. Meaning, whatever is first, it is performed first. It stands for Parentheses, Exponents, Multiplication and Division (read from left to right), and Addition and Subtraction (read from left to right))",
                           "keyPoints":  [
                                             "needs:print",
-                                            "needs:int:2",
+                                            "needs:int:3",
                                             "op:add",
                                             "op:mul",
-                                            "literal:6",
-                                            "literal:4",
-                                            "literal:2",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:num3",
                                             "format:order_of_ops"
                                         ],
                           "chance":  0.55
@@ -651,15 +669,15 @@
                       {
                           "id":  49,
                           "isSolve":  0,
-                          "questions":  "Print the result of (6 + 4) * 2 using variables.",
+                          "questions":  "Create three int variables named num1 with an int value of 6, num2 with an int value of 4, and num3 with an int value of 2. Then, add num1 and num2 inside a parenthesis while placing num3 outside for multiplication. Afterwards, print the answer using System.out.println. Example snippet: System.out.println((num1 + num2) * num3); (Remember: PEMDAS works here for the logic of precedence. Meaning, whatever is first, it is performed first. It stands for Parentheses, Exponents, Multiplication and Division (read from left to right), and Addition and Subtraction (read from left to right))",
                           "keyPoints":  [
                                             "needs:print",
-                                            "needs:int:2",
+                                            "needs:int:3",
                                             "op:add",
                                             "op:mul",
-                                            "literal:6",
-                                            "literal:4",
-                                            "literal:2",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:num3",
                                             "format:parentheses"
                                         ],
                           "chance":  0.55
@@ -667,17 +685,17 @@
                       {
                           "id":  50,
                           "isSolve":  0,
-                          "questions":  "Print the result of (20 / 2) + (3 * 4) using variables.",
+                          "questions":  "Create four int variables named num1 with an int value of 20, num2 with an int value of 2, and num3 with an int value of 3 and num4 with an int value of 4. Then, divide num1 and num2 inside a parenthesis while multiplying num3 and num4 on another parenthesis. Afterwards, add the two results from each side and print it using System.out.println. Example snippet: System.out.println((num1 / num2) + (num3 *num4)); (Remember: PEMDAS works here for the logic of precedence. Meaning, whatever is first, it is performed first. It stands for Parentheses, Exponents, Multiplication and Division (read from left to right), and Addition and Subtraction (read from left to right))",
                           "keyPoints":  [
                                             "needs:print",
                                             "needs:int:2",
                                             "op:div",
                                             "op:mul",
                                             "op:add",
-                                            "literal:20",
-                                            "literal:2",
-                                            "literal:3",
-                                            "literal:4",
+                                            "var:num1",
+                                            "var:num2",
+                                            "var:num3",
+                                            "var:num4",
                                             "format:order_of_ops"
                                         ],
                           "chance":  0.55
