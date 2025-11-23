@@ -1,0 +1,22 @@
+{
+  "level1": {
+    "title": "Variables and Data Types",
+    "content": " In this stage, expect a usage of variables to store data values. \n Common data types include integers, floats, strings, and booleans. \n Good luck! \n\n Hint: Use journal to learn about variables and data types. \n Hint: Menu('ESC') -> Journal"
+  },
+  "level2": {
+      "title": "Loops and Conditionals",
+      "content": " In this stage, expect to use control structures such as if-else statements and loops. \n These structures help in making decisions and repeating actions in your code. \n Good luck! \n\n Hint: Use journal to learn about control structures. \n Hint: Menu('ESC') -> Journal"
+  },
+    "level3": {
+      "title": "Array and Strings",
+      "content": " In this stage, expect to work with arrays and strings. \n Arrays are used to store multiple values in a single variable, while strings are sequences of characters. \n Good luck! \n\n Hint: Use journal to learn about arrays and strings. \n Hint: Menu('ESC') -> Journal"
+    },
+    "level4": {
+        "title": "Object Oriented Programming",
+    "content": " In this stage, expect to use object-oriented programming concepts such as objects and methods. \n This approach helps in organizing code and promoting reusability. \n Good luck! \n\n Hint: Use journal to learn about object-oriented programming. \n Hint: Menu('ESC') -> Journal"
+    },
+    "level5": {
+        "title": "Classes",
+        "content": " In this stage, expect to create and use classes. \n Classes are blueprints for creating objects, encapsulating data and behavior. \n Good luck! \n\n Hint: Use journal to learn about classes. \n Hint: Menu('ESC') -> Journal"
+    }
+}

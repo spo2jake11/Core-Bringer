@@ -8,6 +8,7 @@ import com.altf4studios.corebringer.utils.SettingsData;
 import com.altf4studios.corebringer.utils.SettingsManager;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.files.FileHandle;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -18,9 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.*;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
-import com.badlogic.gdx.utils.Align;
-import com.badlogic.gdx.utils.ScreenUtils;
-import com.badlogic.gdx.utils.Scaling;
+import com.badlogic.gdx.utils.*;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.Vector2;
@@ -614,8 +613,46 @@ public class GameMapScreen implements Screen{
                 // Flush current nodes and recreate a fresh set for the new stage
                 flushAndRecreateNodesForStage(savedStage);
                 appliedStageLevel = savedStage;
+                showStageDialogForLevel(savedStage);
             }
         } catch (Exception ignored) {}
+    }
+
+    // New helper: load notif json and show dialog centered on coregamemapstage
+    private void showStageDialogForLevel(int stageLevel) {
+        try {
+            FileHandle fh = Gdx.files.internal("assets/notif.json");
+            if (!fh.exists()) return;
+            JsonReader jr = new JsonReader();
+            JsonValue root = jr.parse(fh);
+            if (root == null) return;
+
+            // try keys like "level1" then "1"
+            String keyLevel = "level" + stageLevel;
+            JsonValue node = root.get(keyLevel);
+            if (node == null) node = root.get(String.valueOf(stageLevel));
+            if (node == null) return;
+
+            String title = node.getString("title", "");
+            String content = node.getString("content", "");
+            if ((title == null || title.isEmpty()) && (content == null || content.isEmpty())) return;
+
+            Dialog dialog = new Dialog(title, corebringer.testskin);
+            Label label = new Label(content, corebringer.testskin);
+            label.setWrap(true);
+
+            float maxWidth = coregamemapstage.getViewport().getWorldWidth() * 0.6f;
+            dialog.getContentTable().add(label).width(maxWidth).pad(10f);
+            dialog.button("OK", true);
+
+            dialog.pack();
+            float x = (coregamemapstage.getViewport().getWorldWidth() - dialog.getWidth()) / 2f;
+            float y = (coregamemapstage.getViewport().getWorldHeight() - dialog.getHeight()) / 2f;
+            dialog.setPosition(x, y);
+            dialog.show(coregamemapstage);
+        } catch (Exception e) {
+            Gdx.app.error("GameMapScreen", "Failed to show stage dialog for " + stageLevel, e);
+        }
     }
 
     @Override
