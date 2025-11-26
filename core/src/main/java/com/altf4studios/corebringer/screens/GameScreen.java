@@ -38,6 +38,7 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.utils.JsonReader;
 import com.badlogic.gdx.utils.JsonValue;
 import com.badlogic.gdx.utils.ObjectMap;
+import com.badlogic.gdx.files.FileHandle;
 
 public class GameScreen implements Screen{
     /// Declaration of variables and elements here.
@@ -123,6 +124,14 @@ public class GameScreen implements Screen{
     private float perfTimer = 0f;
     private boolean perfHudEnabled = false; // off by default; toggle with F3
 
+    // --- Objective HUD ---
+    private JsonValue objectiveNode = null;
+    private Label objectiveTextLabel = null;
+    private Label objectiveCountLabel = null;
+    private Table objectiveTable = null;
+    private Container<Table> objectiveContainer = null;
+    // --- End Objective HUD ---
+
     // --- Instakill Victory Flow ---
     // When an instakill happens from CodeEditorScreen, delay victory popup by a short duration and tag it.
     private boolean instakillFlowActive = false;
@@ -188,6 +197,8 @@ public class GameScreen implements Screen{
         cardStage = new Stage(new ScreenViewport());
         overlayStage = new Stage(new ScreenViewport());
 
+        // Setup the small objective HUD overlay (left side, non-obstructive)
+        setupObjectiveHud();
 
         // --- Load stats from save file (must exist at this point) ---
         int hp = 20; // Legacy fallback current HP
@@ -651,6 +662,89 @@ public class GameScreen implements Screen{
         }
     }
 
+    // Initialize the Objective HUD: create labels and load the JSON node for current stage
+    private void setupObjectiveHud() {
+        try {
+            // Determine stage level from this screen (already assigned earlier)
+            int lvl = Math.max(1, stageLevelForBattle);
+
+            // Load objectives.json
+            FileHandle fh = Gdx.files.internal("assets/objectives.json");
+            if (fh.exists()) {
+                JsonReader jr = new JsonReader();
+                JsonValue root = jr.parse(fh);
+                if (root != null) {
+                    String key = "level" + lvl;
+                    objectiveNode = root.get(key);
+                    if (objectiveNode == null) objectiveNode = root.get(String.valueOf(lvl));
+                }
+            }
+
+            // Create UI labels (unstyled container, small and semi-transparent)
+            // Increase font size by 50% (previously ~0.9f -> now 1.35f)
+            // We will only show the compact objective line (no story) inside the container
+            objectiveTextLabel = new Label("", corebringer.testskin);
+            // don't display the story label in the container (keep present for compatibility)
+            objectiveTextLabel.setVisible(false);
+            objectiveTextLabel.setWrap(true);
+            objectiveTextLabel.setColor(Color.WHITE);
+            objectiveTextLabel.setFontScale(1.45f);
+
+            objectiveCountLabel = new Label("", corebringer.testskin);
+            objectiveCountLabel.setColor(Color.LIGHT_GRAY);
+            objectiveCountLabel.setFontScale(1.45f);
+
+            objectiveTable = new Table();
+            objectiveTable.setTouchable(Touchable.disabled);
+            // We'll put the table inside a semi-transparent container for readability
+
+            // Layout: only the count/target line (no story)
+            float hudWidth = 500f; // custom width to avoid overlapping
+            // Add only the compact objective line to the visible table
+            objectiveTable.add(objectiveCountLabel).left().padLeft(6f).padBottom(6f).width(hudWidth).row();
+
+            // Wrap the table inside a Container and add a subtle background so it reads on any map
+            objectiveTable.pack();
+            objectiveContainer = new Container<>(objectiveTable);
+            objectiveContainer.setTouchable(Touchable.disabled);
+            // Create a semi-transparent dark background using skin's "white" drawable tinted
+            try {
+                objectiveContainer.setBackground(corebringer.testskin.newDrawable("white", new Color(0f, 0f, 0f, 0.45f)));
+            } catch (Exception ignored) {
+                // fallback: ignore if skin doesn't support newDrawable
+            }
+
+            // Position left side with custom coordinates (x,y). Use mid-left area to avoid central nodes.
+            float x = 12f;
+            float y = Gdx.graphics.getHeight() * 0.70f; // adjustable if needed
+            // Size container slightly larger than content
+            float containerW = hudWidth + 25f;
+            float containerH = objectiveTable.getHeight() + 12f;
+            objectiveContainer.setSize(containerW, containerH);
+            objectiveContainer.setPosition(x, y);
+            overlayStage.addActor(objectiveContainer);
+
+            // Immediately populate labels
+            refreshObjectiveHud();
+        } catch (Exception e) {
+            Gdx.app.error("GameScreen", "Failed to setup objective HUD", e);
+        }
+    }
+
+    // Refresh the HUD labels from the loaded JSON node
+    private void refreshObjectiveHud() {
+        try {
+            if (objectiveNode == null) {
+                if (objectiveCountLabel != null) objectiveCountLabel.setText("");
+                return;
+            }
+            int count = objectiveNode.getInt("count", 0);
+            int target = objectiveNode.getInt("target", 0);
+            // Only update the compact objective line (no story)
+            if (objectiveCountLabel != null) objectiveCountLabel.setText("Objective: " + objectiveNode.getString("objective", "") + "  (" + count + " / " + target + ")");
+        } catch (Exception ignored) {}
+    }
+
     @Override
     public void render(float delta) {
         if (isDisposed || transitioning) return; // Prevent rendering during transition or after dispose
@@ -664,6 +758,8 @@ public class GameScreen implements Screen{
         cardStage.draw();
         uiStage.act(delta);
         uiStage.draw();
+        // Refresh objective HUD each frame so it reflects JSON changes (count/target)
+        try { refreshObjectiveHud(); } catch (Exception ignored) {}
         overlayStage.act(delta);
         overlayStage.draw();
         // Removed: editorStage.act(delta); editorStage.draw();
@@ -1330,8 +1426,6 @@ public class GameScreen implements Screen{
         victoryScreenWindow.toFront();
         // Block all input except the modal by routing input to uiStage
         Gdx.input.setInputProcessor(uiStage);
-        // Clear the tag so subsequent games are clean
-        instakillTag = null;
     }
 
     private void showMetricsAfterVictory() {
