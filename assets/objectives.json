@@ -1,0 +1,127 @@
+{
+    "level1":{
+        "story": "Placeholder of story",
+        "objective": "have a number of correct overhack",
+        "count": 0,
+        "target": 0,
+        "complete": {
+            "result": "You manage to weaken this level's boss",
+            "reward": [
+                "r1": "boss's hp is havled",
+                "r2": "boss's attack is lessen",
+                "r3": "you become stronger this time"
+            ]
+        },
+        "failed":{
+            "result": "You failed to weaken the boss",
+            "reward": [
+                "r1": "boss's health increases",
+                "r2": "boss's attack is more frequent",
+                "r3": "boss's defense increased",
+                "r4": "you become weaker"
+            ]
+        },
+        "winStory": "You manage to defeat the boss",
+        "loseStory": "You perished to the boss's strength"
+    },
+    "level2":{
+        "story": "Placeholder of story",
+        "objective": "have a number of correct overhack",
+        "count": 0,
+        "target": 0,
+        "complete": {
+            "result": "You manage to weaken this level's boss",
+            "reward": [
+                "r1": "boss's hp is havled",
+                "r2": "boss's attack is lessen",
+                "r3": "you become stronger this time"
+            ]
+        },
+        "failed":{
+            "result": "You failed to weaken the boss",
+            "reward": [
+                "r1": "boss's health increases",
+                "r2": "boss's attack is more frequent",
+                "r3": "boss's defense increased",
+                "r4": "you become weaker"
+            ]
+        },
+        "winStory": "You manage to defeat the boss",
+        "loseStory": "You perished to the boss's strength"
+    },
+    "level3":{
+        "story": "Placeholder of story",
+        "objective": "have a number of correct overhack",
+        "count": 0,
+        "target": 0,
+        "complete": {
+            "result": "You manage to weaken this level's boss",
+            "reward": [
+                "r1": "boss's hp is havled",
+                "r2": "boss's attack is lessen",
+                "r3": "you become stronger this time"
+            ]
+        },
+        "failed":{
+            "result": "You failed to weaken the boss",
+            "reward": [
+                "r1": "boss's health increases",
+                "r2": "boss's attack is more frequent",
+                "r3": "boss's defense increased",
+                "r4": "you become weaker"
+            ]
+        },
+        "winStory": "You manage to defeat the boss",
+        "loseStory": "You perished to the boss's strength"
+    },
+    "level4":{
+        "story": "Placeholder of story",
+        "objective": "have a number of correct overhack",
+        "count": 0,
+        "target": 0,
+        "complete": {
+            "result": "You manage to weaken this level's boss",
+            "reward": [
+                "r1": "boss's hp is havled",
+                "r2": "boss's attack is lessen",
+                "r3": "you become stronger this time"
+            ]
+        },
+        "failed":{
+            "result": "You failed to weaken the boss",
+            "reward": [
+                "r1": "boss's health increases",
+                "r2": "boss's attack is more frequent",
+                "r3": "boss's defense increased",
+                "r4": "you become weaker"
+            ]
+        },
+        "winStory": "You manage to defeat the boss",
+        "loseStory": "You perished to the boss's strength"
+    },
+    "level5":{
+        "story": "Placeholder of story",
+        "objective": "have a number of correct overhack",
+        "count": 0,
+        "target": 0,
+        "complete": {
+            "result": "You manage to weaken this level's boss",
+            "reward": [
+                "r1": "boss's hp is havled",
+                "r2": "boss's attack is lessen",
+                "r3": "you become stronger this time"
+            ]
+        },
+        "failed":{
+            "result": "You failed to weaken the boss",
+            "reward": [
+                "r1": "boss's health increases",
+                "r2": "boss's attack is more frequent",
+                "r3": "boss's defense increased",
+                "r4": "you become weaker"
+            ]
+        },
+        "winStory": "You manage to defeat the boss",
+        "loseStory": "You perished to the boss's strength"
+    }
+}

@@ -57,10 +57,11 @@ run {
 // Ensure all required resources are available under an 'assets/' prefix on the classpath
 // so code paths like Gdx.files.internal("assets/...") resolve when running with Gradle and in packages.
 processResources {
-  // Avoid failing on duplicate files if any other plugin contributes resources
   duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-  // Copy only the root assets/ folder. It already contains backgrounds/, basic-characters/, icons/, ui/, atlas/, nameplates/, and JSONs.
+  // Copy assets with 'assets/' prefix (for code using "assets/...")
   from(rootProject.file('assets')) { into 'assets' }
+  // ALSO copy assets without prefix (for code using "ui/...", "backgrounds/...", etc.)
+  from(rootProject.file('assets')) { into '.' }
 }
 
 // Badass Runtime: create custom runtime and Windows installer using jpackage
@@ -78,9 +79,9 @@ runtime {
     // Show console to surface errors when launching (Windows)
     installerOptions += ['--win-console']
     // Optional icon for Windows installer via jpackage option
-    if (project.file('icons/logo.ico').exists()) {
-      installerOptions += ['--icon', project.file('icons/logo.ico').absolutePath]
-    }
+//    if (project.file('icons/logo.ico').exists()) {
+//      installerOptions += ['--icon', project.file('icons/logo.ico').absolutePath]
+//    }
     // JVM args if needed
     //jvmArgs = ['-Xmx1G']
     jvmArgs = ['-Dfile.encoding=UTF-8']
