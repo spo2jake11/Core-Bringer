@@ -145,6 +145,16 @@ public class MainMenuScreen implements Screen {
                     // Initialize save with currentHp=50 and maxHp=50
                     SimpleSaveManager.saveStats(50, 50, 0, 3, defaultCards, 0, 100, 1);
 
+                    // Reset objective counts for a fresh run (level1..level5)
+                    SimpleSaveManager.updateData(data -> {
+                        if (data.objectives == null) data.objectives = new java.util.HashMap<>();
+                        data.objectives.put("level1", 0);
+                        data.objectives.put("level2", 0);
+                        data.objectives.put("level3", 0);
+                        data.objectives.put("level4", 0);
+                        data.objectives.put("level5", 0);
+                    });
+
                     // Initialize question data structure
                     SimpleSaveManager.updateData(data -> {
                         // Initialize all levels

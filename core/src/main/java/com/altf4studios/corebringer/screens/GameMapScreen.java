@@ -213,7 +213,17 @@ public class GameMapScreen implements Screen{
         bossnodeA = createAtlasButton("boss_node");
         bossnodeA.getImage().setScaling(Scaling.fit);
         bossnodeA.addListener(new ClickListener(){
-            @Override public void clicked(InputEvent event, float x, float y) { triggerBossBattle(); }
+            @Override public void clicked(InputEvent event, float x, float y) {
+                try {
+                    // mark node selected so map state advances correctly after returning
+                    try { selectedNodesPerRank.set(9, bossnodeA); } catch (Exception ignored) {}
+                    nodeChosenInCurrentRank = true;
+                    updateRankInteractivity();
+                    com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                    final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                    showBossObjectiveDialogForLevel(savedStage, new Runnable(){ public void run(){ triggerBossBattle(); } });
+                } catch (Exception ignored) { triggerBossBattle(); }
+            }
         });
         rank10table.add(bossnodeA).padBottom(20f).row();
 
@@ -457,7 +467,15 @@ public class GameMapScreen implements Screen{
         bossnodeA.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                triggerBossBattle();
+                try {
+                    // mark node selected so map state advances correctly after returning
+                    try { selectedNodesPerRank.set(9, bossnodeA); } catch (Exception ignored) {}
+                    nodeChosenInCurrentRank = true;
+                    updateRankInteractivity();
+                    com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                    final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                    showBossObjectiveDialogForLevel(savedStage, new Runnable(){ public void run(){ triggerBossBattle(); } });
+                } catch (Exception ignored) { triggerBossBattle(); }
             }
         });
 
@@ -924,5 +942,78 @@ public class GameMapScreen implements Screen{
         }
         updateRankInteractivity();
     }
-}
 
+    // Show a dialog at the boss node that evaluates objectives.json for the given stage level
+    // If persisted objective count >= target -> show complete.result, otherwise show failed.result
+    // Calls onClose.run() after the player dismisses the dialog (or immediately if data missing)
+    private void showBossObjectiveDialogForLevel(int stageLevel, Runnable onClose) {
+        try {
+            FileHandle fh = Gdx.files.internal("assets/objectives.json");
+            String keyLevel = "level" + stageLevel;
+            String message = null;
+
+            if (fh.exists()) {
+                JsonReader jr = new JsonReader();
+                JsonValue root = jr.parse(fh);
+                if (root != null) {
+                    JsonValue node = root.get(keyLevel);
+                    if (node == null) node = root.get(String.valueOf(stageLevel));
+                    int jsonCount = (node != null) ? node.getInt("count", 0) : 0;
+                    int target = (node != null) ? node.getInt("target", 0) : 0;
+
+                    // Prefer persisted objective count stored in SaveManager
+                    int count = jsonCount;
+                    try {
+                        com.altf4studios.corebringer.utils.SaveData sd = SaveManager.loadStats();
+                        if (sd != null) {
+                            String key = keyLevel;
+                            Integer persisted = sd.objectives.get(key);
+                            if (persisted != null) count = persisted;
+                        }
+                    } catch (Exception ignored) {}
+
+                    if (node != null) {
+                        if (count >= target) {
+                            JsonValue complete = node.get("complete");
+                            if (complete != null) message = complete.getString("result", "You have met the objective.");
+                            else message = "You have met the objective.";
+                        } else {
+                            JsonValue failed = node.get("failed");
+                            if (failed != null) message = failed.getString("result", "You did not meet the objective.");
+                            else message = "You did not meet the objective.";
+                        }
+                    }
+                }
+            }
+
+            if (message == null || message.isEmpty()) {
+                // fallback friendly message
+                message = "Objective status unavailable. Proceeding to boss...";
+            }
+
+            final String dialogMsg = message;
+            Dialog dialog = new Dialog("Stage " + stageLevel + " - Objective", corebringer.testskin) {
+                @Override
+                protected void result(Object object) {
+                    super.result(object);
+                    if (onClose != null) onClose.run();
+                }
+            };
+            Label label = new Label(dialogMsg, corebringer.testskin);
+            label.setWrap(true);
+
+            float maxWidth = coregamemapstage.getViewport().getWorldWidth() * 0.6f;
+            dialog.getContentTable().add(label).width(maxWidth).pad(10f);
+            dialog.button("OK", true);
+
+            dialog.pack();
+            float x = (coregamemapstage.getViewport().getWorldWidth() - dialog.getWidth()) / 2f;
+            float y = (coregamemapstage.getViewport().getWorldHeight() - dialog.getHeight()) / 2f;
+            dialog.setPosition(x, y);
+            dialog.show(coregamemapstage);
+        } catch (Exception e) {
+            Gdx.app.error("GameMapScreen", "Failed to show boss objective dialog for " + stageLevel, e);
+            if (onClose != null) onClose.run();
+        }
+    }
+}
