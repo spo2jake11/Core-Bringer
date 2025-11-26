@@ -146,7 +146,6 @@ public class GameMapScreen implements Screen{
         rank7table.clearChildren();
         rank8table.clearChildren();
         rank9table.clearChildren();
-        rank10table.clearChildren();
 
         // Rebuild rank 1 static battles
         staticbattlenodeA = createAtlasButton("combat_node");
@@ -157,10 +156,48 @@ public class GameMapScreen implements Screen{
         staticbattlenodeB.getImage().setScaling(Scaling.stretch);
         staticbattlenodeC.getImage().setScaling(Scaling.stretch);
         staticbattlenodeD.getImage().setScaling(Scaling.stretch);
-        staticbattlenodeA.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){ triggerRandomBattle(); }});
-        staticbattlenodeB.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){ triggerRandomBattle(); }});
-        staticbattlenodeC.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){ triggerRandomBattle(); }});
-        staticbattlenodeD.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){ triggerRandomBattle(); }});
+        // Show objective dialog for first-column nodes before proceeding to their action
+        staticbattlenodeA.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){
+            try {
+                // mark node selected so map state advances correctly after returning
+                try { selectedNodesPerRank.set(0, staticbattlenodeA); } catch (Exception ignored) {}
+                nodeChosenInCurrentRank = true;
+                updateRankInteractivity();
+                com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                showObjectiveDialogForLevel(savedStage, new Runnable(){ public void run(){ triggerRandomBattle(); } });
+            } catch (Exception ignored) { triggerRandomBattle(); }
+        }});
+        staticbattlenodeB.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){
+            try {
+                try { selectedNodesPerRank.set(0, staticbattlenodeB); } catch (Exception ignored) {}
+                nodeChosenInCurrentRank = true;
+                updateRankInteractivity();
+                com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                showObjectiveDialogForLevel(savedStage, new Runnable(){ public void run(){ triggerRandomBattle(); } });
+            } catch (Exception ignored) { triggerRandomBattle(); }
+        }});
+        staticbattlenodeC.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){
+            try {
+                try { selectedNodesPerRank.set(0, staticbattlenodeC); } catch (Exception ignored) {}
+                nodeChosenInCurrentRank = true;
+                updateRankInteractivity();
+                com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                showObjectiveDialogForLevel(savedStage, new Runnable(){ public void run(){ triggerRandomBattle(); } });
+            } catch (Exception ignored) { triggerRandomBattle(); }
+        }});
+        staticbattlenodeD.addListener(new ClickListener(){ @Override public void clicked(InputEvent e, float x, float y){
+            try {
+                try { selectedNodesPerRank.set(0, staticbattlenodeD); } catch (Exception ignored) {}
+                nodeChosenInCurrentRank = true;
+                updateRankInteractivity();
+                com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                showObjectiveDialogForLevel(savedStage, new Runnable(){ public void run(){ triggerRandomBattle(); } });
+            } catch (Exception ignored) { triggerRandomBattle(); }
+        }});
         rank1table.add(staticbattlenodeA).padBottom(20f).row();
         rank1table.add(staticbattlenodeB).padBottom(20f).row();
         rank1table.add(staticbattlenodeC).padBottom(20f).row();
@@ -221,6 +258,55 @@ public class GameMapScreen implements Screen{
         } catch (Exception ignored) {}
         corebringer.restScreen = new RestScreen(corebringer);
         corebringer.setScreen(corebringer.restScreen);
+    }
+
+    // Helper: show the "story" field from assets/objectives.json for a given stage level.
+    // Calls onClose.run() after the player dismisses the dialog (or immediately on failure).
+    private void showObjectiveDialogForLevel(int stageLevel, Runnable onClose) {
+        try {
+            FileHandle fh = Gdx.files.internal("assets/objectives.json");
+            if (!fh.exists()) {
+                if (onClose != null) onClose.run();
+                return;
+            }
+            JsonReader jr = new JsonReader();
+            JsonValue root = jr.parse(fh);
+            if (root == null) {
+                if (onClose != null) onClose.run();
+                return;
+            }
+            String keyLevel = "level" + stageLevel;
+            JsonValue node = root.get(keyLevel);
+            if (node == null) node = root.get(String.valueOf(stageLevel));
+            String story = (node != null) ? node.getString("story", "") : "";
+            if (story == null || story.isEmpty()) {
+                if (onClose != null) onClose.run();
+                return;
+            }
+
+            Dialog dialog = new Dialog("Stage " + stageLevel, corebringer.testskin) {
+                @Override
+                protected void result(Object object) {
+                    super.result(object);
+                    if (onClose != null) onClose.run();
+                }
+            };
+            Label label = new Label(story, corebringer.testskin);
+            label.setWrap(true);
+
+            float maxWidth = coregamemapstage.getViewport().getWorldWidth() * 0.6f;
+            dialog.getContentTable().add(label).width(maxWidth).pad(10f);
+            dialog.button("OK", true);
+
+            dialog.pack();
+            float x = (coregamemapstage.getViewport().getWorldWidth() - dialog.getWidth()) / 2f;
+            float y = (coregamemapstage.getViewport().getWorldHeight() - dialog.getHeight()) / 2f;
+            dialog.setPosition(x, y);
+            dialog.show(coregamemapstage);
+        } catch (Exception e) {
+            Gdx.app.error("GameMapScreen", "Failed to show objective dialog for " + stageLevel, e);
+            if (onClose != null) onClose.run();
+        }
     }
 
     // Add nodes to a rank table with weighted chances and allow duplicates per column
@@ -444,32 +530,60 @@ public class GameMapScreen implements Screen{
             LoggingUtils.log("NodeGeneration","Rank 9 has nodes already or has problems.");
         }
 
-        ///For the functionalities of the Rank 1 Battle Nodes
+        ///For the functionalities of the Rank 1 Battle Nodes - show objective story first, then proceed
         staticbattlenodeA.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                triggerRandomBattle();
+                try {
+                    try { selectedNodesPerRank.set(0, staticbattlenodeA); } catch (Exception ignored) {}
+                    nodeChosenInCurrentRank = true;
+                    updateRankInteractivity();
+                    com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                    final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                    showObjectiveDialogForLevel(savedStage, new Runnable() { public void run() { triggerRandomBattle(); } });
+                } catch (Exception ignored) { triggerRandomBattle(); }
             }
         });
 
         staticbattlenodeB.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                triggerRandomBattle();
+                try {
+                    try { selectedNodesPerRank.set(0, staticbattlenodeB); } catch (Exception ignored) {}
+                    nodeChosenInCurrentRank = true;
+                    updateRankInteractivity();
+                    com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                    final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                    showObjectiveDialogForLevel(savedStage, new Runnable() { public void run() { triggerRandomBattle(); } });
+                } catch (Exception ignored) { triggerRandomBattle(); }
             }
         });
 
         staticbattlenodeC.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                triggerRandomBattle();
+                try {
+                    try { selectedNodesPerRank.set(0, staticbattlenodeC); } catch (Exception ignored) {}
+                    nodeChosenInCurrentRank = true;
+                    updateRankInteractivity();
+                    com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                    final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                    showObjectiveDialogForLevel(savedStage, new Runnable() { public void run() { triggerRandomBattle(); } });
+                } catch (Exception ignored) { triggerRandomBattle(); }
             }
         });
 
         staticbattlenodeD.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                triggerRandomBattle();
+                try {
+                    try { selectedNodesPerRank.set(0, staticbattlenodeD); } catch (Exception ignored) {}
+                    nodeChosenInCurrentRank = true;
+                    updateRankInteractivity();
+                    com.altf4studios.corebringer.utils.SaveData stats = SaveManager.loadStats();
+                    final int savedStage = (stats != null && stats.stageLevel > 0) ? stats.stageLevel : 1;
+                    showObjectiveDialogForLevel(savedStage, new Runnable() { public void run() { triggerRandomBattle(); } });
+                } catch (Exception ignored) { triggerRandomBattle(); }
             }
         });
 
@@ -799,12 +913,16 @@ public class GameMapScreen implements Screen{
 
     /// Call this when returning from a completed node (e.g., after battle Proceed)
     public void advanceToNextRank() {
-        if (nodeChosenInCurrentRank) {
+        // Advance if the current rank was chosen OR we have a saved selected node for this rank.
+        boolean hasSelectedNode = selectedNodesPerRank != null && currentRankIndex < selectedNodesPerRank.size() && selectedNodesPerRank.get(currentRankIndex) != null;
+        if (nodeChosenInCurrentRank || hasSelectedNode) {
             currentRankIndex = Math.min(currentRankIndex + 1, Math.max(0, rankTables.size() - 1));
+            // Clear the flag for the next rank
             nodeChosenInCurrentRank = false;
+            // Clear the selected node for the rank we just left to avoid double-advancing
+            try { if (selectedNodesPerRank != null && currentRankIndex - 1 >= 0 && currentRankIndex - 1 < selectedNodesPerRank.size()) selectedNodesPerRank.set(currentRankIndex - 1, null); } catch (Exception ignored) {}
         }
         updateRankInteractivity();
     }
 }
-
 

@@ -1,127 +1,127 @@
 {
-    "level1":{
-        "story": "Placeholder of story",
-        "objective": "have a number of correct overhack",
-        "count": 0,
-        "target": 0,
-        "complete": {
-            "result": "You manage to weaken this level's boss",
-            "reward": [
-                "r1": "boss's hp is havled",
-                "r2": "boss's attack is lessen",
-                "r3": "you become stronger this time"
-            ]
-        },
-        "failed":{
-            "result": "You failed to weaken the boss",
-            "reward": [
-                "r1": "boss's health increases",
-                "r2": "boss's attack is more frequent",
-                "r3": "boss's defense increased",
-                "r4": "you become weaker"
-            ]
-        },
-        "winStory": "You manage to defeat the boss",
-        "loseStory": "You perished to the boss's strength"
+  "level1":{
+    "story": "In this floor, Jester's first suggestion is to use your power to 'Overhack' the guardian of this floor a number of times to sever the malicious energy powering it, rendering it weaker and easier to defeat.",
+    "objective": "Number or correct overhacks",
+    "count": 0,
+    "target": 5,
+    "complete": {
+      "result": "You manage to weaken the boss",
+      "reward": {
+        "r1": "Boss's max hp is havled",
+        "r2": "Boss's attack is lessen",
+        "r3": "You become stronger this time"
+      }
     },
-    "level2":{
-        "story": "Placeholder of story",
-        "objective": "have a number of correct overhack",
-        "count": 0,
-        "target": 0,
-        "complete": {
-            "result": "You manage to weaken this level's boss",
-            "reward": [
-                "r1": "boss's hp is havled",
-                "r2": "boss's attack is lessen",
-                "r3": "you become stronger this time"
-            ]
-        },
-        "failed":{
-            "result": "You failed to weaken the boss",
-            "reward": [
-                "r1": "boss's health increases",
-                "r2": "boss's attack is more frequent",
-                "r3": "boss's defense increased",
-                "r4": "you become weaker"
-            ]
-        },
-        "winStory": "You manage to defeat the boss",
-        "loseStory": "You perished to the boss's strength"
+    "failed":{
+      "result": "You failed to weaken the boss",
+      "reward": {
+        "r1": "Boss's health increases",
+        "r2": "Boss's attack is more frequent",
+        "r3": "Boss's defense increased",
+        "r4": "You become weaker"
+      }
     },
-    "level3":{
-        "story": "Placeholder of story",
-        "objective": "have a number of correct overhack",
-        "count": 0,
-        "target": 0,
-        "complete": {
-            "result": "You manage to weaken this level's boss",
-            "reward": [
-                "r1": "boss's hp is havled",
-                "r2": "boss's attack is lessen",
-                "r3": "you become stronger this time"
-            ]
-        },
-        "failed":{
-            "result": "You failed to weaken the boss",
-            "reward": [
-                "r1": "boss's health increases",
-                "r2": "boss's attack is more frequent",
-                "r3": "boss's defense increased",
-                "r4": "you become weaker"
-            ]
-        },
-        "winStory": "You manage to defeat the boss",
-        "loseStory": "You perished to the boss's strength"
+    "winStory": "You managed to defeat the boss of this floor. And then, the Core revealed a vision to Jester. He says he saw a vision of calamity befalling the kingdom of Javantis and the Core glowing bright before the vision ended. You wonder if the guardians of the floors of this dungeon would holds the key to the truth behind the Core. There's only one way to find out.",
+    "loseStory": "The guardian of this floor was too strong for you. You slowly crumbled, systems crashing down, until the last vestiges of energy inside you perished. The last thing you heard is Jester's cries of desperation for you to wake up..."
+  },
+  "level2":{
+    "story": "In this floor, Jester suggests you use your power to 'Overhack' the guardian of this floor as well, however, he can feel that the malicious power emanating from this floor's guardian is a lot stronger than the last, and bypassing its defenses will be a lot more complicated.",
+    "objective": "Number or correct overhacks",
+    "count": 0,
+    "target": 3,
+    "complete": {
+      "result": "You manage to weaken the boss",
+      "reward": {
+        "r1": "Boss's max hp is havled",
+        "r2": "Boss's attack is lessen",
+        "r3": "You become stronger this time"
+      }
     },
-    "level4":{
-        "story": "Placeholder of story",
-        "objective": "have a number of correct overhack",
-        "count": 0,
-        "target": 0,
-        "complete": {
-            "result": "You manage to weaken this level's boss",
-            "reward": [
-                "r1": "boss's hp is havled",
-                "r2": "boss's attack is lessen",
-                "r3": "you become stronger this time"
-            ]
-        },
-        "failed":{
-            "result": "You failed to weaken the boss",
-            "reward": [
-                "r1": "boss's health increases",
-                "r2": "boss's attack is more frequent",
-                "r3": "boss's defense increased",
-                "r4": "you become weaker"
-            ]
-        },
-        "winStory": "You manage to defeat the boss",
-        "loseStory": "You perished to the boss's strength"
+    "failed":{
+      "result": "You failed to weaken the boss",
+      "reward": {
+        "r1": "Boss's health increases",
+        "r2": "Boss's attack is more frequent",
+        "r3": "Boss's defense increased",
+        "r4": "You become weaker"
+      }
     },
-    "level5":{
-        "story": "Placeholder of story",
-        "objective": "have a number of correct overhack",
-        "count": 0,
-        "target": 0,
-        "complete": {
-            "result": "You manage to weaken this level's boss",
-            "reward": [
-                "r1": "boss's hp is havled",
-                "r2": "boss's attack is lessen",
-                "r3": "you become stronger this time"
-            ]
-        },
-        "failed":{
-            "result": "You failed to weaken the boss",
-            "reward": [
-                "r1": "boss's health increases",
-                "r2": "boss's attack is more frequent",
-                "r3": "boss's defense increased",
-                "r4": "you become weaker"
-            ]
-        },
-        "winStory": "You manage to defeat the boss",
-        "loseStory": "You perished to the boss's strength"
-    }
+    "winStory": "You managed to defeat the boss of this floor. Just then, the Core revealed another vision to Jester. He says he saw a new vision of you and Jester stand on a cliff overlooking the now ruined kingdom of Javantis. Jester thinks the vision this time is foreboding, but the assurance that you two will reach the surface is assuring, right? ...Right?",
+    "loseStory": "The guardian of this floor was too tough and had cleanly ripped you apart by the attacks alone. The last thing you saw before dying was Jester being crushed to death..."
+  },
+  "level3":{
+    "story": "In this floor, the malicious power from its guardian is evident by the heavy atmosphere. Jester reminds you to be 'careful' while you use your power to 'Overhack' the guardian of this floor to render it weaker for your attacks. However, expect it to be difficult.",
+    "objective": "Number or correct overhacks",
+    "count": 0,
+    "target": 3,
+    "complete": {
+      "result": "You manage to weaken the boss",
+      "reward": {
+        "r1": "Boss's max hp is havled",
+        "r2": "Boss's attack is lessen",
+        "r3": "You become stronger this time"
+      }
+    },
+    "failed":{
+      "result": "You failed to weaken the boss",
+      "reward": {
+        "r1": "Boss's health increases",
+        "r2": "Boss's attack is more frequent",
+        "r3": "Boss's defense increased",
+        "r4": "You become weaker"
+      }
+    },
+    "winStory": "You managed to defeat the boss of this floor. Just then, the Core revealed another vision to Jester. He says he saw a new vision showing cloaked individuals referred as 'Progenitors' creating the Core using an otherworldly kind of power and placing it on the pedestal on the deepest floor of the dungeon where you found it. You wonder who and what they are. And you feel like you're getting closer to the truth the closer you reach the surface.",
+    "loseStory": "The guardian of this floor was incredibly powerful. No matter what you do, you just can't seem to win. And soon, your energy reserves run out and your body getting utterly battered before you died with Jester..."
+  },
+  "level4":{
+    "story": "In this floor, the malicious power from its guardian seems non-existent, and Jester warns you about how this floor could be deceiving the two of you. He tells you that you should use your power to 'Overhack' the guardian of this floor to pierce through its illusion and weaken it. However, be prepared to face something much harder than the past floor guardians.",
+    "objective": "Number or correct overhacks",
+    "count": 0,
+    "target": 2,
+    "complete": {
+      "result": "You manage to weaken the boss",
+      "reward": {
+        "r1": "Boss's max hp is havled",
+        "r2": "Boss's attack is lessen",
+        "r3": "You become stronger this time"
+      }
+    },
+    "failed":{
+      "result": "You failed to weaken the boss",
+      "reward": {
+        "r1": "Boss's health increases",
+        "r2": "Boss's attack is more frequent",
+        "r3": "Boss's defense increased",
+        "r4": "You become weaker"
+      }
+    },
+    "winStory": "You managed to defeat the boss of this floor. Just then, the Core revealed another vision to Jester. He says he saw a new vision showing the Progenitors describing the Core as a container of tremendous otherworldly power. They also warn those taking the Core will be locked on a fate that will determine the fate of not only the kingdom of Javantis but of the whole world. You start to doubt if taking the Core was right, but you remember that your mission was to bring it to the kingdom.",
+    "loseStory": "You were defeated by the guardian of this floor. But, instead of killing you, it took the Core from you. Jester then disintegrated from the lost link to you, and the guardian of this floor left you alone to wander around the floor like a mindless construct after the guardian's malicious energy corrupted you..."
+  },
+  "level5":{
+    "story": "You're at the final floor of the dungeon. However, in this floor, the malicious energy from the final guardian presses violently in the air like a raging hurricane. Jester warns you that whatever is ahead is unbelievably powerful, but he encourages you to fight forward and use your power to 'Overhack' the final guardian and weaken it so you can fight against it toe-to-toe.",
+    "objective": "Number or correct overhacks",
+    "count": 0,
+    "target": 1,
+    "complete": {
+      "result": "You manage to weaken the boss",
+      "reward": {
+        "r1": "Boss's max hp is havled",
+        "r2": "Boss's attack is lessen",
+        "r3": "You become stronger this time"
+      }
+    },
+    "failed":{
+      "result": "You failed to weaken the boss",
+      "reward": {
+        "r1": "Boss's health increases",
+        "r2": "Boss's attack is more frequent",
+        "r3": "Boss's defense increased",
+        "r4": "You become weaker"
+      }
+    },
+    "winStory": "You've done it. You've defeated the final guardian of the dungeon. And then, the Core glows brightly as it reveals a vision to Jester. But, Jester... he remains silent. Unmoving. Utterly shocked. As if what he saw was staggering. Jester then turns to you and demands you return the Core quickly before chaos ensues, but you don't listen to him. Instead, you walk through the open entrance of the dungeon and walked out, and what you see next leaves you standing frozen...",
+    "loseStory": "The final guardian of the dungeon was impossibly strong. Your attacks do nothing against it, your shields does nothing against the sheer force of its attacks and your body is too severely damaged no matter how you heal. Even Jester, when he tries to assist you, was easily crushed to death. And before you die, the final guardian speaks to you, telling you that you are not worthy enough for a grand fate..."
+  }
 }
