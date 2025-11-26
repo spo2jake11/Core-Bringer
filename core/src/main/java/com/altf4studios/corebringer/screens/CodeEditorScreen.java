@@ -524,6 +524,29 @@ public class CodeEditorScreen implements Screen {
 
                 if (ev.passed && q != null) {
                     QuestionnaireManager.get().markSolved(q.id);
+                    // Increment objective count for this stage level in SaveData
+                    try {
+                        SimpleSaveManager.updateData(sd -> {
+                            int lvl = sd.stageLevel > 0 ? sd.stageLevel : 1;
+                            String key = "level" + lvl;
+                            Integer prev = sd.objectives.get(key);
+                            if (prev == null) prev = 0;
+                            sd.objectives.put(key, prev + 1);
+                            Gdx.app.log("CodeEditorScreen", "Objective incremented for " + key + ": " + (prev + 1));
+                        });
+                    } catch (Exception ex) {
+                        Gdx.app.error("CodeEditorScreen", "Failed to increment objective: " + ex.getMessage());
+                    }
+
+                    // Also update the live HUD on GameScreen if present
+                    Gdx.app.postRunnable(() -> {
+                        if (corebringer != null && corebringer.gameScreen != null) {
+                            try {
+                                corebringer.gameScreen.refreshObjectiveHud();
+                            } catch (Exception ignored) {}
+                        }
+                    });
+
                     Gdx.app.postRunnable(() -> {
                         if (corebringer != null && corebringer.gameScreen != null) {
                             com.altf4studios.corebringer.battle.BattleManager bm = corebringer.gameScreen.getBattleManager();

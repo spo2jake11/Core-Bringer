@@ -731,17 +731,28 @@ public class GameScreen implements Screen{
         }
     }
 
-    // Refresh the HUD labels from the loaded JSON node
-    private void refreshObjectiveHud() {
+    // Refresh the HUD labels from the loaded JSON node or persisted SaveData objectives
+    public void refreshObjectiveHud() {
         try {
             if (objectiveNode == null) {
                 if (objectiveCountLabel != null) objectiveCountLabel.setText("");
                 return;
             }
+            // Prefer persisted objective count stored in SaveData (updated by CodeEditorScreen)
             int count = objectiveNode.getInt("count", 0);
+            try {
+                com.altf4studios.corebringer.utils.SaveData sd = com.altf4studios.corebringer.utils.SimpleSaveManager.loadData();
+                if (sd != null) {
+                    int lvl = sd.stageLevel > 0 ? sd.stageLevel : stageLevelForBattle;
+                    String key = "level" + lvl;
+                    Integer persisted = sd.objectives.get(key);
+                    if (persisted != null) count = persisted;
+                }
+            } catch (Exception ignored) {}
+
             int target = objectiveNode.getInt("target", 0);
-            // Only update the compact objective line (no story)
-            if (objectiveCountLabel != null) objectiveCountLabel.setText("Objective: " + objectiveNode.getString("objective", "") + "  (" + count + " / " + target + ")");
+            String objectiveShort = objectiveNode.getString("objective", "");
+            if (objectiveCountLabel != null) objectiveCountLabel.setText("Objective: " + objectiveShort + "  (" + count + " / " + target + ")");
         } catch (Exception ignored) {}
     }
 
