@@ -6,6 +6,10 @@ public class Enemy extends Entity {
     private int skillCooldown;
     private String[] skills;
 
+    private double attackProb = 0.6; // default pattern: 60% attack
+    private double defendProb = 0.25;
+    private double healProb = 0.15;
+
     public enum enemyType {
         NORMAL, ELITE, BOSS, SPECIAL;
     }
@@ -43,6 +47,26 @@ public class Enemy extends Entity {
 
     public void setName(String name) {
         super.setName(name);
+    }
+
+    public void setAttack(int attack) {
+        // Delegate to Entity.setAttack to centralize clamping behavior
+        super.setAttack(attack);
+    }
+
+    public double getAttackProb() { return attackProb; }
+    public double getDefendProb() { return defendProb; }
+    public double getHealProb() { return healProb; }
+
+    public void setAttackPattern(double attackProb, double defendProb, double healProb) {
+        try {
+            double sum = attackProb + defendProb + healProb;
+            if (sum <= 0) return; // ignore
+            // normalize to sum==1
+            this.attackProb = attackProb / sum;
+            this.defendProb = defendProb / sum;
+            this.healProb = healProb / sum;
+        } catch (Exception ignored) {}
     }
 
     // Enemy-specific action

@@ -41,6 +41,8 @@ public class Main extends Game {
     public OptionsScreen optionsScreen;
     public GameMapScreen gameMapScreen;
     public GameScreen gameScreen;
+    // Pending boss modifier set when evaluating objectives at the boss node; applied when GameScreen is created
+    public com.altf4studios.corebringer.battle.BossModifier pendingBossModifier = null;
     public StartGameMapScreen startGameMapScreen;
     public CodeEditorScreen codeEditorScreen;
     public DebugScreen debugScreen;

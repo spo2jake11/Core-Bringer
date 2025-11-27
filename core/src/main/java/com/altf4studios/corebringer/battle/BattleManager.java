@@ -78,8 +78,18 @@ public class BattleManager {
     public void executeEnemyTurn() {
         if (turnManager.isEnemyTurn() && enemy.isAlive() && player.isAlive()) {
             double roll = Math.random();
-            if (roll < 0.60) { // attack
-                Gdx.app.log("TurnManager", "Enemy attacks (40%)");
+            double attackProb = enemy.getAttackProb();
+            double defendProb = enemy.getDefendProb();
+            double healProb = enemy.getHealProb();
+            // Normalize defensively
+            double sum = attackProb + defendProb + healProb;
+            if (sum <= 0) { attackProb = 0.6; defendProb = 0.25; healProb = 0.15; sum = 1.0; }
+            attackProb = attackProb / sum;
+            defendProb = defendProb / sum;
+            healProb = healProb / sum;
+
+            if (roll < attackProb) { // attack
+                Gdx.app.log("TurnManager", "Enemy attacks (prob=" + attackProb + ")");
                 int beforeHp = player.getHp();
                 enemy.attack(player);
                 int hpLost = Math.max(0, beforeHp - player.getHp());
@@ -87,8 +97,8 @@ public class BattleManager {
                     battleStageUI.showDamageOnPlayer(hpLost);
                 }
                 turnManager.endEnemyTurn();
-            } else if (roll < 0.85) { // defend
-                Gdx.app.log("TurnManager", "Enemy defends (35%)");
+            } else if (roll < attackProb + defendProb) { // defend
+                Gdx.app.log("TurnManager", "Enemy defends (prob=" + defendProb + ")");
                 int beforeBlock = enemy.getBlock();
                 enemy.defend();
                 int delta = Math.max(0, enemy.getBlock() - beforeBlock);
@@ -98,7 +108,7 @@ public class BattleManager {
                 turnManager.endEnemyTurn();
             } else { // heal
                 int healAmount = Math.max(3, enemy.getMaxHealth() / 10); // at least 3, ~10% max HP
-                Gdx.app.log("TurnManager", "Enemy heals for " + healAmount + " HP (25%)");
+                Gdx.app.log("TurnManager", "Enemy heals for " + healAmount + " HP (prob=" + healProb + ")");
                 int beforeHp = enemy.getHp();
                 enemy.heal(healAmount);
                 int healed = Math.max(0, enemy.getHp() - beforeHp);
@@ -144,4 +154,3 @@ public class BattleManager {
         }
     }
 }
-

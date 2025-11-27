@@ -265,6 +265,42 @@ public class GameScreen implements Screen{
         player = new Player("Player", playerMaxHp, 10, 5, 3);
         player.setHp(Math.min(hp, playerMaxHp)); // clamp to max
         enemy = new Enemy("enemy1", enemyName, enemyHp, 8, 3, Enemy.enemyType.NORMAL, 0, new String[]{});
+
+        // Apply any pending boss modifier handed off from GameMapScreen (if present)
+        try {
+            if (corebringer != null && corebringer.pendingBossModifier != null) {
+                com.altf4studios.corebringer.battle.BossModifier mod = corebringer.pendingBossModifier;
+                // apply max HP multiplier
+                if (mod.bossMaxHpMultiplier != null) {
+                    int newMax = Math.max(1, (int)Math.round(enemy.getMaxHealth() * mod.bossMaxHpMultiplier));
+                    enemy.setMaxHealth(newMax);
+                    // if current HP greater than new max, clamp
+                    if (enemy.getHp() > newMax) enemy.setHp(newMax);
+                }
+                // apply attack multiplier
+                if (mod.bossAttackMultiplier != null) {
+                    int newAtk = Math.max(1, (int)Math.round(enemy.getAttack() * mod.bossAttackMultiplier));
+                    enemy.setAttack(newAtk);
+                }
+                // apply action pattern
+                if (mod.attackProb != null || mod.defendProb != null || mod.healProb != null) {
+                    double a = (mod.attackProb != null) ? mod.attackProb : enemy.getAttackProb();
+                    double d = (mod.defendProb != null) ? mod.defendProb : enemy.getDefendProb();
+                    double h = (mod.healProb != null) ? mod.healProb : enemy.getHealProb();
+                    enemy.setAttackPattern(a, d, h);
+                }
+                // apply player card effect multiplier (affects this GameScreen's cardEffectMultiplier)
+                if (mod.playerCardEffectMultiplier != null) {
+                    // set the cardEffectMultiplier directly so cards will use it when played
+                    this.cardEffectMultiplier = mod.playerCardEffectMultiplier;
+                    // show a small notice
+                    try { showCenterMessage("Objective modifier: " + mod.selectedRewardText, Color.YELLOW, 2.5f); } catch (Exception ignored) {}
+                }
+                // clear pending modifier so it doesn't persist
+                corebringer.pendingBossModifier = null;
+            }
+        } catch (Exception ignored) {}
+
         // Temporary TurnManager for early consumers; BattleManager will hold the canonical one
         turnManager = new TurnManager(player, enemy);
         // --- End Battle/Turn Management ---

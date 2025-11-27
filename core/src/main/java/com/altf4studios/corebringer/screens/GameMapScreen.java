@@ -980,19 +980,33 @@ public class GameMapScreen implements Screen{
                                 // Randomly pick one reward entry from complete.reward if available
                                 JsonValue rewardNode = complete.get("reward");
                                 String selectedReward = null;
+                                String selectedKey = null;
                                 if (rewardNode != null && rewardNode.child != null) {
                                     ArrayList<String> choices = new ArrayList<String>();
+                                    ArrayList<String> keys = new ArrayList<String>();
                                     for (JsonValue r = rewardNode.child; r != null; r = r.next) {
                                         try {
                                             String v = r.asString();
                                             if (v != null && !v.isEmpty()) choices.add(v);
+                                            // Try to derive key from the node name (r1,r2...) if present
+                                            if (r.name != null && !r.name.isEmpty()) keys.add(r.name); else keys.add("");
                                         } catch (Exception ignored) {}
                                     }
                                     if (!choices.isEmpty()) {
                                         int pick = MathUtils.random(choices.size() - 1);
                                         selectedReward = choices.get(pick);
+                                        selectedKey = (pick >=0 && pick < keys.size()) ? keys.get(pick) : null;
                                     }
                                 }
+                                // Build modifier if we identified a key
+                                try {
+                                    if (selectedKey != null && !selectedKey.isEmpty()) {
+                                        corebringer.pendingBossModifier = com.altf4studios.corebringer.battle.BossModifier.fromBranchAndKey("complete", selectedKey);
+                                        if (corebringer.pendingBossModifier != null) corebringer.pendingBossModifier.selectedRewardText = selectedReward;
+                                    } else {
+                                        corebringer.pendingBossModifier = null;
+                                    }
+                                } catch (Exception ignored) { corebringer.pendingBossModifier = null; }
                                 if (selectedReward != null && !selectedReward.isEmpty()) message = base + "\n\nEffect: " + selectedReward;
                                 else message = base;
                             } else message = "You have met the objective.";
@@ -1003,19 +1017,31 @@ public class GameMapScreen implements Screen{
                                 // Randomly pick one reward entry from failed.reward if available
                                 JsonValue rewardNode = failed.get("reward");
                                 String selectedReward = null;
+                                String selectedKey = null;
                                 if (rewardNode != null && rewardNode.child != null) {
                                     ArrayList<String> choices = new ArrayList<String>();
+                                    ArrayList<String> keys = new ArrayList<String>();
                                     for (JsonValue r = rewardNode.child; r != null; r = r.next) {
                                         try {
                                             String v = r.asString();
                                             if (v != null && !v.isEmpty()) choices.add(v);
+                                            if (r.name != null && !r.name.isEmpty()) keys.add(r.name); else keys.add("");
                                         } catch (Exception ignored) {}
                                     }
                                     if (!choices.isEmpty()) {
                                         int pick = MathUtils.random(choices.size() - 1);
                                         selectedReward = choices.get(pick);
+                                        selectedKey = (pick >=0 && pick < keys.size()) ? keys.get(pick) : null;
                                     }
                                 }
+                                try {
+                                    if (selectedKey != null && !selectedKey.isEmpty()) {
+                                        corebringer.pendingBossModifier = com.altf4studios.corebringer.battle.BossModifier.fromBranchAndKey("failed", selectedKey);
+                                        if (corebringer.pendingBossModifier != null) corebringer.pendingBossModifier.selectedRewardText = selectedReward;
+                                    } else {
+                                        corebringer.pendingBossModifier = null;
+                                    }
+                                } catch (Exception ignored) { corebringer.pendingBossModifier = null; }
                                 if (selectedReward != null && !selectedReward.isEmpty()) message = base + "\n\nEffect: " + selectedReward;
                                 else message = base;
                             } else message = "You did not meet the objective.";

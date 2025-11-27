@@ -67,8 +67,22 @@ public abstract class Entity implements BattleEntity {
         return attack;
     }
 
+    /**
+     * Set the attack value for this entity. Clamped to >= 0.
+     */
+    public void setAttack(int attack) {
+        this.attack = Math.max(0, attack);
+    }
+
     public int getDefense() {
         return defense;
+    }
+
+    /**
+     * Set the defense value for this entity. Clamped to >= 0.
+     */
+    public void setDefense(int defense) {
+        this.defense = Math.max(0, defense);
     }
 
     public boolean isAlive() {
