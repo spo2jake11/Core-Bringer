@@ -7,7 +7,7 @@
     "complete": {
       "result": "You manage to weaken the boss",
       "reward": {
-        "r1": "Boss's max hp is havled",
+        "r1": "Boss's HP is havled",
         "r2": "Boss's attack is lessen",
         "r3": "You become stronger this time"
       }

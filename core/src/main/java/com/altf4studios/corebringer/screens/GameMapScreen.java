@@ -975,12 +975,50 @@ public class GameMapScreen implements Screen{
                     if (node != null) {
                         if (count >= target) {
                             JsonValue complete = node.get("complete");
-                            if (complete != null) message = complete.getString("result", "You have met the objective.");
-                            else message = "You have met the objective.";
+                            if (complete != null) {
+                                String base = complete.getString("result", "You have met the objective.");
+                                // Randomly pick one reward entry from complete.reward if available
+                                JsonValue rewardNode = complete.get("reward");
+                                String selectedReward = null;
+                                if (rewardNode != null && rewardNode.child != null) {
+                                    ArrayList<String> choices = new ArrayList<String>();
+                                    for (JsonValue r = rewardNode.child; r != null; r = r.next) {
+                                        try {
+                                            String v = r.asString();
+                                            if (v != null && !v.isEmpty()) choices.add(v);
+                                        } catch (Exception ignored) {}
+                                    }
+                                    if (!choices.isEmpty()) {
+                                        int pick = MathUtils.random(choices.size() - 1);
+                                        selectedReward = choices.get(pick);
+                                    }
+                                }
+                                if (selectedReward != null && !selectedReward.isEmpty()) message = base + "\n\nEffect: " + selectedReward;
+                                else message = base;
+                            } else message = "You have met the objective.";
                         } else {
                             JsonValue failed = node.get("failed");
-                            if (failed != null) message = failed.getString("result", "You did not meet the objective.");
-                            else message = "You did not meet the objective.";
+                            if (failed != null) {
+                                String base = failed.getString("result", "You did not meet the objective.");
+                                // Randomly pick one reward entry from failed.reward if available
+                                JsonValue rewardNode = failed.get("reward");
+                                String selectedReward = null;
+                                if (rewardNode != null && rewardNode.child != null) {
+                                    ArrayList<String> choices = new ArrayList<String>();
+                                    for (JsonValue r = rewardNode.child; r != null; r = r.next) {
+                                        try {
+                                            String v = r.asString();
+                                            if (v != null && !v.isEmpty()) choices.add(v);
+                                        } catch (Exception ignored) {}
+                                    }
+                                    if (!choices.isEmpty()) {
+                                        int pick = MathUtils.random(choices.size() - 1);
+                                        selectedReward = choices.get(pick);
+                                    }
+                                }
+                                if (selectedReward != null && !selectedReward.isEmpty()) message = base + "\n\nEffect: " + selectedReward;
+                                else message = base;
+                            } else message = "You did not meet the objective.";
                         }
                     }
                 }
